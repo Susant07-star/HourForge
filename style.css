@@ -1749,17 +1749,26 @@ main#hourLogView.active {
     background: rgba(99, 102, 241, 0.15);
     border: 1px solid rgba(99, 102, 241, 0.3);
     color: #a5b4fc;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.75rem;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.15rem;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
     margin-left: 0.75rem;
     -webkit-text-fill-color: #a5b4fc;
+}
+
+.profile-icon-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
 }
 
 .profile-icon-btn:hover {
@@ -1994,8 +2003,11 @@ main#hourLogView.active {
     }
 
     .profile-icon-btn {
-        width: 36px;
-        height: 36px;
+        padding: 0.3rem 0.6rem;
         font-size: 0.85rem;
+    }
+
+    .profile-icon-label {
+        font-size: 0.55rem;
     }
 }
