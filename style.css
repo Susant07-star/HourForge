@@ -1611,13 +1611,6 @@ main#hourLogView.active {
         display: none;
     }
 
-    .empty-state-cell {
-        grid-column: 1 / -1 !important;
-        width: 100% !important;
-        word-break: break-word;
-        padding: 2rem 1rem !important;
-    }
-
     .status-cell-wrapper {
         display: flex !important;
         flex-direction: column !important;
@@ -2082,6 +2075,7 @@ main#hourLogView.active {
     font-size: 1.25rem;
     -webkit-text-fill-color: white;
     color: white;
+    margin: 0px;
 }
 
 .header-icon-btn:hover {
@@ -2267,7 +2261,6 @@ main#hourLogView.active {
 .info-section {
     margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .info-section:last-of-type {
