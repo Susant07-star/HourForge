@@ -23,6 +23,9 @@
             <div class="logo">
                 <i class="fa-solid fa-brain"></i>
                 <h1>StudyTracker</h1>
+                <button id="btnProfileIcon" class="profile-icon-btn" title="Student Profile">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </button>
             </div>
             <p class="tagline">Master your memory with the 2-4-7 Revision Method <span id="streakBadge"
                     class="streak-badge" style="display:none;"><i class="fa-solid fa-fire"></i> <span
@@ -75,8 +78,9 @@
                     style="display: flex; justify-content: space-around; align-items: center; padding: 1.5rem; background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(245, 158, 11, 0.05)); border-color: rgba(245, 158, 11, 0.3);">
                     <div class="countdown-item" style="text-align: center;">
                         <span class="countdown-label"
-                            style="display: block; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Pre-Board
-                            Exam in</span>
+                            style="display: block; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;"
+                            id="exam1Label">Exam 1
+                            in</span>
                         <span id="preBoardCountdown" class="countdown-days"
                             style="display: block; font-size: 2.5rem; font-weight: 800; color: #f59e0b; text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);">--</span>
                         <span class="countdown-unit"
@@ -86,8 +90,9 @@
                     </div>
                     <div class="countdown-item" style="text-align: center;">
                         <span class="countdown-label"
-                            style="display: block; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Final
-                            Board Exam in</span>
+                            style="display: block; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;"
+                            id="exam2Label">Exam 2
+                            in</span>
                         <span id="boardCountdown" class="countdown-days"
                             style="display: block; font-size: 2.5rem; font-weight: 800; color: #f59e0b; text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);">--</span>
                         <span class="countdown-unit"
@@ -146,12 +151,7 @@
                         <label for="subject">Subject</label>
                         <select id="subject" required>
                             <option value="" disabled selected>Select Subject...</option>
-                            <option value="Physics">Physics</option>
-                            <option value="Chemistry">Chemistry</option>
-                            <option value="Maths">Maths</option>
-                            <option value="Computer">Computer</option>
-                            <option value="English">English</option>
-                            <option value="Nepali">Nepali</option>
+                            <!-- Subjects populated dynamically from profile -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -183,14 +183,9 @@
                 <!-- All Tracked Topics & Filters -->
                 <div class="all-topics glass-panel">
                     <h2><i class="fa-solid fa-book-open"></i> Ongoing Revisions</h2>
-                    <div class="filter-group">
+                    <div class="filter-group" id="subjectFilterGroup">
                         <button class="filter-btn active" data-filter="all">All</button>
-                        <button class="filter-btn" data-filter="Physics">Physics</button>
-                        <button class="filter-btn" data-filter="Chemistry">Chemistry</button>
-                        <button class="filter-btn" data-filter="Maths">Maths</button>
-                        <button class="filter-btn" data-filter="Computer">Computer</button>
-                        <button class="filter-btn" data-filter="English">English</button>
-                        <button class="filter-btn" data-filter="Nepali">Nepali</button>
+                        <!-- Subject filters populated dynamically from profile -->
                     </div>
                     <div id="allTopicsList" class="topics-list">
                         <!-- Listed Items dynamically injected via JavaScript -->
@@ -206,13 +201,8 @@
                     <h2><i class="fa-solid fa-table-list"></i> Subject Logs & Status</h2>
                 </div>
 
-                <div class="subject-tabs">
-                    <button class="sub-tab active" data-subject="Physics">Physics</button>
-                    <button class="sub-tab" data-subject="Chemistry">Chemistry</button>
-                    <button class="sub-tab" data-subject="Maths">Maths</button>
-                    <button class="sub-tab" data-subject="Computer">Computer</button>
-                    <button class="sub-tab" data-subject="English">English</button>
-                    <button class="sub-tab" data-subject="Nepali">Nepali</button>
+                <div class="subject-tabs" id="subjectTabsGroup">
+                    <!-- Subject tabs populated dynamically from profile -->
                 </div>
 
                 <div class="table-container">
@@ -258,12 +248,7 @@
                                 analytics)</span></label>
                         <select id="timeSubjectInput">
                             <option value="">General / Other</option>
-                            <option value="Physics">Physics</option>
-                            <option value="Chemistry">Chemistry</option>
-                            <option value="Maths">Maths</option>
-                            <option value="Computer">Computer</option>
-                            <option value="English">English</option>
-                            <option value="Nepali">Nepali</option>
+                            <!-- Subjects populated dynamically from profile -->
                             <option value="Sleep">😴 Sleep</option>
                         </select>
                     </div>
@@ -436,6 +421,101 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Profile Setup Modal -->
+    <div id="profileModal" class="profile-modal-overlay" style="display: none;">
+        <div class="profile-modal glass-panel">
+            <div class="profile-modal-header">
+                <h2><i class="fa-solid fa-user-graduate" style="color: #6366f1;"></i> Student Profile</h2>
+                <button id="btnCloseProfile" class="profile-close-btn" title="Close"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="profile-modal-desc">Set up your profile to personalize subjects, AI feedback, and exam tracking.
+            </p>
+            <form id="profileForm" class="profile-form">
+                <div class="form-group">
+                    <label for="profileName">Your Name <span
+                            style="font-size: 0.8em; opacity: 0.6;">(optional)</span></label>
+                    <input type="text" id="profileName" placeholder="e.g. Susant" autocomplete="off">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="profileGrade">Class / Grade Level</label>
+                        <select id="profileGrade">
+                            <option value="">Select...</option>
+                            <option value="Class 1">Class 1</option>
+                            <option value="Class 2">Class 2</option>
+                            <option value="Class 3">Class 3</option>
+                            <option value="Class 4">Class 4</option>
+                            <option value="Class 5">Class 5</option>
+                            <option value="Class 6">Class 6</option>
+                            <option value="Class 7">Class 7</option>
+                            <option value="Class 8">Class 8</option>
+                            <option value="Class 9">Class 9</option>
+                            <option value="Class 10">Class 10</option>
+                            <option value="Class 11">Class 11</option>
+                            <option value="Class 12">Class 12</option>
+                            <option value="Bachelor">Bachelor</option>
+                            <option value="Master">Master</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileFaculty">Faculty</label>
+                        <select id="profileFaculty">
+                            <option value="">Select...</option>
+                            <option value="Science">Science</option>
+                            <option value="Management">Management</option>
+                            <option value="Humanities">Humanities</option>
+                            <option value="Education">Education</option>
+                            <option value="Law">Law</option>
+                            <option value="Custom">Custom (pick your own)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Subjects <span style="font-size: 0.8em; opacity: 0.6;">(auto-filled from faculty,
+                            editable)</span></label>
+                    <div id="profileSubjectTags" class="profile-subject-tags">
+                        <!-- Tags rendered dynamically -->
+                    </div>
+                    <div class="profile-add-subject-row">
+                        <input type="text" id="profileNewSubject" placeholder="Add a subject..." autocomplete="off">
+                        <button type="button" id="btnAddSubject" class="btn-add-subject"><i
+                                class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Exam Dates <span style="font-size: 0.8em; opacity: 0.6;">(optional — leave blank if
+                            none)</span></label>
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="profileExam1Label" style="font-size: 0.8rem;">Exam 1 Name</label>
+                            <input type="text" id="profileExam1Label" placeholder="e.g. Pre-Board">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="profileExam1Date" style="font-size: 0.8rem;">Date</label>
+                            <input type="date" id="profileExam1Date">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-top: 0.5rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="profileExam2Label" style="font-size: 0.8rem;">Exam 2 Name</label>
+                            <input type="text" id="profileExam2Label" placeholder="e.g. Final Board">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="profileExam2Date" style="font-size: 0.8rem;">Date</label>
+                            <input type="date" id="profileExam2Date">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary profile-save-btn" style="margin-top: 0.5rem;"><i
+                        class="fa-solid fa-check"></i> Save Profile</button>
+            </form>
+        </div>
     </div>
 
     <!-- Main Logic Script -->
