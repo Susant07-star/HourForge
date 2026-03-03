@@ -20,12 +20,24 @@
     <div class="app-container">
         <!-- Header Section -->
         <header class="top-nav">
+            <!-- Centered title -->
             <div class="logo">
                 <i class="fa-solid fa-brain"></i>
                 <h1>StudyTracker</h1>
-                <button id="btnProfileIcon" class="profile-icon-btn" title="Student Profile">
+            </div>
+            <!-- Icon group positioned to the right -->
+            <div class="header-icon-group">
+                <button id="btnInfoIcon" class="header-icon-btn" title="App Info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span class="header-icon-label">Info</span>
+                </button>
+                <button id="btnProfileIcon" class="header-icon-btn profile-icon-btn" title="Student Profile">
                     <i class="fa-solid fa-user-graduate"></i>
-                    <span class="profile-icon-label">Profile</span>
+                    <span class="header-icon-label">Profile</span>
+                </button>
+                <button id="btnPomodoroIcon" class="header-icon-btn pomodoro-icon-btn" title="Pomodoro Timer">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                    <span class="header-icon-label">Timer</span>
                 </button>
             </div>
             <p class="tagline">Master your memory with the 2-4-7 Revision Method <span id="streakBadge"
@@ -519,6 +531,310 @@
                         class="fa-solid fa-check"></i> Save Profile</button>
             </form>
         </div>
+    </div>
+
+    <!-- =================== INFO MODAL =================== -->
+    <div id="infoModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box info-modal">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-circle-info" style="color:#6366f1;"></i> About StudyTracker</h2>
+                <button id="btnCloseInfo" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Section 1: What is this? -->
+            <div class="info-section">
+                <h3 class="info-section-title"><i class="fa-solid fa-bullseye"></i> What is StudyTracker?</h3>
+                <p class="info-text">StudyTracker is a <strong>personal academic productivity app</strong> built to help
+                    students at every level study smarter, not harder. It combines <strong>spaced repetition
+                        revision</strong>, <strong>time logging</strong>, and <strong>AI-powered feedback</strong> — all
+                    in one place, completely offline-capable.</p>
+            </div>
+
+            <!-- Section 2: Features -->
+            <div class="info-section">
+                <h3 class="info-section-title"><i class="fa-solid fa-star"></i> Features</h3>
+                <div class="info-features-grid">
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(99,102,241,0.15); color:#818cf8;"><i
+                                class="fa-solid fa-brain"></i></div>
+                        <div>
+                            <div class="info-feature-name">Spaced Repetition</div>
+                            <div class="info-feature-desc">Auto-scheduled 2-4-7 day revision reminders to beat
+                                forgetting</div>
+                        </div>
+                    </div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(16,185,129,0.15); color:#34d399;"><i
+                                class="fa-solid fa-clock"></i></div>
+                        <div>
+                            <div class="info-feature-name">Time Tracker</div>
+                            <div class="info-feature-desc">Log every study session with subject, start/end time and
+                                notes</div>
+                        </div>
+                    </div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(245,158,11,0.15); color:#fbbf24;"><i
+                                class="fa-solid fa-robot"></i></div>
+                        <div>
+                            <div class="info-feature-name">AI Insights</div>
+                            <div class="info-feature-desc">Get brutally honest, data-driven feedback from an AI study
+                                coach</div>
+                        </div>
+                    </div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(236,72,153,0.15); color:#f472b6;"><i
+                                class="fa-solid fa-chart-line"></i></div>
+                        <div>
+                            <div class="info-feature-name">Progress Charts</div>
+                            <div class="info-feature-desc">Visual breakdown of daily hours, subject distribution, and
+                                revision rate</div>
+                        </div>
+                    </div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(139,92,246,0.15); color:#c084fc;"><i
+                                class="fa-solid fa-user-graduate"></i></div>
+                        <div>
+                            <div class="info-feature-name">Student Profiles</div>
+                            <div class="info-feature-desc">Works for any student — configure your faculty, subjects and
+                                exam dates</div>
+                        </div>
+                    </div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(239,68,68,0.15); color:#f87171;"><i
+                                class="fa-solid fa-hourglass-half"></i></div>
+                        <div>
+                            <div class="info-feature-name">Pomodoro Timer</div>
+                            <div class="info-feature-desc">Built-in focus timer with short and long break modes</div>
+                        </div>
+                    </div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(14,165,233,0.15); color:#38bdf8;"><i
+                                class="fa-solid fa-floppy-disk"></i></div>
+                        <div>
+                            <div class="info-feature-name">Auto Backup</div>
+                            <div class="info-feature-desc">Link a local folder and auto-save your data — never lose
+                                progress</div>
+                        </div>
+                    </div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(251,191,36,0.15); color:#fcd34d;"><i
+                                class="fa-solid fa-fire"></i></div>
+                        <div>
+                            <div class="info-feature-name">Streak Tracking</div>
+                            <div class="info-feature-desc">Daily study streaks to keep you accountable and consistent
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: How to use -->
+            <div class="info-section">
+                <h3 class="info-section-title"><i class="fa-solid fa-map"></i> How to Use</h3>
+                <div class="info-steps">
+                    <div class="info-step">
+                        <div class="info-step-num">1</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Set Up Your Profile</div>
+                            <div class="info-step-desc">Tap the <strong>Profile</strong> icon → Choose your grade &
+                                faculty → Subjects auto-fill. Add exam dates for a countdown timer.</div>
+                        </div>
+                    </div>
+                    <div class="info-step">
+                        <div class="info-step-num">2</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Log What You Study</div>
+                            <div class="info-step-desc">On the <strong>Dashboard</strong>, add a session with the
+                                subject, chapter/topic, and date. The app auto-schedules revision reminders.</div>
+                        </div>
+                    </div>
+                    <div class="info-step">
+                        <div class="info-step-num">3</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Do Your Revisions</div>
+                            <div class="info-step-desc">Check the <strong>Due Today</strong> list daily. Green circles =
+                                done. Orange hourglass = revision due. Red = overdue!</div>
+                        </div>
+                    </div>
+                    <div class="info-step">
+                        <div class="info-step-num">4</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Track Your Hours</div>
+                            <div class="info-step-desc">Go to <strong>Time Tracker</strong> and log each activity with a
+                                start time, end time, and subject. This feeds the charts and AI.</div>
+                        </div>
+                    </div>
+                    <div class="info-step">
+                        <div class="info-step-num">5</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Get AI Feedback</div>
+                            <div class="info-step-desc">Visit <strong>AI Insights</strong>, enter your Groq API key
+                                (free), and generate a daily/weekly/monthly mentor analysis of your habits.</div>
+                        </div>
+                    </div>
+                    <div class="info-step">
+                        <div class="info-step-num">6</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Backup Your Data</div>
+                            <div class="info-step-desc">Use the <strong>Auto-Backup</strong> button to link a folder on
+                                your device. Data is saved automatically so you never lose it.</div>
+                        </div>
+                    </div>
+                    <div class="info-step">
+                        <div class="info-step-num">7</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Add to Home Screen (as App)</div>
+                            <div class="info-step-desc">
+                                <strong>iPhone (Safari):</strong> Tap the Share icon
+                                <i class="fa-solid fa-arrow-up-from-bracket" style="color:#38bdf8;"></i>
+                                → <em>"Add to Home Screen"</em> → Tap Add. StudyTracker will appear as an app
+                                icon!<br><br>
+                                <strong>Android (Chrome):</strong> Tap the 3-dot menu
+                                <i class="fa-solid fa-ellipsis-vertical" style="color:#34d399;"></i>
+                                → <em>"Add to Home screen"</em> or look for the install banner at the bottom of the
+                                screen.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Export / Import & Backup -->
+            <div class="info-section">
+                <h3 class="info-section-title"><i class="fa-solid fa-database"></i> Your Data — Safe &amp; Portable</h3>
+                <div class="info-callout info-callout-blue">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <div>All your data is stored <strong>only on your device</strong> — no account, no cloud, fully
+                        private.</div>
+                </div>
+                <div class="info-data-actions">
+                    <div class="info-data-card">
+                        <div class="info-data-icon" style="background:rgba(14,165,233,0.15);color:#38bdf8;"><i
+                                class="fa-solid fa-download"></i></div>
+                        <div>
+                            <div class="info-data-title">Export Data</div>
+                            <div class="info-data-desc">Download a backup JSON — use the <strong>Export</strong> button
+                                in the header backup controls.</div>
+                        </div>
+                    </div>
+                    <div class="info-data-card">
+                        <div class="info-data-icon" style="background:rgba(52,211,153,0.15);color:#34d399;"><i
+                                class="fa-solid fa-upload"></i></div>
+                        <div>
+                            <div class="info-data-title">Import Data</div>
+                            <div class="info-data-desc">Switching device? Use <strong>Import</strong> to restore from a
+                                previously exported file instantly.</div>
+                        </div>
+                    </div>
+                    <div class="info-data-card">
+                        <div class="info-data-icon" style="background:rgba(139,92,246,0.15);color:#c084fc;"><i
+                                class="fa-solid fa-folder-open"></i></div>
+                        <div>
+                            <div class="info-data-title">Auto-Backup Folder</div>
+                            <div class="info-data-desc">Link a local folder and the app auto-saves in the background —
+                                great for peace of mind.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile → AI confirmation -->
+            <div class="info-callout info-callout-violet" style="margin-bottom:1.25rem;">
+                <i class="fa-solid fa-robot"></i>
+                <div><strong>Yes — your profile IS shared with the AI!</strong> Your name, grade, faculty, subjects and
+                    exam dates are sent with every AI prompt so it gives you personalised, specific advice — not generic
+                    tips.</div>
+            </div>
+
+            <div class="info-footer">
+                <p>Built with ❤️ for students everywhere &nbsp;·&nbsp; <strong>StudyTracker v2.0</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================== POMODORO MODAL =================== -->
+    <div id="pomodoroModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box pomodoro-modal">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-hourglass-half" style="color:#ef4444;"></i> Pomodoro Timer</h2>
+                <button id="btnClosePomodoro" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Mode selector -->
+            <div class="pomo-mode-bar">
+                <button class="pomo-mode-btn active" data-mode="focus" data-duration="1500">Focus</button>
+                <button class="pomo-mode-btn" data-mode="short" data-duration="300">Short Break</button>
+                <button class="pomo-mode-btn" data-mode="long" data-duration="900">Long Break</button>
+            </div>
+
+            <!-- Custom time settings -->
+            <div class="pomo-settings-row">
+                <div class="pomo-setting">
+                    <label>Focus <span class="pomo-setting-unit">min</span></label>
+                    <input type="number" id="pomoFocusMin" class="pomo-setting-input" value="25" min="1" max="120">
+                </div>
+                <div class="pomo-setting">
+                    <label>Short Break <span class="pomo-setting-unit">min</span></label>
+                    <input type="number" id="pomoShortMin" class="pomo-setting-input" value="5" min="1" max="60">
+                </div>
+                <div class="pomo-setting">
+                    <label>Long Break <span class="pomo-setting-unit">min</span></label>
+                    <input type="number" id="pomoLongMin" class="pomo-setting-input" value="15" min="1" max="60">
+                </div>
+            </div>
+
+            <!-- Timer ring -->
+            <div class="pomo-ring-wrap">
+                <svg class="pomo-ring" viewBox="0 0 120 120">
+                    <circle class="pomo-ring-bg" cx="60" cy="60" r="54" />
+                    <circle class="pomo-ring-fill" id="pomoRingFill" cx="60" cy="60" r="54" stroke-dasharray="339.29"
+                        stroke-dashoffset="0" />
+                </svg>
+                <div class="pomo-timer-display">
+                    <div id="pomoTime">25:00</div>
+                    <div id="pomoModeLabel" class="pomo-mode-label">Focus</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="pomo-controls">
+                <button id="btnPomoPrev" class="pomo-ctrl-btn" title="Restart"><i
+                        class="fa-solid fa-rotate-left"></i></button>
+                <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn">
+                    <i class="fa-solid fa-play" id="pomoPlayIcon"></i>
+                </button>
+                <button id="btnPomoSkip" class="pomo-ctrl-btn" title="Skip"><i
+                        class="fa-solid fa-forward-step"></i></button>
+            </div>
+
+            <!-- Session dots -->
+            <div class="pomo-sessions">
+                <div class="pomo-session-label">Sessions completed</div>
+                <div id="pomoSessionDots" class="pomo-session-dots">
+                    <span class="pomo-dot" data-idx="0"></span>
+                    <span class="pomo-dot" data-idx="1"></span>
+                    <span class="pomo-dot" data-idx="2"></span>
+                    <span class="pomo-dot" data-idx="3"></span>
+                </div>
+                <div id="pomoSessionCount" class="pomo-session-count">0 / 4</div>
+            </div>
+
+            <p class="pomo-tip">💡 Close this modal — the timer keeps running!</p>
+        </div>
+    </div>
+
+    <!-- =================== FLOATING MINI TIMER =================== -->
+    <div id="pomoMiniTimer" class="pomo-mini-timer" style="display:none;">
+        <button id="pomoMiniPlay" class="pomo-mini-play">
+            <i class="fa-solid fa-play" id="pomoMiniPlayIcon"></i>
+        </button>
+        <div class="pomo-mini-info">
+            <div id="pomoMiniTime" class="pomo-mini-time">25:00</div>
+            <div id="pomoMiniLabel" class="pomo-mini-label">Focus</div>
+        </div>
+        <button id="pomoMiniOpen" class="pomo-mini-open" title="Open Timer">
+            <i class="fa-solid fa-up-right-from-square"></i>
+        </button>
     </div>
 
     <!-- Main Logic Script -->
