@@ -1,12 +1,75 @@
-// Constants & State
-const SUBJECT_COLORS = {
-    'Physics': 'var(--color-physics)',
-    'Chemistry': 'var(--color-chemistry)',
-    'Maths': 'var(--color-maths)',
-    'Computer': 'var(--color-computer)',
-    'English': 'var(--color-english)',
-    'Nepali': 'var(--color-nepali)'
+// ==========================================
+// STUDENT PROFILE SYSTEM
+// ==========================================
+
+const FACULTY_PRESETS = {
+    'Science': ['Physics', 'Chemistry', 'Maths', 'Computer', 'English', 'Nepali'],
+    'Management': ['Accountancy', 'Business Studies', 'Economics', 'Marketing', 'English', 'Nepali'],
+    'Humanities': ['Sociology', 'History', 'Political Science', 'Psychology', 'English', 'Nepali'],
+    'Education': ['Pedagogy', 'Child Psychology', 'Health & Physical Education', 'English', 'Nepali'],
+    'Law': ['Constitutional Law', 'Criminal Law', 'Business Law', 'English', 'Nepali'],
+    'Custom': []
 };
+
+// Dynamic color palette — auto-assigns colors to any subject list
+const DYNAMIC_COLOR_PALETTE = [
+    { css: '#818cf8', cssVar: 'var(--color-physics, #818cf8)' },
+    { css: '#f472b6', cssVar: 'var(--color-chemistry, #f472b6)' },
+    { css: '#fb923c', cssVar: 'var(--color-maths, #fb923c)' },
+    { css: '#34d399', cssVar: 'var(--color-computer, #34d399)' },
+    { css: '#38bdf8', cssVar: 'var(--color-english, #38bdf8)' },
+    { css: '#a78bfa', cssVar: 'var(--color-nepali, #a78bfa)' },
+    { css: '#fbbf24', cssVar: '#fbbf24' },
+    { css: '#f87171', cssVar: '#f87171' },
+    { css: '#2dd4bf', cssVar: '#2dd4bf' },
+    { css: '#c084fc', cssVar: '#c084fc' },
+    { css: '#fb7185', cssVar: '#fb7185' },
+    { css: '#4ade80', cssVar: '#4ade80' },
+];
+
+const DEFAULT_PROFILE = {
+    name: '',
+    grade: 'Class 12',
+    faculty: 'Science',
+    subjects: ['Physics', 'Chemistry', 'Maths', 'Computer', 'English', 'Nepali'],
+    exam1Label: 'Pre-Board Exam',
+    exam1Date: '2026-03-20',
+    exam2Label: 'Final Board Exam',
+    exam2Date: '2026-04-27',
+    setupComplete: false
+};
+
+function getProfile() {
+    try {
+        const stored = JSON.parse(localStorage.getItem('studentProfile'));
+        if (stored && stored.subjects && stored.subjects.length > 0) return stored;
+    } catch (e) { }
+    return { ...DEFAULT_PROFILE };
+}
+
+function saveProfile(profile) {
+    localStorage.setItem('studentProfile', JSON.stringify(profile));
+}
+
+function getSubjects() {
+    return getProfile().subjects || DEFAULT_PROFILE.subjects;
+}
+
+// Build dynamic color maps from current subjects
+function buildSubjectColors() {
+    const subjects = getSubjects();
+    const colors = {};
+    const chartColors = {};
+    subjects.forEach((subj, i) => {
+        const palette = DYNAMIC_COLOR_PALETTE[i % DYNAMIC_COLOR_PALETTE.length];
+        colors[subj] = palette.cssVar;
+        chartColors[subj] = palette.css;
+    });
+    return { colors, chartColors };
+}
+
+// Constants & State (dynamic)
+let SUBJECT_COLORS = buildSubjectColors().colors;
 
 // Timezone-safe local date string (YYYY-MM-DD) — avoids toISOString() UTC drift
 function getLocalDateStr(d) {
@@ -59,7 +122,7 @@ if (studySessions.length > 0 || timeLogs.length > 0) {
     }, 500);
 }
 let currentFilter = 'all';
-let currentTableSubject = 'Physics';
+let currentTableSubject = getSubjects()[0] || 'General';
 
 // Fast timeout wrapper to prevent hanging file system operations
 function withTimeout(promise, ms) {
@@ -158,11 +221,16 @@ addTimeLogForm.addEventListener('submit', (e) => {
     if (isOvernight) {
         // SPLIT at midnight into two separate log entries
         // Part 1: original date, startTime → 23:59 (before midnight)
-        const midnightMs = new Date('2000-01-02T00:00').getTime() - start.getTime();
+        // FIX: Use the next day for end time to get correct duration calculation
+        const endOfDay = new Date(`2000-01-01T23:59:59`);
+        const midnightMs = endOfDay.getTime() - start.getTime() + 1000; // +1 second to include the full minute
         const beforeMidnightHours = parseFloat((midnightMs / (1000 * 60 * 60)).toFixed(2));
 
         // Part 2: next date, 00:00 → endTime (after midnight)
-        const afterMidnightMs = end.getTime() - new Date('2000-01-01T00:00').getTime();
+        // FIX: Calculate from midnight on the NEXT day to the end time
+        const startOfNextDay = new Date(`2000-01-02T00:00:00`);
+        const endNextDay = new Date(`2000-01-02T${endTimeStr}`);
+        const afterMidnightMs = endNextDay.getTime() - startOfNextDay.getTime();
         const afterMidnightHours = parseFloat((afterMidnightMs / (1000 * 60 * 60)).toFixed(2));
 
         // Calculate next day's date string (avoid toISOString timezone trap)
@@ -171,6 +239,8 @@ addTimeLogForm.addEventListener('submit', (e) => {
         const nextDayStr = `${nextDay.getFullYear()}-${String(nextDay.getMonth() + 1).padStart(2, '0')}-${String(nextDay.getDate()).padStart(2, '0')}`;
 
         const now = new Date().toISOString();
+        const overnightGroupId = `overnight_${Date.now()}`;
+        const totalOvernightHours = parseFloat((beforeMidnightHours + afterMidnightHours).toFixed(2));
 
         // Log 1: Before midnight (original date)
         if (beforeMidnightHours > 0) {
@@ -183,7 +253,11 @@ addTimeLogForm.addEventListener('submit', (e) => {
                 date: dateStr,
                 duration: beforeMidnightHours,
                 notes: notes,
-                createdAt: now
+                createdAt: now,
+                overnightGroup: overnightGroupId,
+                overnightTotal: totalOvernightHours,
+                overnightOriginalStart: startTimeStr,
+                overnightOriginalEnd: endTimeStr
             });
         }
 
@@ -198,7 +272,11 @@ addTimeLogForm.addEventListener('submit', (e) => {
                 date: nextDayStr,
                 duration: afterMidnightHours,
                 notes: notes + ' (continued from previous night)',
-                createdAt: now
+                createdAt: now,
+                overnightGroup: overnightGroupId,
+                overnightTotal: totalOvernightHours,
+                overnightOriginalStart: startTimeStr,
+                overnightOriginalEnd: endTimeStr
             });
         }
     } else {
@@ -405,35 +483,55 @@ async function recoverDataIfNeeded() {
 // ==========================================
 // EXAM COUNTDOWN LOGIC
 // ==========================================
-const EXAM_DATES = {
-    preBoard: '2026-03-20',
-    board: '2026-04-27'
-};
+function getExamDates() {
+    const profile = getProfile();
+    return {
+        exam1: { label: profile.exam1Label || '', date: profile.exam1Date || '' },
+        exam2: { label: profile.exam2Label || '', date: profile.exam2Date || '' }
+    };
+}
 
 function updateExamCountdowns() {
     const preBoardEl = document.getElementById('preBoardCountdown');
     const boardEl = document.getElementById('boardCountdown');
+    const exam1LabelEl = document.getElementById('exam1Label');
+    const exam2LabelEl = document.getElementById('exam2Label');
+    const countdownContainer = document.querySelector('.exam-countdown-container');
 
     if (!preBoardEl || !boardEl) return;
+
+    const exams = getExamDates();
+
+    // Update labels
+    if (exam1LabelEl) exam1LabelEl.textContent = exams.exam1.label ? `${exams.exam1.label} in` : 'Exam 1 in';
+    if (exam2LabelEl) exam2LabelEl.textContent = exams.exam2.label ? `${exams.exam2.label} in` : 'Exam 2 in';
+
+    // If no exam dates at all, show '--'
+    if (!exams.exam1.date && !exams.exam2.date) {
+        preBoardEl.textContent = '--';
+        boardEl.textContent = '--';
+        return;
+    }
 
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
     const calculateDaysRemaining = (examDateStr) => {
+        if (!examDateStr) return null;
         const examDate = new Date(examDateStr);
         examDate.setHours(0, 0, 0, 0);
         const diffTime = examDate.getTime() - now.getTime();
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     };
 
-    const daysToPreBoard = calculateDaysRemaining(EXAM_DATES.preBoard);
-    const daysToBoard = calculateDaysRemaining(EXAM_DATES.board);
-
-    // Update Display for Pre-Board
-    if (daysToPreBoard > 0) {
-        preBoardEl.textContent = daysToPreBoard;
-        if (daysToPreBoard <= 7) preBoardEl.style.color = '#ef4444'; // Red alert when close
-    } else if (daysToPreBoard === 0) {
+    // Exam 1
+    const daysToExam1 = calculateDaysRemaining(exams.exam1.date);
+    if (daysToExam1 === null) {
+        preBoardEl.textContent = '--';
+    } else if (daysToExam1 > 0) {
+        preBoardEl.textContent = daysToExam1;
+        preBoardEl.style.color = daysToExam1 <= 7 ? '#ef4444' : '#f59e0b';
+    } else if (daysToExam1 === 0) {
         preBoardEl.textContent = 'TODAY';
         preBoardEl.style.color = '#ef4444';
         preBoardEl.style.fontSize = '2rem';
@@ -442,11 +540,14 @@ function updateExamCountdowns() {
         preBoardEl.style.opacity = '0.5';
     }
 
-    // Update Display for Board
-    if (daysToBoard > 0) {
-        boardEl.textContent = daysToBoard;
-        if (daysToBoard <= 14) boardEl.style.color = '#ef4444'; // Red alert when close
-    } else if (daysToBoard === 0) {
+    // Exam 2
+    const daysToExam2 = calculateDaysRemaining(exams.exam2.date);
+    if (daysToExam2 === null) {
+        boardEl.textContent = '--';
+    } else if (daysToExam2 > 0) {
+        boardEl.textContent = daysToExam2;
+        boardEl.style.color = daysToExam2 <= 14 ? '#ef4444' : '#f59e0b';
+    } else if (daysToExam2 === 0) {
         boardEl.textContent = 'TODAY';
         boardEl.style.color = '#ef4444';
         boardEl.style.fontSize = '2rem';
@@ -469,6 +570,9 @@ async function init() {
     } else if (recovered === 'backup-file') {
         showToast('Data recovered from your linked backup folder! 📂', 'success');
     }
+
+    // Render dynamic subjects from profile
+    renderDynamicSubjects();
 
     // Set today's date in form by default
     const today = getLocalDateStr();
@@ -504,7 +608,221 @@ async function init() {
 
     // Event Listeners
     addSessionForm.addEventListener('submit', handleAddSession);
+
+    // Show profile modal on first visit
+    const profile = getProfile();
+    if (!profile.setupComplete) {
+        setTimeout(() => showProfileModal(), 800);
+    }
 }
+
+// ==========================================
+// DYNAMIC SUBJECT RENDERING
+// ==========================================
+function renderDynamicSubjects() {
+    const subjects = getSubjects();
+
+    // Rebuild color maps
+    const { colors, chartColors } = buildSubjectColors();
+    SUBJECT_COLORS = colors;
+    SUBJECT_CHART_COLORS = chartColors;
+
+    // 1. Populate <select id="subject"> (Revision Tracker)
+    const subjectSelect = document.getElementById('subject');
+    if (subjectSelect) {
+        // Keep the first "Select Subject..." option
+        const firstOpt = subjectSelect.querySelector('option[disabled]');
+        subjectSelect.innerHTML = '';
+        if (firstOpt) subjectSelect.appendChild(firstOpt);
+        subjects.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            subjectSelect.appendChild(opt);
+        });
+    }
+
+    // 2. Populate <select id="timeSubjectInput"> (Time Tracker)
+    const timeSubjectSelect = document.getElementById('timeSubjectInput');
+    if (timeSubjectSelect) {
+        const generalOpt = '<option value="">General / Other</option>';
+        const sleepOpt = '<option value="Sleep">😴 Sleep</option>';
+        timeSubjectSelect.innerHTML = generalOpt;
+        subjects.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            timeSubjectSelect.appendChild(opt);
+        });
+        timeSubjectSelect.insertAdjacentHTML('beforeend', sleepOpt);
+    }
+
+    // 3. Populate filter buttons (Dashboard)
+    const filterGroup = document.getElementById('subjectFilterGroup');
+    if (filterGroup) {
+        // Keep the "All" button
+        const allBtn = filterGroup.querySelector('[data-filter="all"]');
+        filterGroup.innerHTML = '';
+        if (allBtn) filterGroup.appendChild(allBtn);
+        subjects.forEach(s => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn';
+            btn.dataset.filter = s;
+            btn.textContent = s;
+            btn.addEventListener('click', (e) => {
+                filterGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = s;
+                renderAllTopics();
+            });
+            filterGroup.appendChild(btn);
+        });
+    }
+
+    // 4. Populate subject tabs (Log Table)
+    const tabsGroup = document.getElementById('subjectTabsGroup');
+    if (tabsGroup) {
+        tabsGroup.innerHTML = '';
+        subjects.forEach((s, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'sub-tab' + (i === 0 ? ' active' : '');
+            btn.dataset.subject = s;
+            btn.textContent = s;
+            btn.addEventListener('click', (e) => {
+                tabsGroup.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                currentTableSubject = s;
+                renderTableView();
+            });
+            tabsGroup.appendChild(btn);
+        });
+        // Set initial table subject to first subject
+        if (subjects.length > 0) currentTableSubject = subjects[0];
+    }
+}
+
+// ==========================================
+// PROFILE MODAL
+// ==========================================
+let _profileModalSubjects = []; // Temp state for subject tags in modal
+
+function showProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+
+    const profile = getProfile();
+    document.getElementById('profileName').value = profile.name || '';
+    document.getElementById('profileGrade').value = profile.grade || '';
+    document.getElementById('profileFaculty').value = profile.faculty || '';
+    document.getElementById('profileExam1Label').value = profile.exam1Label || '';
+    document.getElementById('profileExam1Date').value = profile.exam1Date || '';
+    document.getElementById('profileExam2Label').value = profile.exam2Label || '';
+    document.getElementById('profileExam2Date').value = profile.exam2Date || '';
+
+    _profileModalSubjects = [...(profile.subjects || [])];
+    renderProfileSubjectTags();
+
+    // Animate in
+    setTimeout(() => modal.classList.add('active'), 10);
+}
+
+function hideProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    setTimeout(() => { modal.style.display = 'none'; }, 300);
+}
+
+function renderProfileSubjectTags() {
+    const container = document.getElementById('profileSubjectTags');
+    if (!container) return;
+    container.innerHTML = '';
+    _profileModalSubjects.forEach((subj, i) => {
+        const tag = document.createElement('span');
+        tag.className = 'profile-subject-tag';
+        tag.innerHTML = `${subj} <button type="button" class="tag-remove" data-index="${i}" title="Remove">&times;</button>`;
+        tag.querySelector('.tag-remove').addEventListener('click', () => {
+            _profileModalSubjects.splice(i, 1);
+            renderProfileSubjectTags();
+        });
+        container.appendChild(tag);
+    });
+}
+
+// Profile icon click
+document.getElementById('btnProfileIcon').addEventListener('click', showProfileModal);
+
+// Close button
+document.getElementById('btnCloseProfile').addEventListener('click', hideProfileModal);
+
+// Click outside to close
+document.getElementById('profileModal').addEventListener('click', (e) => {
+    if (e.target.classList.contains('profile-modal-overlay')) hideProfileModal();
+});
+
+// Faculty change → auto-fill subjects
+document.getElementById('profileFaculty').addEventListener('change', (e) => {
+    const faculty = e.target.value;
+    if (FACULTY_PRESETS[faculty] && FACULTY_PRESETS[faculty].length > 0) {
+        _profileModalSubjects = [...FACULTY_PRESETS[faculty]];
+        renderProfileSubjectTags();
+    }
+    // For Custom, keep existing subjects so user can add their own
+});
+
+// Add subject button
+document.getElementById('btnAddSubject').addEventListener('click', () => {
+    const input = document.getElementById('profileNewSubject');
+    const val = input.value.trim();
+    if (val && !_profileModalSubjects.includes(val)) {
+        _profileModalSubjects.push(val);
+        renderProfileSubjectTags();
+        input.value = '';
+    }
+});
+
+// Enter to add subject
+document.getElementById('profileNewSubject').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('btnAddSubject').click();
+    }
+});
+
+// Save profile
+document.getElementById('profileForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    if (_profileModalSubjects.length === 0) {
+        alert('Please add at least one subject.');
+        return;
+    }
+
+    const profile = {
+        name: document.getElementById('profileName').value.trim(),
+        grade: document.getElementById('profileGrade').value,
+        faculty: document.getElementById('profileFaculty').value,
+        subjects: [..._profileModalSubjects],
+        exam1Label: document.getElementById('profileExam1Label').value.trim(),
+        exam1Date: document.getElementById('profileExam1Date').value,
+        exam2Label: document.getElementById('profileExam2Label').value.trim(),
+        exam2Date: document.getElementById('profileExam2Date').value,
+        setupComplete: true
+    };
+
+    saveProfile(profile);
+
+    // Refresh all dynamic UI
+    renderDynamicSubjects();
+    renderDashboard();
+    renderTableView();
+    renderTimeLogs();
+    updateExamCountdowns();
+
+    hideProfileModal();
+    showToast('Profile saved! Subjects & exams updated. 🎓', 'success');
+});
 
 // Navigation — wired at top level (not inside init) to avoid timing issues
 navBtns.forEach(btn => {
@@ -524,6 +842,9 @@ navBtns.forEach(btn => {
         }
     });
 });
+// Note: subTabs and filterBtns event listeners are now handled dynamically
+// in renderDynamicSubjects() — the static handlers below are kept as fallback
+// for any tabs/buttons that exist in static HTML
 subTabs.forEach(tab => {
     tab.addEventListener('click', (e) => {
         subTabs.forEach(t => t.classList.remove('active'));
@@ -533,7 +854,7 @@ subTabs.forEach(tab => {
     });
 });
 
-// Filter logic
+// Filter logic (fallback for static buttons, dynamic ones are handled in renderDynamicSubjects)
 filterBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
         filterBtns.forEach(b => b.classList.remove('active'));
@@ -1343,7 +1664,7 @@ function saveLatestInsights(feedbackHtml, chartData, periodLabel, ratingObj, tar
 
     // Save per-date insights map
     let insightsMap = {};
-    try { insightsMap = JSON.parse(localStorage.getItem('aiInsightsMap') || '{}'); } catch (e) {}
+    try { insightsMap = JSON.parse(localStorage.getItem('aiInsightsMap') || '{}'); } catch (e) { }
     insightsMap[targetDate] = insightData;
 
     // Cap at 30 entries (remove oldest)
@@ -1368,7 +1689,7 @@ function loadInsightsForDate(dateStr) {
             updateHistoryStatus();
             return true;
         }
-    } catch (e) {}
+    } catch (e) { }
     return false;
 }
 
@@ -1401,7 +1722,7 @@ function loadLatestInsights() {
             lastInsightsPeriod = data.period;
             updateHistoryStatus();
         }
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function updateHistoryStatus() {
@@ -1500,14 +1821,7 @@ const CHART_COLORS = {
     red: { bg: 'rgba(239, 68, 68, 0.2)', border: '#ef4444' },
 };
 
-const SUBJECT_CHART_COLORS = {
-    'Physics': '#818cf8',
-    'Chemistry': '#f472b6',
-    'Maths': '#fb923c',
-    'Computer': '#34d399',
-    'English': '#38bdf8',
-    'Nepali': '#a78bfa',
-};
+let SUBJECT_CHART_COLORS = buildSubjectColors().chartColors;
 
 // Chart.js global defaults for dark theme
 Chart.defaults.color = 'rgba(255,255,255,0.6)';
@@ -2015,6 +2329,30 @@ async function generateAIInsights() {
             dailyBreakdown[log.date] = (dailyBreakdown[log.date] || 0) + log.duration;
         });
 
+        // Aggregate overnight entries (e.g. sleep 10PM→5AM split across midnight)
+        // so the AI sees the REAL total, not just the partial after-midnight portion
+        const overnightNotes = [];
+        const seenOvernightGroups = new Set();
+        const allLogs_forOvernight = timeLogs; // search ALL logs, not just filtered period
+        logs.forEach(log => {
+            if (log.overnightGroup && !seenOvernightGroups.has(log.overnightGroup)) {
+                seenOvernightGroups.add(log.overnightGroup);
+                // Find the paired entry (could be on a different date)
+                const paired = allLogs_forOvernight.filter(l => l.overnightGroup === log.overnightGroup);
+                if (paired.length === 2) {
+                    const totalH = log.overnightTotal || paired.reduce((s, l) => s + l.duration, 0);
+                    const origStart = log.overnightOriginalStart || paired[0].startTime;
+                    const origEnd = log.overnightOriginalEnd || paired[paired.length - 1].endTime;
+                    const taskName = log.task;
+                    const subj = log.subject || '';
+                    overnightNotes.push(`⚠️ "${taskName}"${subj ? ' [' + subj + ']' : ''} was logged overnight (${origStart}→${origEnd}), total: ${totalH}h. It was split across midnight into two entries — evaluate the TOTAL (${totalH}h), not the individual parts.`);
+                }
+            }
+        });
+        const overnightContext = overnightNotes.length > 0
+            ? '\n## ⚠️ OVERNIGHT ENTRIES (USE TOTAL DURATION, NOT PARTIAL)\n' + overnightNotes.join('\n') + '\n'
+            : '';
+
         // Study sessions summary
         let revDone = 0, revTotal = 0;
         studySessions.forEach(s => {
@@ -2027,20 +2365,17 @@ async function generateAIInsights() {
 
         const rawLogData = taskSummaries.length > 0 ? taskSummaries.join('\n') : 'No activities logged.';
 
-        // --- Call 1: AI Chart Data (structured JSON) ---
+        const _subjects = getSubjects();
         const chartPrompt = `You are a study activity categorizer. Read each activity's task name AND notes carefully to determine the real subject. Do NOT rely on tags — many are set to "General / Other" by default and are WRONG.
 
 Activity Logs:
 ${rawLogData}
 
-Subjects to categorize into: Physics, Chemistry, Maths, Computer, English, Nepali, Sleep, Meditation, Other
+Subjects to categorize into: ${_subjects.join(', ')}, Sleep, Meditation, Other
 
 Categorization rules:
 - READ the task name and notes to understand what was actually studied
-- "Math - Parabola", "integration", "calculus", "exercise" about math topics = Maths
-- "Physics paper", "physics tactics" = Physics  
-- "Chemistry", "carboxylic acid", "organic chemistry" = Chemistry
-- "App development", "coding", "programming", "web dev", "made app" = Computer
+- Match activities to the closest subject from the list above
 - "Meditation", "stretches", "morning ritual" = Meditation
 - "Sleep", "nap" = Sleep
 - "Wasted time", "not productive", "unproductive" = Other
@@ -2169,12 +2504,12 @@ Only include subjects with hours > 0. Use exact decimal hours from the logs.`;
             revDetails.push(describeRev(rev2, '2-day', rev2Due, false));
 
             // rev4: due 4 days after rev2 completion (or estimated baseDate+2 if no completedAt)
-            const rev4Ref = rev2.done && rev2.completedAt ? new Date(new Date(rev2.completedAt).setHours(0,0,0,0)) : new Date(baseDate.getTime() + 2 * 86400000);
+            const rev4Ref = rev2.done && rev2.completedAt ? new Date(new Date(rev2.completedAt).setHours(0, 0, 0, 0)) : new Date(baseDate.getTime() + 2 * 86400000);
             const rev4Due = new Date(rev4Ref.getTime() + 4 * 86400000);
             revDetails.push(describeRev(rev4, '4-day', rev4Due, !rev2.done));
 
             // rev7: due 7 days after rev4 completion
-            const rev7Ref = rev4.done && rev4.completedAt ? new Date(new Date(rev4.completedAt).setHours(0,0,0,0)) : new Date(rev4Ref.getTime() + 4 * 86400000);
+            const rev7Ref = rev4.done && rev4.completedAt ? new Date(new Date(rev4.completedAt).setHours(0, 0, 0, 0)) : new Date(rev4Ref.getTime() + 4 * 86400000);
             const rev7Due = new Date(rev7Ref.getTime() + 7 * 86400000);
             revDetails.push(describeRev(rev7, '7-day', rev7Due, !rev4.done));
 
@@ -2200,20 +2535,20 @@ This is a SINGLE DAY deep dive. Analyze at granular level:
 
 1. **HOUR-BY-HOUR AUDIT**: Walk through the day chronologically. What did they do from waking to sleeping? Identify every gap, every wasted slot, every productive stretch. Be specific — "From 10:00-11:30 you did X, but then 11:30-13:00 was completely unaccounted for."
 
-2. **ACADEMIC vs EVERYTHING ELSE**: Calculate exact hours for graded subjects (Physics, Chemistry, Maths, Computer, English, Nepali) vs personal projects (coding, app dev, robotics) vs wellness (meditation, sleep, stretches) vs wasted time. Example: "Out of ${totalHours.toFixed(1)}h logged: Xh academic, Yh personal interest, Zh wellness, Wh unproductive."
+2. **ACADEMIC vs EVERYTHING ELSE**: Calculate exact hours for graded subjects (${getSubjects().join(', ')}) vs personal projects vs wellness (meditation, sleep, stretches) vs wasted time. Example: "Out of ${totalHours.toFixed(1)}h logged: Xh academic, Yh personal interest, Zh wellness, Wh unproductive."
 
 3. **FOCUS QUALITY**: Did they do deep work (90+ min unbroken on one subject) or scattered short bursts? Short context-switching kills retention. Call out any session under 30 min as low-impact.
 
-4. **ENERGY MISALLOCATION**: Were hard subjects (Physics, Maths, Chemistry) done during peak cognitive hours (morning/early afternoon) or shoved into low-energy evening slots? This matters enormously.
+4. **ENERGY MISALLOCATION**: Were hard subjects done during peak cognitive hours (morning/early afternoon) or shoved into low-energy evening slots? This matters enormously.
 
-5. **PROCRASTINATION DETECTION**: Look for patterns — did they start late? Take excessive breaks? Do easy/fun subjects first to avoid hard ones? Spending time on app dev before touching Physics is a red flag.
+5. **PROCRASTINATION DETECTION**: Look for patterns — did they start late? Take excessive breaks? Do easy/fun subjects first to avoid hard ones?
 
 6. **REVISION COMPLIANCE**: Check today's 2-4-7 revision status. Did they complete what was due? Every missed revision compounds forgetting.
 
 7. **SLEEP & RECOVERY**: If sleep data is present, evaluate: Did they get 7-8h? Late nights destroy next-day focus. A student sleeping at 1 AM and waking at 6 AM is running on fumes.
 
-8. **BURNOUT CHECK**: Signs to flag — declining session lengths throughout the day, increasing "wasted time" entries, notes mentioning inability to focus, very long days (14h+) without proper breaks.` 
-        : currentPeriod === 'week' ? `
+8. **BURNOUT CHECK**: Signs to flag — declining session lengths throughout the day, increasing "wasted time" entries, notes mentioning inability to focus, very long days (14h+) without proper breaks.`
+            : currentPeriod === 'week' ? `
 ## WEEKLY PATTERN ANALYSIS (${periodLabel})
 This is a 7-DAY pattern analysis. Look for TRENDS and CONSISTENCY:
 
@@ -2221,7 +2556,7 @@ This is a 7-DAY pattern analysis. Look for TRENDS and CONSISTENCY:
 
 2. **ACADEMIC HOURS TREND**: Are daily academic hours increasing, decreasing, or flat across the week? Plot the direction. "Monday: 6h, Tuesday: 5h, ... Sunday: 2h" = alarming decline.
 
-3. **SUBJECT COVERAGE MAP**: Which academic subjects got time THIS WEEK vs which got ZERO? With ${Math.ceil((new Date('2026-03-20') - new Date().setHours(0, 0, 0, 0)) / 86400000)} days to pre-boards, every subject needs regular contact. Flag any subject with 0h this week as CRITICAL NEGLECT.
+3. **SUBJECT COVERAGE MAP**: Which academic subjects got time THIS WEEK vs which got ZERO? ${getProfile().exam1Date ? `With ${Math.ceil((new Date(getProfile().exam1Date) - new Date().setHours(0, 0, 0, 0)) / 86400000)} days to ${getProfile().exam1Label || 'exams'}, every subject needs regular contact.` : 'Every subject needs regular contact.'} Flag any subject with 0h this week as CRITICAL NEGLECT.
 
 4. **WEEKLY RHYTHM**: Which days were strongest/weakest? Is there a pattern (e.g., always low on weekends)? Identify the student's natural productive days vs slump days.
 
@@ -2232,13 +2567,13 @@ This is a 7-DAY pattern analysis. Look for TRENDS and CONSISTENCY:
 7. **CUMULATIVE FATIGUE**: Did performance degrade later in the week? If Thursday-Sunday shows declining hours and increasing "wasted time", burnout is building.
 
 8. **PEAK PERFORMANCE WINDOWS**: Across the week, when (time of day) was the student most productive? Are they consistently leveraging this window for hard subjects?`
-        : `
+                : `
 ## MONTHLY STRATEGIC REVIEW (${periodLabel})
 This is a 30-DAY macro analysis. Focus on BIG PICTURE and EXAM READINESS:
 
-1. **EXAM COUNTDOWN REALITY CHECK**: With ${Math.ceil((new Date('2026-03-20') - new Date().setHours(0, 0, 0, 0)) / 86400000)} days to Pre-Board and ${Math.ceil((new Date('2026-04-27') - new Date().setHours(0, 0, 0, 0)) / 86400000)} days to Finals — is this student's monthly output sufficient? Calculate required daily academic hours to cover remaining syllabus.
+1. **EXAM COUNTDOWN REALITY CHECK**: ${getProfile().exam1Date && getProfile().exam2Date ? `With ${Math.ceil((new Date(getProfile().exam1Date) - new Date().setHours(0, 0, 0, 0)) / 86400000)} days to ${getProfile().exam1Label || 'Exam 1'} and ${Math.ceil((new Date(getProfile().exam2Date) - new Date().setHours(0, 0, 0, 0)) / 86400000)} days to ${getProfile().exam2Label || 'Exam 2'}` : 'Based on the exam timeline'} — is this student's monthly output sufficient? Calculate required daily academic hours to cover remaining syllabus.
 
-2. **MONTHLY ACADEMIC HOURS TOTAL**: Sum all academic-only hours. Compare against what's needed. A Grade 12 Science student should be doing 6-8h of pure academic study daily in the final stretch. Are they meeting this?
+2. **MONTHLY ACADEMIC HOURS TOTAL**: Sum all academic-only hours. Compare against what's needed. A ${getProfile().grade} ${getProfile().faculty} student should be doing 6-8h of pure academic study daily in the final stretch. Are they meeting this?
 
 3. **SUBJECT DISTRIBUTION (MONTH)**: Pie chart analysis — which subjects consumed what percentage of the month? Identify the most neglected subjects. A subject with <5% of monthly hours needs emergency attention.
 
@@ -2254,21 +2589,26 @@ This is a 30-DAY macro analysis. Focus on BIG PICTURE and EXAM READINESS:
 
 9. **BIGGEST WINS & BIGGEST FAILURES**: Name the 3 best days and 3 worst days of the month by academic output. What was different about them? This reveals what conditions drive peak performance.`;
 
-        const feedbackPrompt = `You are an elite study coach and academic strategist for a Grade 12 Science student in Nepal. You have their COMPLETE activity data. Your job is to deliver a brutally honest, data-driven analysis that will materially improve their exam results.
+        const _p = getProfile();
+        const _examTimeline = [];
+        if (_p.exam1Date) _examTimeline.push(`- ${_p.exam1Label || 'Exam 1'}: ${_p.exam1Date} → ${Math.ceil((new Date(_p.exam1Date) - new Date().setHours(0, 0, 0, 0)) / 86400000)} days remaining`);
+        if (_p.exam2Date) _examTimeline.push(`- ${_p.exam2Label || 'Exam 2'}: ${_p.exam2Date} → ${Math.ceil((new Date(_p.exam2Date) - new Date().setHours(0, 0, 0, 0)) / 86400000)} days remaining`);
+        const _examSection = _examTimeline.length > 0
+            ? `## EXAM TIMELINE (NON-NEGOTIABLE DEADLINES)\n${_examTimeline.join('\n')}\nEvery hour matters. Frame all analysis against these deadlines.`
+            : '## EXAM TIMELINE\nNo exam dates configured. Analyze performance based on general study goals.';
+
+        const feedbackPrompt = `You are an elite study coach and academic strategist for a ${_p.grade} ${_p.faculty} student${_p.name ? ` named ${_p.name}` : ''}. You have their COMPLETE activity data. Your job is to deliver a brutally honest, data-driven analysis that will materially improve their results.
 
 DO NOT give generic advice. EVERY claim must reference specific data from the logs below.
 
 ## STUDENT PROFILE
-- Grade 12 Science, Nepal Education Board
-- Academic subjects (GRADED, exam-critical): Physics, Chemistry, Maths, Computer, English, Nepali
-- Personal interests (NOT graded): App development, coding projects, robotics — valuable but NOT on the exam
+- ${_p.grade} ${_p.faculty} student
+- Academic subjects (GRADED, exam-critical): ${getSubjects().join(', ')}
+- Personal interests (NOT graded): Other activities not in the subject list — valuable but NOT on the exam
 - Wellness activities (NOT study): Meditation, sleep, stretches, exercise
 - Unproductive time: Wasted time, couldn't concentrate, distracted
 
-## EXAM TIMELINE (NON-NEGOTIABLE DEADLINES)
-- Pre-Board Exam: March 20, 2026 → ${Math.ceil((new Date('2026-03-20') - new Date().setHours(0, 0, 0, 0)) / 86400000)} days remaining
-- Final Board Exam: April 27, 2026 → ${Math.ceil((new Date('2026-04-27') - new Date().setHours(0, 0, 0, 0)) / 86400000)} days remaining
-Every hour matters. Frame all analysis against these deadlines.
+${_examSection}
 
 ## ALL-TIME STATS
 - Lifetime hours logged: ${lifetimeTotalHours.toFixed(1)}h across ${allLogs.length} activities
@@ -2291,6 +2631,7 @@ ${peakHoursSummary || 'No data'}
 ## SPACED REPETITION SESSIONS (2-4-7 method):
 ${sessionsContext || 'None yet'}
 ${revisionAlertSection}
+${overnightContext}
 ${periodAnalysisFocus}
 
 ## RESPONSE STRUCTURE
@@ -2309,11 +2650,11 @@ Flag anything alarming: neglected subjects, broken revision chains, declining tr
 Briefly acknowledge what the student is doing RIGHT. Specific examples only — no generic praise.
 
 ### 🗓️ Action Plan
-${currentPeriod === 'today' ? 
-'Provide a concrete TOMORROW SCHEDULE with time blocks (e.g., "06:00-08:00: Physics — Optics chapter problems"). Prioritize by exam proximity and subject neglect. Include breaks. Must be realistic but push the student.' :
-currentPeriod === 'week' ?
-'Provide a NEXT WEEK STRATEGY: which subjects need emergency attention, suggested daily hour targets, specific topics to prioritize based on revision data and neglected areas.' :
-'Provide a NEXT MONTH GAME PLAN: week-by-week focus areas leading to exams, subject priority order, minimum daily targets, revision system repairs if needed.'}
+${currentPeriod === 'today' ?
+                'Provide a concrete TOMORROW SCHEDULE with time blocks (e.g., "06:00-08:00: Physics — Optics chapter problems"). Prioritize by exam proximity and subject neglect. Include breaks. Must be realistic but push the student.' :
+                currentPeriod === 'week' ?
+                    'Provide a NEXT WEEK STRATEGY: which subjects need emergency attention, suggested daily hour targets, specific topics to prioritize based on revision data and neglected areas.' :
+                    'Provide a NEXT MONTH GAME PLAN: week-by-week focus areas leading to exams, subject priority order, minimum daily targets, revision system repairs if needed.'}
 
 ### 💬 Mentor\'s Note
 One paragraph of direct, personal advice. Address the student\'s specific patterns — not generic motivation. If they\'re doing well, push them harder. If they\'re struggling, identify the ROOT CAUSE and give one concrete fix.
