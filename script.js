@@ -714,7 +714,19 @@ function showProfileModal() {
     const profile = getProfile();
     document.getElementById('profileName').value = profile.name || '';
     document.getElementById('profileGrade').value = profile.grade || '';
-    document.getElementById('profileFaculty').value = profile.faculty || '';
+
+    // Handle custom faculty
+    const customFacultyInput = document.getElementById('profileCustomFaculty');
+    if (profile.faculty && !FACULTY_PRESETS[profile.faculty]) {
+        // It's a custom faculty name not in presets
+        document.getElementById('profileFaculty').value = 'Custom';
+        customFacultyInput.value = profile.faculty;
+        customFacultyInput.style.display = 'block';
+    } else {
+        document.getElementById('profileFaculty').value = profile.faculty || '';
+        customFacultyInput.value = '';
+        customFacultyInput.style.display = profile.faculty === 'Custom' ? 'block' : 'none';
+    }
     document.getElementById('profileExam1Label').value = profile.exam1Label || '';
     document.getElementById('profileExam1Date').value = profile.exam1Date || '';
     document.getElementById('profileExam2Label').value = profile.exam2Label || '';
@@ -761,14 +773,24 @@ document.getElementById('profileModal').addEventListener('click', (e) => {
     if (e.target.classList.contains('profile-modal-overlay')) hideProfileModal();
 });
 
-// Faculty change → auto-fill subjects
+// Faculty change → auto-fill subjects and show/hide custom faculty input
 document.getElementById('profileFaculty').addEventListener('change', (e) => {
     const faculty = e.target.value;
-    if (FACULTY_PRESETS[faculty] && FACULTY_PRESETS[faculty].length > 0) {
-        _profileModalSubjects = [...FACULTY_PRESETS[faculty]];
-        renderProfileSubjectTags();
+    const customInput = document.getElementById('profileCustomFaculty');
+
+    // Show/hide custom faculty name input
+    if (faculty === 'Custom') {
+        customInput.style.display = 'block';
+        customInput.focus();
+        // Don't clear existing subjects for Custom — user adds their own
+    } else {
+        customInput.style.display = 'none';
+        customInput.value = '';
+        if (FACULTY_PRESETS[faculty] && FACULTY_PRESETS[faculty].length > 0) {
+            _profileModalSubjects = [...FACULTY_PRESETS[faculty]];
+            renderProfileSubjectTags();
+        }
     }
-    // For Custom, keep existing subjects so user can add their own
 });
 
 // Add subject button
@@ -799,10 +821,17 @@ document.getElementById('profileForm').addEventListener('submit', (e) => {
         return;
     }
 
+    // Determine faculty name (use custom text if Custom is selected)
+    let facultyValue = document.getElementById('profileFaculty').value;
+    const customFacultyVal = document.getElementById('profileCustomFaculty').value.trim();
+    if (facultyValue === 'Custom' && customFacultyVal) {
+        facultyValue = customFacultyVal;
+    }
+
     const profile = {
         name: document.getElementById('profileName').value.trim(),
         grade: document.getElementById('profileGrade').value,
-        faculty: document.getElementById('profileFaculty').value,
+        faculty: facultyValue,
         subjects: [..._profileModalSubjects],
         exam1Label: document.getElementById('profileExam1Label').value.trim(),
         exam1Date: document.getElementById('profileExam1Date').value,
@@ -2556,7 +2585,7 @@ This is a 7-DAY pattern analysis. Look for TRENDS and CONSISTENCY:
 
 2. **ACADEMIC HOURS TREND**: Are daily academic hours increasing, decreasing, or flat across the week? Plot the direction. "Monday: 6h, Tuesday: 5h, ... Sunday: 2h" = alarming decline.
 
-3. **SUBJECT COVERAGE MAP**: Which academic subjects got time THIS WEEK vs which got ZERO? ${getProfile().exam1Date ? `With ${Math.ceil((new Date(getProfile().exam1Date) - new Date().setHours(0, 0, 0, 0)) / 86400000)} days to ${getProfile().exam1Label || 'exams'}, every subject needs regular contact.` : 'Every subject needs regular contact.'} Flag any subject with 0h this week as CRITICAL NEGLECT.
+3. **SUBJECT COVERAGE MAP**: Which academic subjects got time THIS WEEK vs which got ZERO? ${(() => { const d = getProfile().exam1Date; if (!d) return 'Every subject needs regular contact.'; const ex = new Date(d); ex.setHours(0, 0, 0, 0); const n = new Date(); n.setHours(0, 0, 0, 0); return `With ${Math.round((ex - n) / 86400000)} days to ${getProfile().exam1Label || 'exams'}, every subject needs regular contact.`; })()} Flag any subject with 0h this week as CRITICAL NEGLECT.
 
 4. **WEEKLY RHYTHM**: Which days were strongest/weakest? Is there a pattern (e.g., always low on weekends)? Identify the student's natural productive days vs slump days.
 
@@ -2571,7 +2600,7 @@ This is a 7-DAY pattern analysis. Look for TRENDS and CONSISTENCY:
 ## MONTHLY STRATEGIC REVIEW (${periodLabel})
 This is a 30-DAY macro analysis. Focus on BIG PICTURE and EXAM READINESS:
 
-1. **EXAM COUNTDOWN REALITY CHECK**: ${getProfile().exam1Date && getProfile().exam2Date ? `With ${Math.ceil((new Date(getProfile().exam1Date) - new Date().setHours(0, 0, 0, 0)) / 86400000)} days to ${getProfile().exam1Label || 'Exam 1'} and ${Math.ceil((new Date(getProfile().exam2Date) - new Date().setHours(0, 0, 0, 0)) / 86400000)} days to ${getProfile().exam2Label || 'Exam 2'}` : 'Based on the exam timeline'} — is this student's monthly output sufficient? Calculate required daily academic hours to cover remaining syllabus.
+1. **EXAM COUNTDOWN REALITY CHECK**: ${(() => { const p = getProfile(); if (!p.exam1Date || !p.exam2Date) return 'Based on the exam timeline'; const e1 = new Date(p.exam1Date); e1.setHours(0, 0, 0, 0); const e2 = new Date(p.exam2Date); e2.setHours(0, 0, 0, 0); const n = new Date(); n.setHours(0, 0, 0, 0); return `With ${Math.round((e1 - n) / 86400000)} days to ${p.exam1Label || 'Exam 1'} and ${Math.round((e2 - n) / 86400000)} days to ${p.exam2Label || 'Exam 2'}`; })()} — is this student's monthly output sufficient? Calculate required daily academic hours to cover remaining syllabus.
 
 2. **MONTHLY ACADEMIC HOURS TOTAL**: Sum all academic-only hours. Compare against what's needed. A ${getProfile().grade} ${getProfile().faculty} student should be doing 6-8h of pure academic study daily in the final stretch. Are they meeting this?
 
@@ -2591,8 +2620,10 @@ This is a 30-DAY macro analysis. Focus on BIG PICTURE and EXAM READINESS:
 
         const _p = getProfile();
         const _examTimeline = [];
-        if (_p.exam1Date) _examTimeline.push(`- ${_p.exam1Label || 'Exam 1'}: ${_p.exam1Date} → ${Math.ceil((new Date(_p.exam1Date) - new Date().setHours(0, 0, 0, 0)) / 86400000)} days remaining`);
-        if (_p.exam2Date) _examTimeline.push(`- ${_p.exam2Label || 'Exam 2'}: ${_p.exam2Date} → ${Math.ceil((new Date(_p.exam2Date) - new Date().setHours(0, 0, 0, 0)) / 86400000)} days remaining`);
+        // Helper: timezone-safe days remaining (both dates normalized to local midnight)
+        const _daysTo = (dateStr) => { const d = new Date(dateStr); d.setHours(0, 0, 0, 0); const n = new Date(); n.setHours(0, 0, 0, 0); return Math.round((d - n) / 86400000); };
+        if (_p.exam1Date) _examTimeline.push(`- ${_p.exam1Label || 'Exam 1'}: ${_p.exam1Date} → ${_daysTo(_p.exam1Date)} days remaining`);
+        if (_p.exam2Date) _examTimeline.push(`- ${_p.exam2Label || 'Exam 2'}: ${_p.exam2Date} → ${_daysTo(_p.exam2Date)} days remaining`);
         const _examSection = _examTimeline.length > 0
             ? `## EXAM TIMELINE (NON-NEGOTIABLE DEADLINES)\n${_examTimeline.join('\n')}\nEvery hour matters. Frame all analysis against these deadlines.`
             : '## EXAM TIMELINE\nNo exam dates configured. Analyze performance based on general study goals.';
