@@ -36,7 +36,7 @@ A personal academic productivity web app that helps students study smarter — c
 
 ## 🖥️ Screenshots
 
-> *(Add screenshots of your app here — Tip: take a screenshot of the Dashboard, AI Insights view, and Time Tracker)*
+![StudyTracker Dashboard](screenshots/dashboard.png)
 
 ---
 
