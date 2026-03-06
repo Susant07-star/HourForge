@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hourforge-v1';
+const CACHE_NAME = 'hourforge-v2';
 const ASSETS = [
     './',
     './index.html',
@@ -6,7 +6,10 @@ const ASSETS = [
     './script.js',
     './manifest.json',
     './favicon.ico',
-    './logo.png'
+    './logo.png',
+    './icon-192.png',
+    './icon-512.png',
+    './apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (e) => {
