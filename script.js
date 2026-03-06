@@ -181,6 +181,72 @@ const idb = {
     }
 };
 
+// ==========================================
+// DB MIGRATION (StudyTracker -> HourForge)
+// ==========================================
+async function migrateDatabaseIfNeeded() {
+    const oldDBName = 'StudyTrackerDB';
+    const newDBName = 'HourForgeDB';
+
+    // Check if migration already done
+    const migrationDone = localStorage.getItem('dbMigrationDone');
+    if (migrationDone) return;
+
+    return new Promise((resolve) => {
+        const checkRequest = indexedDB.open(oldDBName);
+        checkRequest.onsuccess = async (e) => {
+            const db = e.target.result;
+            // If the old DB doesn't have our 'store', nothing to migrate
+            if (!db.objectStoreNames.contains('store')) {
+                db.close();
+                localStorage.setItem('dbMigrationDone', 'true');
+                resolve();
+                return;
+            }
+
+            console.log('🏁 Starting DB Migration from StudyTracker to HourForge...');
+            
+            try {
+                const tx = db.transaction('store', 'readonly');
+                const store = tx.objectStore('store');
+                const keysRequest = store.getAllKeys();
+                
+                keysRequest.onsuccess = async () => {
+                    const keys = keysRequest.result;
+                    const migrationData = {};
+                    
+                    for (const key of keys) {
+                        migrationData[key] = await new Promise(r => {
+                            const req = store.get(key);
+                            req.onsuccess = () => r(req.result);
+                        });
+                    }
+
+                    db.close();
+
+                    // Now write to new DB
+                    for (const [key, val] of Object.entries(migrationData)) {
+                        await idb.set(key, val);
+                    }
+
+                    console.log('✅ DB Migration Complete!');
+                    localStorage.setItem('dbMigrationDone', 'true');
+                    
+                    // Cleanup: Delete old DB
+                    indexedDB.deleteDatabase(oldDBName);
+                }
+            } catch (err) {
+                console.error('❌ DB Migration failed:', err);
+            }
+            resolve();
+        };
+        checkRequest.onerror = () => {
+            // Old DB doesn't exist or error, just skip
+            resolve();
+        };
+    });
+}
+
 // DOM Elements - Navigation & Views
 const navBtns = document.querySelectorAll('.nav-btn');
 const viewSections = document.querySelectorAll('.view-section');
