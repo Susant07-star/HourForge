@@ -139,10 +139,15 @@ let timeLogBackupFolderHandle = null;
 
 // Lightweight IndexedDB wrapper for persisting the backup directory handles
 const idb = {
-    async getDB() {
+        async getDB() {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open('StudyTrackerDB', 1);
-            request.onupgradeneeded = () => request.result.createObjectStore('store');
+            const request = indexedDB.open('HourForgeDB', 1);
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('store')) {
+                    db.createObjectStore('store');
+                }
+            };
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject(request.error);
         });
@@ -559,6 +564,9 @@ function updateExamCountdowns() {
 
 // Initialize App
 async function init() {
+    // Attempt migration from old DB name if needed
+    await migrateDatabaseIfNeeded();
+
     // CRITICAL: Restore backup handle FIRST so recovery can use it
     await restoreAutoBackupSettings();
 
@@ -852,7 +860,7 @@ function pomoUpdateUI() {
     }
 
     // Page title
-    document.title = POMO.running ? `⏱ ${timeStr} — StudyTracker` : 'StudyTracker';
+    document.title = POMO.running ? `⏱ ${timeStr} — HourForge` : 'HourForge';
 }
 
 function pomoBeeep() {
@@ -940,7 +948,7 @@ function hidePomodoroModal() {
     const m = document.getElementById('pomodoroModal');
     m.classList.remove('active');
     setTimeout(() => { m.style.display = 'none'; }, 300);
-    if (!POMO.running) document.title = 'StudyTracker';
+    if (!POMO.running) document.title = 'HourForge';
     // Mini-timer shows automatically via pomoUpdateUI if mid-session
     pomoUpdateUI();
 }
@@ -1644,7 +1652,7 @@ function exportBackup() {
 
     const a1 = document.createElement('a');
     a1.href = studyUrl;
-    a1.download = `StudyTracker_Backup_${getLocalDateStr()}.json`;
+    a1.download = `HourForge_Backup_${getLocalDateStr()}.json`;
     document.body.appendChild(a1);
     a1.click();
     document.body.removeChild(a1);
@@ -1658,7 +1666,7 @@ function exportBackup() {
 
         const a2 = document.createElement('a');
         a2.href = aiUrl;
-        a2.download = `StudyTracker_AIRatings_${getLocalDateStr()}.json`;
+        a2.download = `HourForge_AIRatings_${getLocalDateStr()}.json`;
 
         // Slight delay to prevent some browsers from blocking the second download
         setTimeout(() => {
@@ -1807,7 +1815,7 @@ async function setupAutoBackup() {
         }
 
         // No existing handle or permission denied — pick a new folder
-        backupDirHandle = await window.showDirectoryPicker({ mode: 'readwrite', id: 'studytrackerBackupDir' });
+        backupDirHandle = await window.showDirectoryPicker({ mode: 'readwrite', id: 'hourforgeBackupDir' });
         await idb.set('autoBackupFolderHandle', backupDirHandle);
         updateBackupUIVisually();
         await autoBackupSync();
@@ -1831,14 +1839,14 @@ async function autoBackupSync() {
             return;
         }
         // 1) Auto-backup Core Study Data
-        const studyHandle = await backupDirHandle.getFileHandle('StudyTracker_AutoBackup.backup', { create: true });
+        const studyHandle = await backupDirHandle.getFileHandle('HourForge_AutoBackup.backup', { create: true });
         const studyWritable = await studyHandle.createWritable();
         await studyWritable.write(btoa(JSON.stringify({ studySessions, timeLogs })));
         await studyWritable.close();
 
         // 2) Auto-backup AI Ratings Separately
         if (aiRatingsHistory && aiRatingsHistory.length > 0) {
-            const aiHandle = await backupDirHandle.getFileHandle('StudyTracker_AIRatings.backup', { create: true });
+            const aiHandle = await backupDirHandle.getFileHandle('HourForge_AIRatings.backup', { create: true });
             const aiWritable = await aiHandle.createWritable();
             await aiWritable.write(btoa(JSON.stringify({ aiRatingsHistory })));
             await aiWritable.close();

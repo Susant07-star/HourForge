@@ -1,6 +1,21 @@
 $WshShell = New-Object -comObject WScript.Shell
 $DesktopPath = [Environment]::GetFolderPath("Desktop")
-$ShortcutPath = "$DesktopPath\StudyTracker.lnk"
+$ShortcutPath = "$DesktopPath\HourForge.lnk"
+$Shortcut = $WshShell.CreateShortcut($ShortcutPath)
+
+# Try to find Chrome installation path
+$chromePaths = @(
+    "C:\Program Files\Google\Chrome\Application\chrome.exe",
+    "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe"
+)
+
+$chromeExe = "chrome.exe" # Fallback to PATH
+foreach ($path in $chromePaths) {
+    if (Test-Path $path) {
+$WshShell = New-Object -comObject WScript.Shell
+$DesktopPath = [Environment]::GetFolderPath("Desktop")
+$ShortcutPath = "$DesktopPath\HourForge.lnk"
 $Shortcut = $WshShell.CreateShortcut($ShortcutPath)
 
 # Try to find Chrome installation path
