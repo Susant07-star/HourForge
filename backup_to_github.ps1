@@ -3,7 +3,7 @@ cd "d:\Productivity\StudyTracker"
 
 $Date = Get-Date -Format "yyyy-MM-dd hh:mm tt"
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  StudyTracker Auto-Backup to GitHub" -ForegroundColor Cyan
+Write-Host "  HourForge Auto-Backup to GitHub" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Checking for changes..." -ForegroundColor Yellow

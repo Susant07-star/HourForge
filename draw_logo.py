@@ -22,7 +22,7 @@ def create_logo():
     # Center connection
     draw.ellipse((90, 40, 166, 210), fill=(99, 102, 241, 180)) 
 
-    # S for StudyTracker
+    # H for HourForge
     try:
         font = ImageFont.truetype("segoeui.ttf", 130)
     except:

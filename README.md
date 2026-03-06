@@ -1,10 +1,10 @@
 <div align="center">
 
-# 🧠 StudyTracker
+# 🧠 HourForge
 
 ### Master Your Memory with the **2-4-7 Spaced Repetition Method**
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-GitHub_Pages-6366f1?style=for-the-badge)](https://susant07-star.github.io/StudyTracker/)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-GitHub_Pages-6366f1?style=for-the-badge)](https://susant07-star.github.io/HourForge/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
 [![Made with](https://img.shields.io/badge/Made_with-HTML_|_CSS_|_JS-f59e0b?style=for-the-badge)](#)
 [![AI Powered](https://img.shields.io/badge/AI-Groq_API-ec4899?style=for-the-badge)](#)
@@ -36,13 +36,13 @@ A personal academic productivity web app that helps students study smarter — c
 
 ## 🖥️ Screenshots
 
-![StudyTracker Dashboard](screenshots/dashboard.png)
+![HourForge Dashboard](screenshots/dashboard.png)
 
 ---
 
 ## 🚀 Live Demo
 
-👉 **[Open StudyTracker →](https://susant07-star.github.io/StudyTracker/)**
+👉 **[Open HourForge →](https://susant07-star.github.io/HourForge/)**
 
 No installation needed. Works directly in your browser.
 
@@ -75,7 +75,7 @@ No installation needed. Works directly in your browser.
 > Go to **Time Tracker** and log each activity with a start time, end time, and subject. This feeds all the analytics charts.
 
 **5. Get AI Feedback**
-> Visit **AI Insights**, paste your free [Groq API key](https://console.groq.com/keys), and generate a daily/weekly/monthly mentor analysis.
+> Visit **AI Insights**, paste your free [Groq API key](https://console.groq.com/keys), and generate a daily/weekly/monthly mentor analysis of your habits on HourForge.
 
 **6. Backup Your Data**
 > Use the **Auto-Backup** button to link a local folder — data saves automatically in the background.
@@ -88,10 +88,10 @@ No build step required. Just open the file in any modern browser:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Susant07-star/StudyTracker.git
+git clone https://github.com/Susant07-star/HourForge.git
 
 # Navigate into the folder
-cd StudyTracker
+cd HourForge
 
 # Open in browser (double-click or use a local server)
 # With VS Code Live Server:
@@ -102,11 +102,11 @@ cd StudyTracker
 
 ## 🤖 AI Setup (Optional)
 
-StudyTracker uses the **Groq API** for AI-powered insights. It's completely free:
+HourForge uses the **Groq API** for AI-powered insights. It's completely free:
 
 1. Go to [console.groq.com/keys](https://console.groq.com/keys) and sign up for free
 2. Create an API key
-3. Open **AI Insights** tab in StudyTracker
+3. Open **AI Insights** tab in HourForge
 4. Paste your key and click **Save**
 5. Click **Generate AI Insights** 🎉
 
@@ -117,7 +117,7 @@ StudyTracker uses the **Groq API** for AI-powered insights. It's completely free
 ## 📁 Project Structure
 
 ```
-StudyTracker/
+HourForge/
 ├── index.html        # Main app — all views (Dashboard, Time Tracker, AI Insights)
 ├── style.css         # All styles — glassmorphism dark UI
 ├── script.js         # All logic — data management, charts, AI calls
@@ -148,6 +148,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 Built with ❤️ for students everywhere
 
-**[⭐ Star this repo](https://github.com/Susant07-star/StudyTracker)** if StudyTracker helped you study smarter!
+**[⭐ Star this repo](https://github.com/Susant07-star/HourForge)** if HourForge helped you study smarter!
 
 </div>
