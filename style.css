@@ -1501,7 +1501,6 @@ main#hourLogView.active {
     .tagline {
         font-size: 0.85rem;
         padding: 0 0.5rem;
-        margin-top: 9px;
     }
 
     .app-nav {
@@ -2944,7 +2943,7 @@ main#hourLogView.active {
 @media (max-width: 480px) {
     .header-icon-group {
         gap: 0.35rem;
-        margin-left: 0.5rem;
+        margin-top: 1.5rem;
     }
 
     .header-icon-btn {
