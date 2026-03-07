@@ -128,6 +128,7 @@ let aiRatingsHistory = JSON.parse(localStorage.getItem('aiRatingsHistory')) || [
     if (changed || deduped.length !== aiRatingsHistory.length) {
         aiRatingsHistory = deduped;
         localStorage.setItem('aiRatingsHistory', JSON.stringify(aiRatingsHistory));
+        uploadDataToCloud(); // Sync
     }
 }
 
@@ -196,8 +197,233 @@ const idb = {
             req.onsuccess = () => resolve();
             req.onerror = () => reject(req.error);
         });
-    }
 };
+
+// ==========================================
+// SUPABASE: AUTH & CLOUD SYNC UI HANDLERS
+// ==========================================
+const loginModal = document.getElementById('loginModal');
+const btnLoginIcon = document.getElementById('btnLoginIcon');
+const btnCloseLogin = document.getElementById('btnCloseLogin');
+const authForm = document.getElementById('authForm');
+const toggleAuthMode = document.getElementById('toggleAuthMode');
+const authEmail = document.getElementById('authEmail');
+const authPassword = document.getElementById('authPassword');
+const btnAuthSubmit = document.getElementById('btnAuthSubmit');
+const authMessage = document.getElementById('authMessage');
+const activeUserDisplay = document.getElementById('activeUserDisplay');
+const currentUserEmail = document.getElementById('currentUserEmail');
+const btnSignOut = document.getElementById('btnSignOut');
+const btnProfileIcon = document.getElementById('btnProfileIcon');
+
+let isSignUpMode = false;
+
+if (btnLoginIcon) btnLoginIcon.addEventListener('click', () => {
+    loginModal.style.display = 'flex';
+    authMessage.style.display = 'none';
+});
+if (btnCloseLogin) btnCloseLogin.addEventListener('click', () => loginModal.style.display = 'none');
+
+if (toggleAuthMode) toggleAuthMode.addEventListener('click', (e) => {
+    e.preventDefault();
+    isSignUpMode = !isSignUpMode;
+    toggleAuthMode.textContent = isSignUpMode ? 'Log In' : 'Sign Up';
+    btnAuthSubmit.textContent = isSignUpMode ? 'Create Account' : 'Sign In';
+    authMessage.style.display = 'none';
+});
+
+if (authForm) authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!supabase) return;
+    
+    authMessage.style.display = 'block';
+    authMessage.style.color = 'var(--text-secondary)';
+    authMessage.textContent = 'Processing...';
+    btnAuthSubmit.disabled = true;
+
+    const email = authEmail.value;
+    const password = authPassword.value;
+
+    try {
+        if (isSignUpMode) {
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            if (error) throw error;
+            authMessage.style.color = '#34d399';
+            authMessage.textContent = 'Success! Please check your email to verify (or log in if auto-verified).';
+        } else {
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            loginModal.style.display = 'none';
+            authForm.reset();
+        }
+    } catch (error) {
+        authMessage.style.color = '#ef4444';
+        authMessage.textContent = error.message;
+    } finally {
+        btnAuthSubmit.disabled = false;
+    }
+});
+
+if (btnSignOut) btnSignOut.addEventListener('click', async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    // Don't wipe local DB so they can keep working offline
+    showToast('Signed out. Local data preserved.', 'info');
+});
+
+function updateAuthUI() {
+    if (!btnLoginIcon || !activeUserDisplay) return;
+    if (currentSession) {
+        // Logged In
+        btnLoginIcon.style.display = 'none';
+        btnProfileIcon.style.display = 'flex';
+        activeUserDisplay.style.display = 'flex';
+        authForm.style.display = 'none';
+        if (currentUserEmail) currentUserEmail.textContent = currentSession.user.email;
+    } else {
+        // Logged Out
+        btnLoginIcon.style.display = 'flex';
+        btnProfileIcon.style.display = 'none'; // We keep the UI clean, only show login icon
+        activeUserDisplay.style.display = 'none';
+        authForm.style.display = 'block';
+    }
+}
+
+const supabaseUrl = 'https://dkhofhvqjhpwhmurlmtj.supabase.co';
+const supabaseKey = 'sb_publishable_iKrSXmlesEVVxZqGsk3QTg_pb1E86FT';
+const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+let currentSession = null;
+
+// Listen for Auth changes
+if (supabase) {
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        currentSession = session;
+        updateAuthUI();
+        if (event === 'SIGNED_IN') {
+            await syncDataWithCloud();
+        } else if (event === 'SIGNED_OUT') {
+            // Optional: clear local data on sign out? Usually better to keep it for offline use in single-user devices.
+            // For now, we will leave local data intact so they can keep using it offline.
+        }
+    });
+
+    // Check initial session on load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        currentSession = session;
+        updateAuthUI();
+        if (session) {
+            syncDataWithCloud();
+        }
+    });
+}
+
+// Data Sync Logic: Push to / Pull from Supabase
+async function syncDataWithCloud() {
+    if (!supabase || !currentSession) return;
+    
+    try {
+        console.log("☁️ Syncing with Supabase Cloud...");
+        const userId = currentSession.user.id;
+        
+        // 1. Fetch Cloud Data
+        const { data: cloudRow, error: fetchErr } = await supabase
+            .from('user_data')
+            .select('data, updated_at')
+            .eq('user_id', userId)
+            .single();
+
+        if (fetchErr && fetchErr.code !== 'PGRST116') { // Ignore "Rows not found" error
+            console.error("Cloud Fetch Error:", fetchErr);
+            return;
+        }
+
+        // Gather all local data
+        const localData = {
+            studySessions,
+            timeLogs,
+            aiRatingsHistory,
+            dbMigrationDone: localStorage.getItem('dbMigrationDone')
+        };
+        
+        let shouldUpload = true;
+
+        // Compare timestamps strategy (simple approach: if cloud exists, we download if it's "newer", but tracking local mutations is complex.)
+        // For V1 Sync: Cloud wins on Login if it exists. (A more robust CRDT sync is ideal for V2).
+        if (cloudRow && cloudRow.data) {
+            // Only overwrite local if cloud data is substantially different or "newer" by some metric.
+            // For now, let's assume Cloud is the master backup.
+            const cloudLen = JSON.stringify(cloudRow.data).length;
+            const localLen = JSON.stringify(localData).length;
+
+            if (cloudLen > 50 && cloudLen >= localLen) {
+                console.log("☁️ Downloading Cloud Master to Local...");
+                studySessions = cloudRow.data.studySessions || [];
+                timeLogs = cloudRow.data.timeLogs || [];
+                aiRatingsHistory = cloudRow.data.aiRatingsHistory || [];
+                
+                localStorage.setItem('studySessions', JSON.stringify(studySessions));
+                localStorage.setItem('timeLogs', JSON.stringify(timeLogs));
+                localStorage.setItem('aiRatingsHistory', JSON.stringify(aiRatingsHistory));
+                if(cloudRow.data.dbMigrationDone) localStorage.setItem('dbMigrationDone', cloudRow.data.dbMigrationDone);
+
+                // Update IDB mirror
+                await idb.set('studySessions', studySessions).catch(()=>{});
+                await idb.set('timeLogs', timeLogs).catch(()=>{});
+
+                // Refresh UI
+                updateTotals();
+                populateTopicFilter();
+                refreshAllTopicLists();
+                renderTable();
+                initChart();
+                checkRevisionsAndRemind();
+                
+                showToast("Cloud Data Synced! ☁️", "success");
+                shouldUpload = false; // We just downloaded, no need to upload immediately
+            }
+        }
+
+        // 2. Upload Local to Cloud
+        if (shouldUpload) {
+            uploadDataToCloud();
+        }
+
+    } catch (e) {
+        console.error("Sync caught error:", e);
+    }
+}
+
+// Fire and Forget Upload Function (throttled locally in practice, but called on data mutations)
+async function uploadDataToCloud() {
+    if (!supabase || !currentSession) return;
+    try {
+        console.log("☁️ Uploading Local to Cloud...");
+        const payload = {
+            user_id: currentSession.user.id,
+            updated_at: new Date().toISOString(),
+            data: {
+                studySessions,
+                timeLogs,
+                aiRatingsHistory,
+                dbMigrationDone: localStorage.getItem('dbMigrationDone')
+            }
+        };
+
+        const { error } = await supabase.from('user_data').upsert(payload, { onConflict: 'user_id' });
+        
+        if (error) {
+            console.warn("Cloud Upload Failed (will retry later):", error.message);
+        } else {
+            console.log("☁️ Upload Success.");
+        }
+    } catch (e) {
+        console.warn("Cloud Upload Exception:", e);
+    }
+}
+
+// Inject uploadDataToCloud into existing save/mutate functions
+// (We will hook this into updateTotals and other save routines later)
 
 // ==========================================
 // DB MIGRATION (StudyTracker -> HourForge)
