@@ -295,6 +295,7 @@ async function syncDataWithCloud(isInitialLoad = false) {
 
         // Gather all local data
         const localData = {
+            profile: getProfile(),
             studySessions,
             timeLogs,
             aiRatingsHistory,
@@ -313,6 +314,7 @@ async function syncDataWithCloud(isInitialLoad = false) {
 
             if (cloudLen > 50 && cloudLen >= localLen) {
                 console.log("☁️ Downloading Cloud Master to Local...");
+                if (cloudRow.data.profile) saveProfile(cloudRow.data.profile);
                 studySessions = cloudRow.data.studySessions || [];
                 timeLogs = cloudRow.data.timeLogs || [];
                 aiRatingsHistory = cloudRow.data.aiRatingsHistory || [];
@@ -360,6 +362,7 @@ async function uploadDataToCloud() {
             user_id: currentSession.user.id,
             updated_at: new Date().toISOString(),
             data: {
+                profile: getProfile(),
                 studySessions,
                 timeLogs,
                 aiRatingsHistory,
@@ -1670,37 +1673,20 @@ document.getElementById('profileForm').addEventListener('submit', async (e) => {
     };
 
     // Save to local storage for immediate offline access
-    localStorage.setItem('hourForge_studentProfile', JSON.stringify(profileData));
+    saveProfile(profileData);
     
     // Sync to Supabase user_data record if logged in
     if (currentSession && supabaseClient) {
-        try {
-            const btn = document.querySelector('.profile-save-btn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing...';
-            btn.disabled = true;
+        const btn = document.querySelector('.profile-save-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing...';
+        btn.disabled = true;
 
-            const { error } = await supabaseClient
-                .from('user_data')
-                .upsert({
-                    id: currentSession.user.id,
-                    student_profile: profileData,
-                    updated_at: new Date().toISOString()
-                }, { onConflict: 'id' });
-                
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-
-            if (error) {
-                console.error("Failed to sync profile:", error);
-                showToast('Profile saved locally. Cloud sync failed.', 'warning');
-            } else {
-                showToast('Profile saved and synced successfully! 🎓', 'success');
-            }
-        } catch (err) {
-            console.error("Profile sync exception:", err);
-            showToast('Profile saved locally.', 'success');
-        }
+        await uploadDataToCloud();
+            
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        showToast('Profile saved and synced successfully! 🎓', 'success');
     } else {
         showToast('Profile saved locally! 🎓', 'success');
     }
