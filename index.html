@@ -895,15 +895,45 @@
     <!-- Main Logic Script -->
     <script src="script.js"></script>
     
-    <!-- PWA Service Worker Registration -->
+    <!-- PWA Service Worker: Force-clear old caches, then register fresh -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then((reg) => console.log('Service Worker registered!', reg))
-                    .catch((err) => console.error('Service Worker registration failed: ', err));
-            });
-        }
+        (async function() {
+            if (!('serviceWorker' in navigator)) return;
+            
+            const CURRENT_SW_VERSION = 'v6';
+            const lastVersion = localStorage.getItem('sw_version');
+            
+            // If the version changed or never set, nuke everything and start fresh
+            if (lastVersion !== CURRENT_SW_VERSION) {
+                console.log('🔄 Clearing old service worker caches...');
+                
+                // 1. Unregister ALL existing service workers
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const reg of registrations) {
+                    await reg.unregister();
+                    console.log('✅ Unregistered old SW');
+                }
+                
+                // 2. Delete ALL caches
+                const cacheNames = await caches.keys();
+                for (const name of cacheNames) {
+                    await caches.delete(name);
+                    console.log('✅ Deleted cache:', name);
+                }
+                
+                // 3. Mark as done
+                localStorage.setItem('sw_version', CURRENT_SW_VERSION);
+                console.log('✅ Old caches nuked! Registering fresh SW...');
+            }
+            
+            // Register the (new) service worker
+            try {
+                const reg = await navigator.serviceWorker.register('./sw.js');
+                console.log('✅ Service Worker registered!', reg);
+            } catch (err) {
+                console.error('Service Worker registration failed:', err);
+            }
+        })();
     </script>
 </body>
 
