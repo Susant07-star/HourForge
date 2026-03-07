@@ -3450,47 +3450,60 @@ main#hourLogView.active {
     left: 0;
     right: 0;
     z-index: 250;
-    height: calc(64px + env(safe-area-inset-bottom));
+    height: calc(70px + env(safe-area-inset-bottom));
     padding-bottom: env(safe-area-inset-bottom);
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-around;
-    background: rgba(15, 12, 41, 0.92);
+    background: rgba(10, 8, 32, 0.96);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border-top: 1px solid rgba(255,255,255,0.07);
-    box-shadow: 0 -8px 32px rgba(0,0,0,0.25);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
     pointer-events: auto;
 }
 
 .bottom-nav-item {
     background: none;
     border: none;
-    color: rgba(148,163,184,0.7);
-    font-size: 1.35rem;
+    color: rgba(148,163,184,0.6);
+    font-size: 1.25rem;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 0.5rem 1.2rem;
-    border-radius: 12px;
-    transition: color 0.2s, transform 0.15s;
-    min-width: 52px;
-    min-height: 52px;
+    gap: 3px;
+    flex: 1;
+    padding: 0.4rem 0.25rem 0.5rem;
+    border-radius: 0;
+    transition: color 0.2s, background 0.2s;
+    min-height: 62px;
     position: relative;
+    -webkit-tap-highlight-color: transparent;
 }
-.bottom-nav-item:active { transform: scale(0.9); }
+.bottom-nav-item:active {
+    background: rgba(255,255,255,0.04);
+    transform: none;
+}
+.bottom-nav-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    opacity: 0.8;
+    margin-top: 1px;
+}
 
 .bottom-nav-dot {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
     background: var(--accent-primary, #818cf8);
     opacity: 0;
     transition: opacity 0.2s, transform 0.2s;
     transform: scale(0);
+    position: absolute;
+    top: 6px;
 }
 
 .bottom-nav-item.active {
@@ -3501,11 +3514,13 @@ main#hourLogView.active {
     transform: scale(1);
 }
 .bottom-nav-item.active i {
-    filter: drop-shadow(0 0 6px rgba(129,140,248,0.6));
+    filter: drop-shadow(0 0 8px rgba(129,140,248,0.7));
+}
+.bottom-nav-item.active .bottom-nav-label {
+    color: var(--accent-primary, #818cf8);
 }
 
 /* ---- MAIN CONTENT LAYOUT ADJUSTMENTS ---- */
-/* Push content below top bar and above bottom nav */
 .app-container {
     display: flex;
     flex-direction: column;
@@ -3515,7 +3530,7 @@ main#hourLogView.active {
 .main-content.view-section,
 .insights-layout {
     padding-top: calc(56px + 1.5rem) !important;
-    padding-bottom: calc(75px + 1.5rem + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(80px + 1.5rem + env(safe-area-inset-bottom)) !important;
 }
 
 /* Hide the old top-nav / app-nav completely */
@@ -3524,20 +3539,32 @@ main#hourLogView.active {
     display: none !important;
 }
 
+/* Consistent card spacing */
+.glass-panel {
+    margin-bottom: 1rem;
+}
+
 /* Extra clearance for mobile view to ensure headers aren't caught under the blur */
 @media (max-width: 768px) {
     .main-content.view-section {
-        padding-top: 5.5rem !important; /* 88px */
-        padding-bottom: 7rem !important; /* 112px */
+        padding-top: 6rem !important;  /* 96px — above the 56px fixed top bar */
+        padding-bottom: 7.5rem !important; /* 120px — above the 70px fixed bottom nav */
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    .view-section > h2:first-child,
+    .view-section > h1:first-child {
+        margin-top: 0;
     }
 }
 
 /* ---- MOBILE SPACING TWEAKS ---- */
 @media (max-width: 480px) {
     .bottom-nav-item {
-        font-size: 1.2rem;
-        padding: 0.5rem 0.8rem;
+        font-size: 1.1rem;
+        gap: 2px;
     }
+    .bottom-nav-label { font-size: 0.58rem; }
     .top-bar-title span { font-size: 1rem; }
 }
 

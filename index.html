@@ -892,24 +892,29 @@
     <!-- ===================== BOTTOM NAV BAR ===================== -->
     <nav class="bottom-nav" id="bottomNav">
         <button class="bottom-nav-item active" data-view="dashboardView" aria-label="Dashboard">
-            <i class="fa-solid fa-layer-group"></i>
             <span class="bottom-nav-dot"></span>
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="bottom-nav-label">Home</span>
         </button>
         <button class="bottom-nav-item" data-view="tableView" aria-label="Log Table">
-            <i class="fa-solid fa-table"></i>
             <span class="bottom-nav-dot"></span>
+            <i class="fa-solid fa-table"></i>
+            <span class="bottom-nav-label">Log</span>
         </button>
         <button class="bottom-nav-item" data-view="hourLogView" aria-label="Time Tracker">
-            <i class="fa-solid fa-clock"></i>
             <span class="bottom-nav-dot"></span>
+            <i class="fa-solid fa-clock"></i>
+            <span class="bottom-nav-label">Hours</span>
         </button>
         <button class="bottom-nav-item" data-view="insightsView" aria-label="AI Insights">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
             <span class="bottom-nav-dot"></span>
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span class="bottom-nav-label">Insights</span>
         </button>
         <button class="bottom-nav-item" data-view="pomodoroView" id="bottomNavPomodoro" aria-label="Pomodoro Timer">
-            <i class="fa-solid fa-hourglass-half"></i>
             <span class="bottom-nav-dot"></span>
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span class="bottom-nav-label">Focus</span>
         </button>
     </nav>
     
@@ -962,7 +967,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v7';
+            const CURRENT_SW_VERSION = 'v8';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh
