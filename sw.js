@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hourforge-v9';
+const CACHE_NAME = 'hourforge-v10';
 const ASSETS = [
     './',
     './index.html',
@@ -61,7 +61,7 @@ self.addEventListener('fetch', (e) => {
                 const clone = response.clone();
                 caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
                 return response;
-            }).catch(() => caches.match(e.request))
+            }).catch(() => caches.match(e.request).then(cachedRes => cachedRes || new Response("Network error", {status: 503})))
         );
     } else {
         // Cache first for images/icons/manifest
