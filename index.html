@@ -32,7 +32,22 @@
 </head>
 
 <body>
-    <div class="app-container">
+    <!-- Full-Screen Login Gate -->
+    <div id="loginGate" class="login-gate" style="display: flex;">
+        <div class="login-gate-content">
+            <div class="login-gate-logo">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <h1>HourForge</h1>
+            <p>Welcome back. Please sign in to sync your study data.</p>
+            <button id="btnGoogleSignIn" class="google-signin-btn">
+                <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="google-logo">
+                Sign in with Google
+            </button>
+        </div>
+    </div>
+
+    <div class="app-container" id="mainAppContainer" style="display: none;">
         <!-- Header Section -->
         <header class="top-nav">
             <!-- Centered title -->
@@ -46,17 +61,13 @@
                     <i class="fa-solid fa-download"></i>
                     <span class="header-icon-label">Install</span>
                 </button>
-                <button id="btnInfoIcon" class="header-icon-btn" title="App Info">
-                    <i class="fa-solid fa-circle-info"></i>
-                    <span class="header-icon-label">Info</span>
-                </button>
-                <button id="btnLoginIcon" class="header-icon-btn login-icon-btn" title="Cloud Sync / Login">
-                    <i class="fa-solid fa-cloud"></i>
-                    <span class="header-icon-label">Sync</span>
-                </button>
                 <button id="btnProfileIcon" class="header-icon-btn profile-icon-btn" title="Student Profile">
                     <i class="fa-solid fa-user-graduate"></i>
                     <span class="header-icon-label">Profile</span>
+                </button>
+                <button id="btnSignOutIcon" class="header-icon-btn logout-icon-btn" title="Sign Out">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span class="header-icon-label">Logout</span>
                 </button>
                 <button id="btnPomodoroIcon" class="header-icon-btn pomodoro-icon-btn" title="Pomodoro Timer">
                     <i class="fa-solid fa-hourglass-half"></i>
@@ -851,7 +862,7 @@
         </button>
     </div>
 
-    <!-- =================== LOGIN / SIGNUP MODAL =================== -->
+    <!-- The email/password login modal is completely removed as we pivoted to mandatory Google Auth -->
     <div id="loginModal" class="modal-overlay" style="display:none;">
         <div class="modal-box login-modal" style="max-width: 400px; text-align: center;">
             <div class="modal-header" style="justify-content: center; position: relative;">

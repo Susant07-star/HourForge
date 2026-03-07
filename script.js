@@ -333,93 +333,57 @@ async function uploadDataToCloud() {
 }
 
 // ==========================================
-// SUPABASE: AUTH UI EVENT HANDLERS
+// SUPABASE: MANDATORY GOOGLE AUTH
 // ==========================================
-const loginModal = document.getElementById('loginModal');
-const btnLoginIcon = document.getElementById('btnLoginIcon');
-const btnCloseLogin = document.getElementById('btnCloseLogin');
-const authForm = document.getElementById('authForm');
-const toggleAuthMode = document.getElementById('toggleAuthMode');
-const authEmail = document.getElementById('authEmail');
-const authPassword = document.getElementById('authPassword');
-const btnAuthSubmit = document.getElementById('btnAuthSubmit');
-const authMessage = document.getElementById('authMessage');
-const activeUserDisplay = document.getElementById('activeUserDisplay');
-const currentUserEmail = document.getElementById('currentUserEmail');
-const btnSignOut = document.getElementById('btnSignOut');
-const btnProfileIcon = document.getElementById('btnProfileIcon');
+const loginGate = document.getElementById('loginGate');
+const mainAppContainer = document.getElementById('mainAppContainer');
+const btnGoogleSignIn = document.getElementById('btnGoogleSignIn');
+const btnSignOutIcon = document.getElementById('btnSignOutIcon');
 
-let isSignUpMode = false;
-
-if (btnLoginIcon) btnLoginIcon.addEventListener('click', () => {
-    loginModal.style.display = 'flex';
-    authMessage.style.display = 'none';
-});
-if (btnCloseLogin) btnCloseLogin.addEventListener('click', () => loginModal.style.display = 'none');
-
-if (toggleAuthMode) toggleAuthMode.addEventListener('click', (e) => {
-    e.preventDefault();
-    isSignUpMode = !isSignUpMode;
-    toggleAuthMode.textContent = isSignUpMode ? 'Log In' : 'Sign Up';
-    btnAuthSubmit.textContent = isSignUpMode ? 'Create Account' : 'Sign In';
-    authMessage.style.display = 'none';
-});
-
-if (authForm) authForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!supabaseClient) return;
-    
-    authMessage.style.display = 'block';
-    authMessage.style.color = 'var(--text-secondary)';
-    authMessage.textContent = 'Processing...';
-    btnAuthSubmit.disabled = true;
-
-    const email = authEmail.value;
-    const password = authPassword.value;
-
-    try {
-        if (isSignUpMode) {
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
+if (btnGoogleSignIn) {
+    btnGoogleSignIn.addEventListener('click', async () => {
+        if (!supabaseClient) return;
+        btnGoogleSignIn.disabled = true;
+        btnGoogleSignIn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+        
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            });
             if (error) throw error;
-            authMessage.style.color = '#34d399';
-            authMessage.textContent = 'Success! Please check your email to verify (or log in if auto-verified).';
-        } else {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-            loginModal.style.display = 'none';
-            authForm.reset();
+        } catch (error) {
+            console.error('Google Auth Error:', error);
+            alert('Failed to connect to Google. Please try again.');
+            btnGoogleSignIn.disabled = false;
+            btnGoogleSignIn.innerHTML = '<img src="https://www.google.com/favicon.ico" alt="Google Logo" class="google-logo"> Sign in with Google';
         }
-    } catch (error) {
-        authMessage.style.color = '#ef4444';
-        authMessage.textContent = error.message;
-    } finally {
-        btnAuthSubmit.disabled = false;
-    }
-});
+    });
+}
 
-if (btnSignOut) btnSignOut.addEventListener('click', async () => {
-    if (!supabaseClient) return;
-    await supabaseClient.auth.signOut();
-    showToast('Signed out. Local data preserved.', 'info');
-});
+if (btnSignOutIcon) {
+    btnSignOutIcon.addEventListener('click', async () => {
+        if (!supabaseClient) return;
+        if (confirm("Sign out of HourForge? Your data is synced to the cloud.")) {
+            await supabaseClient.auth.signOut();
+            window.location.reload(); // Force reload to show login gate
+        }
+    });
+}
 
 function updateAuthUI() {
-    if (!btnLoginIcon) return;
+    if (!loginGate || !mainAppContainer) return;
+    
     if (currentSession) {
-        // Logged In — change Sync icon to indicate connected
-        btnLoginIcon.innerHTML = '<i class="fa-solid fa-cloud" style="color:#34d399;"></i><span class="header-icon-label">Synced</span>';
-        btnLoginIcon.title = 'Cloud Sync — Connected';
-        btnLoginIcon.style.borderColor = 'rgba(52, 211, 153, 0.3)';
-        if (activeUserDisplay) activeUserDisplay.style.display = 'flex';
-        if (authForm) authForm.style.display = 'none';
-        if (currentUserEmail) currentUserEmail.textContent = currentSession.user.email;
+        // User is logged in -> Hide Gate, Show App
+        loginGate.style.display = 'none';
+        mainAppContainer.style.display = 'block';
     } else {
-        // Logged Out — show default cloud icon
-        btnLoginIcon.innerHTML = '<i class="fa-solid fa-cloud"></i><span class="header-icon-label">Sync</span>';
-        btnLoginIcon.title = 'Cloud Sync / Login';
-        btnLoginIcon.style.borderColor = '';
-        if (activeUserDisplay) activeUserDisplay.style.display = 'none';
-        if (authForm) authForm.style.display = 'block';
+        // User is logged out -> Show Gate, Hide App
+        loginGate.style.display = 'flex';
+        mainAppContainer.style.display = 'none';
     }
 }
 
