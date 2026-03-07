@@ -305,6 +305,10 @@ async function syncDataWithCloud(isInitialLoad = false) {
 
     } catch (e) {
         console.error("Sync caught error:", e);
+        if (isInitialLoad && !isAppInitialized) {
+            init(); // MUST FALLBACK ON EXCEPTION TOO
+            isAppInitialized = true;
+        }
     }
 }
 
