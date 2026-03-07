@@ -197,7 +197,7 @@ const idb = {
 // ==========================================
 const supabaseUrl = 'https://dkhofhvqjhpwhmurlmtj.supabase.co';
 const supabaseKey = 'sb_publishable_iKrSXmlesEVVxZqGsk3QTg_pb1E86FT';
-const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
 
 let currentSession = null;
 
@@ -206,8 +206,8 @@ let currentSession = null;
 // ==========================================
 
 // Listen for Auth changes
-if (supabase) {
-    supabase.auth.onAuthStateChange(async (event, session) => {
+if (supabaseClient) {
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
         currentSession = session;
         updateAuthUI();
         if (event === 'SIGNED_IN') {
@@ -219,7 +219,7 @@ if (supabase) {
     });
 
     // Check initial session on load
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
         currentSession = session;
         updateAuthUI();
         if (session) {
@@ -230,14 +230,14 @@ if (supabase) {
 
 // Data Sync Logic: Push to / Pull from Supabase
 async function syncDataWithCloud() {
-    if (!supabase || !currentSession) return;
+    if (!supabaseClient || !currentSession) return;
     
     try {
         console.log("☁️ Syncing with Supabase Cloud...");
         const userId = currentSession.user.id;
         
         // 1. Fetch Cloud Data
-        const { data: cloudRow, error: fetchErr } = await supabase
+        const { data: cloudRow, error: fetchErr } = await supabaseClient
             .from('user_data')
             .select('data, updated_at')
             .eq('user_id', userId)
@@ -306,7 +306,7 @@ async function syncDataWithCloud() {
 
 // Fire and Forget Upload Function (throttled locally in practice, but called on data mutations)
 async function uploadDataToCloud() {
-    if (!supabase || !currentSession) return;
+    if (!supabaseClient || !currentSession) return;
     try {
         console.log("☁️ Uploading Local to Cloud...");
         const payload = {
@@ -320,7 +320,7 @@ async function uploadDataToCloud() {
             }
         };
 
-        const { error } = await supabase.from('user_data').upsert(payload, { onConflict: 'user_id' });
+        const { error } = await supabaseClient.from('user_data').upsert(payload, { onConflict: 'user_id' });
         
         if (error) {
             console.warn("Cloud Upload Failed (will retry later):", error.message);
@@ -367,7 +367,7 @@ if (toggleAuthMode) toggleAuthMode.addEventListener('click', (e) => {
 
 if (authForm) authForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!supabase) return;
+    if (!supabaseClient) return;
     
     authMessage.style.display = 'block';
     authMessage.style.color = 'var(--text-secondary)';
@@ -379,12 +379,12 @@ if (authForm) authForm.addEventListener('submit', async (e) => {
 
     try {
         if (isSignUpMode) {
-            const { data, error } = await supabase.auth.signUp({ email, password });
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
             if (error) throw error;
             authMessage.style.color = '#34d399';
             authMessage.textContent = 'Success! Please check your email to verify (or log in if auto-verified).';
         } else {
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) throw error;
             loginModal.style.display = 'none';
             authForm.reset();
@@ -398,8 +398,8 @@ if (authForm) authForm.addEventListener('submit', async (e) => {
 });
 
 if (btnSignOut) btnSignOut.addEventListener('click', async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
+    if (!supabaseClient) return;
+    await supabaseClient.auth.signOut();
     showToast('Signed out. Local data preserved.', 'info');
 });
 
