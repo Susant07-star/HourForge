@@ -61,7 +61,6 @@
                         <div class="sidebar-brand-name">HourForge</div>
                         <div class="sidebar-brand-tagline">2-4-7 Spaced Repetition</div>
                     </div>
-                </div>
             </div>
 
             <div class="sidebar-user-card">
@@ -125,6 +124,9 @@
             <div class="top-bar-title">
                 <i class="fa-solid fa-brain"></i>
                 <span>HourForge</span>
+                <span id="topBarStreak" class="topbar-streak" style="display:none;">
+                    <i class="fa-solid fa-fire"></i> <span id="topBarStreakCount">0</span>
+                </span>
             </div>
 
             <div class="top-bar-right">
@@ -889,6 +891,30 @@
         </button>
     </div>
 
+    <!-- ===================== BOTTOM NAV BAR ===================== -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="bottom-nav-item active" data-view="dashboardView" aria-label="Dashboard">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="bottom-nav-dot"></span>
+        </button>
+        <button class="bottom-nav-item" data-view="tableView" aria-label="Log Table">
+            <i class="fa-solid fa-table"></i>
+            <span class="bottom-nav-dot"></span>
+        </button>
+        <button class="bottom-nav-item" data-view="hourLogView" aria-label="Time Tracker">
+            <i class="fa-solid fa-clock"></i>
+            <span class="bottom-nav-dot"></span>
+        </button>
+        <button class="bottom-nav-item" data-view="insightsView" aria-label="AI Insights">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span class="bottom-nav-dot"></span>
+        </button>
+        <button class="bottom-nav-item" data-view="pomodoroView" id="bottomNavPomodoro" aria-label="Pomodoro Timer">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span class="bottom-nav-dot"></span>
+        </button>
+    </nav>
+    
     <!-- The email/password login modal is completely removed as we pivoted to mandatory Google Auth -->
     <div id="loginModal" class="modal-overlay" style="display:none;">
         <div class="modal-box login-modal" style="max-width: 400px; text-align: center;">
@@ -973,30 +999,6 @@
             }
         })();
     </script>
-
-    <!-- ===================== BOTTOM NAV BAR ===================== -->
-    <nav class="bottom-nav" id="bottomNav">
-        <button class="bottom-nav-item active" data-view="dashboardView" aria-label="Dashboard">
-            <i class="fa-solid fa-layer-group"></i>
-            <span class="bottom-nav-dot"></span>
-        </button>
-        <button class="bottom-nav-item" data-view="tableView" aria-label="Log Table">
-            <i class="fa-solid fa-table"></i>
-            <span class="bottom-nav-dot"></span>
-        </button>
-        <button class="bottom-nav-item" data-view="hourLogView" aria-label="Time Tracker">
-            <i class="fa-solid fa-clock"></i>
-            <span class="bottom-nav-dot"></span>
-        </button>
-        <button class="bottom-nav-item" data-view="insightsView" aria-label="AI Insights">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span class="bottom-nav-dot"></span>
-        </button>
-        <button class="bottom-nav-item" data-view="pomodoroView" id="bottomNavPomodoro" aria-label="Pomodoro Timer">
-            <i class="fa-solid fa-hourglass-half"></i>
-            <span class="bottom-nav-dot"></span>
-        </button>
-    </nav>
 
 </body>
 

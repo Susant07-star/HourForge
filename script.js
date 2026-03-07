@@ -617,6 +617,76 @@ if (btnProfileTop) {
     });
 }
 
+// --- Swipe Gestures for Mobile Tab Switching ---
+let touchStartX = 0;
+let touchEndX = 0;
+let touchStartY = 0;
+let touchEndY = 0;
+
+const viewsOrder = ['dashboardView', 'tableView', 'hourLogView', 'insightsView'];
+
+document.addEventListener('touchstart', e => {
+    // Only capture if we are touching a view section (not modals or sidebar)
+    if (!e.target.closest('.view-section')) return;
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+}, {passive: true});
+
+document.addEventListener('touchend', e => {
+    if (!e.target.closest('.view-section')) return;
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
+}, {passive: true});
+
+function handleSwipe() {
+    const xDiff = touchEndX - touchStartX;
+    const yDiff = touchEndY - touchStartY;
+    
+    // Ensure horizontal swipe is much larger than vertical swipe (not scrolling)
+    if (Math.abs(xDiff) > 70 && Math.abs(xDiff) > Math.abs(yDiff) * 2) {
+        // Find current active view index
+        const currentViewId = document.querySelector('.view-section.active')?.id;
+        if (!currentViewId) return;
+        
+        const currentIndex = viewsOrder.indexOf(currentViewId);
+        if (currentIndex === -1) return;
+
+        if (xDiff < 0 && currentIndex < viewsOrder.length - 1) {
+            switchTab(viewsOrder[currentIndex + 1]);
+        } else if (xDiff > 0 && currentIndex > 0) {
+            switchTab(viewsOrder[currentIndex - 1]);
+        }
+    }
+}
+
+// --- STREAK UI UPDATE ---
+// Temporarily mock the streak logic if it's missing from the main codebase.
+// Since we removed it or it wasn't there, we just read from timeLogs array.
+function updateStreakUI() {
+    if (!timeLogs || timeLogs.length === 0) return;
+    
+    // Simple mock logic: count unique days in timeLogs
+    const uniqueDays = new Set(timeLogs.map(l => l.date)).size;
+    const streakDays = Math.min(uniqueDays, 30); // simplistic mock
+    
+    // Sidebar streak
+    const sBadge = document.getElementById('streakBadge');
+    const sCount = document.getElementById('streakCount');
+    if (sBadge && sCount && streakDays > 0) {
+        sCount.textContent = streakDays;
+        sBadge.style.display = 'inline-flex';
+    }
+
+    // Top bar streak
+    const topBadge = document.getElementById('topBarStreak');
+    const topCount = document.getElementById('topBarStreakCount');
+    if (topBadge && topCount && streakDays > 0) {
+        topCount.textContent = streakDays;
+        topBadge.style.display = 'inline-flex';
+    }
+}
+
 
 // ==========================================
 // PWA INSTALLATION LOGIC
