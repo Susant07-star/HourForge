@@ -1094,21 +1094,10 @@ document.getElementById('btnProfileIcon').addEventListener('click', showProfileM
 // ==========================================
 // INFO MODAL
 // ==========================================
-function showInfoModal() {
-    const m = document.getElementById('infoModal');
-    m.style.display = 'flex';
-    setTimeout(() => m.classList.add('active'), 10);
-}
-function hideInfoModal() {
-    const m = document.getElementById('infoModal');
-    m.classList.remove('active');
-    setTimeout(() => { m.style.display = 'none'; }, 300);
-}
-document.getElementById('btnInfoIcon').addEventListener('click', showInfoModal);
-document.getElementById('btnCloseInfo').addEventListener('click', hideInfoModal);
-document.getElementById('infoModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('infoModal')) hideInfoModal();
-});
+// ==========================================
+// INFO MODAL (Removed in favor of Google Auth Gate)
+// ==========================================
+// Info Modal button was removed from the header.
 
 // ==========================================
 // POMODORO TIMER
