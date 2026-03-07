@@ -266,12 +266,20 @@ async function syncDataWithCloud(isInitialLoad = false) {
         console.log("☁️ Syncing with Supabase Cloud...");
         const userId = currentSession.user.id;
         
-        // 1. Fetch Cloud Data
-        const { data: cloudRow, error: fetchErr } = await supabaseClient
-            .from('user_data')
-            .select('data, updated_at')
-            .eq('user_id', userId)
-            .single();
+        // Timeout helper — if Supabase hangs for 4s, abort and boot locally
+        const timeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Supabase timeout')), 4000)
+        );
+
+        // 1. Fetch Cloud Data (race against timeout)
+        const { data: cloudRow, error: fetchErr } = await Promise.race([
+            supabaseClient
+                .from('user_data')
+                .select('data, updated_at')
+                .eq('user_id', userId)
+                .single(),
+            timeout.then(() => ({ data: null, error: { code: 'TIMEOUT' } }))
+        ]);
 
         if (fetchErr && fetchErr.code !== 'PGRST116') { // Ignore "Rows not found" error
             console.error("Cloud Fetch Error:", fetchErr);
