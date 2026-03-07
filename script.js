@@ -211,6 +211,7 @@ if (supabaseClient) {
         const wasLoggedOut = !currentSession && session;
         currentSession = session;
         updateAuthUI();
+        loadUserAvatarAndName(session);
         if (event === 'SIGNED_IN' || wasLoggedOut) {
             await syncDataWithCloud(true);
         } else if (event === 'SIGNED_OUT') {
@@ -222,6 +223,7 @@ if (supabaseClient) {
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         currentSession = session;
         updateAuthUI();
+        loadUserAvatarAndName(session);
         if (session) {
             syncDataWithCloud(true);
         } else if (!isAppInitialized) {
@@ -497,9 +499,124 @@ async function migrateDatabaseIfNeeded() {
     });
 }
 
-// DOM Elements - Navigation & Views
+// ==========================================
+// MOBILE NAVIGATION — Bottom Tab Bar + Sidebar
+// ==========================================
+
+// Keep old selectors alive for any existing code that references them
 const navBtns = document.querySelectorAll('.nav-btn');
 const viewSections = document.querySelectorAll('.view-section');
+
+// --- Tab switching (used by bottom nav AND sidebar) ---
+function switchTab(viewId) {
+    // Show the right view section
+    document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(viewId);
+    if (target) target.classList.add('active');
+
+    // Update bottom nav active state
+    document.querySelectorAll('.bottom-nav-item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === viewId);
+    });
+
+    // Update sidebar nav active state
+    document.querySelectorAll('.sidebar-nav-item').forEach(btn => {
+        btn.classList.remove('active-sidebar-item');
+    });
+
+    // Scroll to top of view
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// --- Bottom nav click handler ---
+document.querySelectorAll('.bottom-nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        if (view === 'pomodoroView') {
+            // Trigger Pomodoro modal instead of switching view
+            const pomoBtn = document.getElementById('btnPomodoroIcon');
+            if (pomoBtn) pomoBtn.click();
+        } else {
+            switchTab(view);
+        }
+    });
+});
+
+// Also wire up old nav-btn clicks (compat)
+navBtns.forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.view));
+});
+
+// --- Sidebar open / close ---
+const sidebarDrawer = document.getElementById('sidebarDrawer');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const btnHamburger = document.getElementById('btnHamburger');
+
+function openSidebar() {
+    sidebarDrawer && sidebarDrawer.classList.add('open');
+    sidebarOverlay && sidebarOverlay.classList.add('active');
+    document.body.classList.add('sidebar-open');
+}
+function closeSidebar() {
+    sidebarDrawer && sidebarDrawer.classList.remove('open');
+    sidebarOverlay && sidebarOverlay.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
+}
+
+if (btnHamburger) btnHamburger.addEventListener('click', openSidebar);
+if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+// Sidebar profile button → open profile modal
+const btnSidebarProfileOpen = document.getElementById('btnSidebarProfileOpen');
+if (btnSidebarProfileOpen) {
+    btnSidebarProfileOpen.addEventListener('click', () => {
+        closeSidebar();
+        if (typeof showProfileModal === 'function') showProfileModal();
+    });
+}
+
+// --- Load Google Avatar from Supabase session ---
+function loadUserAvatarAndName(session) {
+    if (!session) return;
+    const meta = session.user?.user_metadata || {};
+    const avatarUrl = meta.avatar_url || meta.picture || '';
+    const name = meta.full_name || meta.name || 'Student';
+    const email = session.user?.email || '';
+
+    // Top bar avatar
+    const topImg = document.getElementById('topAvatarImg');
+    const topFallback = document.getElementById('topAvatarFallback');
+    if (topImg && avatarUrl) {
+        topImg.src = avatarUrl;
+        topImg.style.display = 'block';
+        if (topFallback) topFallback.style.display = 'none';
+    }
+
+    // Sidebar avatar + user info
+    const sidebarImg = document.getElementById('sidebarAvatar');
+    const sidebarFallback = document.getElementById('sidebarAvatarFallback');
+    if (sidebarImg && avatarUrl) {
+        sidebarImg.src = avatarUrl;
+        sidebarImg.style.display = 'block';
+        if (sidebarFallback) sidebarFallback.style.display = 'none';
+    } else if (sidebarFallback) {
+        sidebarFallback.style.display = 'flex';
+    }
+
+    const nameEl = document.getElementById('sidebarUserName');
+    const emailEl = document.getElementById('sidebarUserEmail');
+    if (nameEl) nameEl.textContent = name;
+    if (emailEl) emailEl.textContent = email;
+}
+
+// Wire profile button in top bar to open profile modal
+const btnProfileTop = document.getElementById('btnProfileIcon');
+if (btnProfileTop) {
+    btnProfileTop.addEventListener('click', () => {
+        if (typeof showProfileModal === 'function') showProfileModal();
+    });
+}
+
 
 // ==========================================
 // PWA INSTALLATION LOGIC

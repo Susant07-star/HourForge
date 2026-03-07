@@ -48,74 +48,101 @@
     </div>
 
     <div class="app-container" id="mainAppContainer" style="display: none;">
-        <!-- Header Section -->
-        <header class="top-nav">
-            <!-- Centered title -->
-            <div class="logo">
+
+        <!-- ===================== SIDEBAR OVERLAY ===================== -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- ===================== SIDEBAR DRAWER ===================== -->
+        <aside id="sidebarDrawer" class="sidebar-drawer">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="fa-solid fa-brain sidebar-brand-icon"></i>
+                    <div>
+                        <div class="sidebar-brand-name">HourForge</div>
+                        <div class="sidebar-brand-tagline">2-4-7 Spaced Repetition</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-user-card">
+                <img id="sidebarAvatar" class="sidebar-avatar" src="" alt="Profile" onerror="this.src=''; this.style.display='none'; document.getElementById('sidebarAvatarFallback').style.display='flex';">
+                <div id="sidebarAvatarFallback" class="sidebar-avatar-fallback"><i class="fa-solid fa-user"></i></div>
+                <div class="sidebar-user-info">
+                    <div id="sidebarUserName" class="sidebar-user-name">Student</div>
+                    <div id="sidebarUserEmail" class="sidebar-user-email">Not signed in</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="sidebar-nav-item active-sidebar-item" onclick="switchTab('dashboardView'); closeSidebar();">
+                    <i class="fa-solid fa-layer-group"></i> Dashboard
+                </button>
+                <button class="sidebar-nav-item" onclick="switchTab('tableView'); closeSidebar();">
+                    <i class="fa-solid fa-table"></i> Log Table
+                </button>
+                <button class="sidebar-nav-item" onclick="switchTab('hourLogView'); closeSidebar();">
+                    <i class="fa-solid fa-clock"></i> Time Tracker
+                </button>
+                <button class="sidebar-nav-item" onclick="switchTab('insightsView'); closeSidebar();">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Insights
+                </button>
+                <button class="sidebar-nav-item" id="btnSidebarProfileOpen">
+                    <i class="fa-solid fa-user-graduate"></i> My Profile
+                </button>
+                <div class="sidebar-section-label">More</div>
+                <button class="sidebar-nav-item" id="btnInstallPWA" style="display: none;">
+                    <i class="fa-solid fa-download"></i> Install App
+                </button>
+                <div class="sidebar-info-block" id="sidebarInfoBlock">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <div>
+                        <strong>About HourForge</strong>
+                        <p>Study smarter using the scientifically proven 2-4-7 spaced repetition method. Your data syncs automatically across all your devices.</p>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-streak" id="sidebarStreakArea">
+                    <span id="streakBadge" class="streak-badge" style="display:none;">
+                        <i class="fa-solid fa-fire"></i> <span id="streakCount">0</span> Day Streak
+                    </span>
+                </div>
+                <button id="btnSignOutIcon" class="sidebar-logout-btn">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- ===================== TOP BAR ===================== -->
+        <header class="top-bar">
+            <button id="btnHamburger" class="top-bar-btn hamburger-btn" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <div class="top-bar-title">
                 <i class="fa-solid fa-brain"></i>
-                <h1>HourForge</h1>
-            </div>
-            <!-- Icon group positioned to the right -->
-            <div class="header-icon-group">
-                <button id="btnInstallPWA" class="header-icon-btn install-btn" title="Install App" style="display: none;">
-                    <i class="fa-solid fa-download"></i>
-                    <span class="header-icon-label">Install</span>
-                </button>
-                <button id="btnProfileIcon" class="header-icon-btn profile-icon-btn" title="Student Profile">
-                    <i class="fa-solid fa-user-graduate"></i>
-                    <span class="header-icon-label">Profile</span>
-                </button>
-                <button id="btnSignOutIcon" class="header-icon-btn logout-icon-btn" title="Sign Out">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    <span class="header-icon-label">Logout</span>
-                </button>
-                <button id="btnPomodoroIcon" class="header-icon-btn pomodoro-icon-btn" title="Pomodoro Timer">
-                    <i class="fa-solid fa-hourglass-half"></i>
-                    <span class="header-icon-label">Timer</span>
-                </button>
-            </div>
-            <p class="tagline">Master your memory with the 2-4-7 Revision Method <span id="streakBadge"
-                    class="streak-badge" style="display:none;"><i class="fa-solid fa-fire"></i> <span
-                        id="streakCount">0</span> Day Streak</span></p>
-
-            <div class="app-nav">
-                <button type="button" class="nav-btn active" data-view="dashboardView"><i
-                        class="fa-solid fa-layer-group"></i>
-                    Dashboard</button>
-                <button type="button" class="nav-btn" data-view="tableView"><i class="fa-solid fa-table"></i> Log
-                    Table</button>
-                <button type="button" class="nav-btn" data-view="hourLogView"><i class="fa-solid fa-clock"></i> Time
-                    Tracker</button>
-                <button type="button" class="nav-btn" data-view="insightsView"><i
-                        class="fa-solid fa-wand-magic-sparkles"></i> AI
-                    Insights</button>
+                <span>HourForge</span>
             </div>
 
-            <div class="backup-controls"
-                style="display: flex; gap: 0.75rem; align-items: center; justify-content: center;">
-                <button id="btnAutoBackup" class="btn-utility btn-auto-sync" title="Enable Auto-Backup to Folder"
-                    style="width: auto; padding: 0 1.25rem; border-radius: 2rem; gap: 0.5rem; font-size: 0.95rem; font-weight: 500;">
-                    <i class="fa-solid fa-folder-tree"></i> <span>Auto-Backup</span>
+            <div class="top-bar-right">
+                <button id="btnProfileIcon" class="top-bar-avatar-btn" title="My Profile" aria-label="Profile">
+                    <img id="topAvatarImg" src="" alt="" onerror="this.style.display='none'; document.getElementById('topAvatarFallback').style.display='flex';" style="display:none;">
+                    <div id="topAvatarFallback" class="avatar-fallback"><i class="fa-solid fa-user-graduate"></i></div>
                 </button>
-
-                <button id="btnDisconnectBackup" class="btn-utility" title="Disconnect Auto-Backup Folder"
-                    style="display: none; color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1);">
-                    <i class="fa-solid fa-link-slash"></i>
-                </button>
-
-                <div style="width: 1px; height: 28px; background: rgba(255,255,255,0.15); margin: 0 0.25rem;"></div>
-
-                <button id="btnExport" class="btn-utility" title="Export Dashboard Data to PC"
-                    style="width: auto; padding: 0 1rem; border-radius: 2rem; gap: 0.5rem; font-size: 0.9rem; font-weight: 500;">
-                    <i class="fa-solid fa-file-export"></i> <span>Export Data</span>
-                </button>
-                <label for="importFile" class="btn-utility" title="Import Backup Data into App"
-                    style="width: auto; padding: 0 1rem; border-radius: 2rem; gap: 0.5rem; font-size: 0.9rem; font-weight: 500; cursor: pointer;">
-                    <i class="fa-solid fa-file-import"></i> <span>Import Data</span>
-                </label>
-                <input type="file" id="importFile" accept=".json,.backup" style="display: none;">
             </div>
         </header>
+
+        <!-- hidden file input for import (kept for JS compat) -->
+        <input type="file" id="importFile" accept=".json,.backup" style="display: none;">
+        <!-- hidden legacy backup buttons (kept for JS compat, not shown) -->
+        <button id="btnAutoBackup" style="display:none;"></button>
+        <button id="btnDisconnectBackup" style="display:none;"></button>
+        <button id="btnExport" style="display:none;"></button>
+        <button id="btnPomodoroIcon" style="display:none;"></button>
+
 
         <!-- Dashboard View -->
         <main id="dashboardView" class="main-content view-section active">
@@ -946,6 +973,31 @@
             }
         })();
     </script>
+
+    <!-- ===================== BOTTOM NAV BAR ===================== -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="bottom-nav-item active" data-view="dashboardView" aria-label="Dashboard">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="bottom-nav-dot"></span>
+        </button>
+        <button class="bottom-nav-item" data-view="tableView" aria-label="Log Table">
+            <i class="fa-solid fa-table"></i>
+            <span class="bottom-nav-dot"></span>
+        </button>
+        <button class="bottom-nav-item" data-view="hourLogView" aria-label="Time Tracker">
+            <i class="fa-solid fa-clock"></i>
+            <span class="bottom-nav-dot"></span>
+        </button>
+        <button class="bottom-nav-item" data-view="insightsView" aria-label="AI Insights">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span class="bottom-nav-dot"></span>
+        </button>
+        <button class="bottom-nav-item" data-view="pomodoroView" id="bottomNavPomodoro" aria-label="Pomodoro Timer">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span class="bottom-nav-dot"></span>
+        </button>
+    </nav>
+
 </body>
 
 </html>
