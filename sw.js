@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hourforge-v11';
+const CACHE_NAME = 'hourforge-v12';
 const ASSETS = [
     './',
     './index.html',
@@ -36,39 +36,31 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-    // Ignore non-GET requests (like Supabase POST/PATCH)
+    // CRITICAL: Only intercept same-origin GET requests.
+    // Let the browser handle ALL external/CDN requests natively.
     if (e.request.method !== 'GET') return;
 
     const url = new URL(e.request.url);
 
-    // Ignore external APIs (Supabase, Sentry, PostHog, Google)
-    if (
-        url.hostname.includes('supabase.co') || 
-        url.hostname.includes('sentry.io') || 
-        url.hostname.includes('posthog.com') ||
-        url.hostname.includes('google.com') ||
-        url.hostname.includes('googleapis.com')
-    ) {
-        return;
-    }
+    // Only handle requests from our own origin — never touch CDN scripts
+    if (url.origin !== self.location.origin) return;
 
-    // Network-first for HTML/JS files (so updates are always fresh), cache-first for assets
+    // Network-first for HTML/JS/CSS (always get fresh code updates)
     if (url.pathname.endsWith('.html') || url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname === '/') {
-        // Network first — try fresh, fall back to cache
         e.respondWith(
-            fetch(e.request).then((response) => {
-                // Must clone response to put it in cache because body can only be read once
-                const clone = response.clone();
-                caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-                return response;
-            }).catch(() => caches.match(e.request).then(cachedRes => cachedRes || new Response("Network error", {status: 503})))
+            fetch(e.request)
+                .then((response) => {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+                    return response;
+                })
+                .catch(() => caches.match(e.request).then(res => res || new Response('Offline', { status: 503 })))
         );
     } else {
-        // Cache first for images/icons/manifest
+        // Cache-first for images/icons/manifest
         e.respondWith(
-            caches.match(e.request).then((response) => {
-                return response || fetch(e.request);
-            })
+            caches.match(e.request).then((cached) => cached || fetch(e.request))
         );
     }
 });
+

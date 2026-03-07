@@ -224,8 +224,36 @@ if (supabaseClient) {
         updateAuthUI();
         if (session) {
             syncDataWithCloud(true);
+        } else if (!isAppInitialized) {
+            // No session: show login gate but boot local app after 1s
+            setTimeout(() => {
+                if (!isAppInitialized) {
+                    init();
+                    isAppInitialized = true;
+                }
+            }, 1000);
+        }
+    }).catch(() => {
+        // Supabase getSession failed — boot locally
+        if (!isAppInitialized) {
+            init();
+            isAppInitialized = true;
         }
     });
+} else {
+    // Supabase CDN failed to load — bypass login gate and boot app from local data
+    console.warn('⚠️ Supabase unavailable. Booting in offline mode.');
+    setTimeout(() => {
+        if (!isAppInitialized) {
+            // Hide the google login gate, show app
+            const gate = document.getElementById('loginGate');
+            const app = document.getElementById('mainAppContainer');
+            if (gate) gate.style.display = 'none';
+            if (app) app.style.display = 'block';
+            init();
+            isAppInitialized = true;
+        }
+    }, 500);
 }
 
 // Data Sync Logic: Push to / Pull from Supabase
