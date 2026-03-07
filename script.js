@@ -215,8 +215,10 @@ if (supabaseClient) {
         loadUserAvatarAndName(session);
         if (event === 'SIGNED_IN' || wasLoggedOut) {
             await syncDataWithCloud(true);
+            setupRealtimeSubscription(session.user.id);
         } else if (event === 'SIGNED_OUT') {
             // Leave local data intact for offline use.
+            teardownRealtimeSubscription();
         }
     });
 
@@ -227,6 +229,7 @@ if (supabaseClient) {
         loadUserAvatarAndName(session);
         if (session) {
             syncDataWithCloud(true);
+            setupRealtimeSubscription(session.user.id);
         } else if (!isAppInitialized) {
             // No session: show login gate but boot local app after 1s
             setTimeout(() => {
@@ -261,6 +264,64 @@ if (supabaseClient) {
 
 // Data Sync Logic: Push to / Pull from Supabase
 let isAppInitialized = false;
+
+// --- Supabase Realtime Sync ---
+let realtimeChannel = null;
+
+async function applyCloudData(cloudData) {
+    if (!cloudData) return;
+    
+    // Save to local vars
+    if (cloudData.profile) saveProfile(cloudData.profile);
+    studySessions = cloudData.studySessions || [];
+    timeLogs = cloudData.timeLogs || [];
+    aiRatingsHistory = cloudData.aiRatingsHistory || [];
+    
+    // Save to LocalStorage
+    localStorage.setItem('studySessions', JSON.stringify(studySessions));
+    localStorage.setItem('timeLogs', JSON.stringify(timeLogs));
+    localStorage.setItem('aiRatingsHistory', JSON.stringify(aiRatingsHistory));
+    if(cloudData.dbMigrationDone) localStorage.setItem('dbMigrationDone', cloudData.dbMigrationDone);
+
+    // Update IDB mirror
+    await idb.set('studySessions', studySessions).catch(()=>{});
+    await idb.set('timeLogs', timeLogs).catch(()=>{});
+
+    // Re-render UI aggressively if app is already initialized
+    if (isAppInitialized) {
+        renderDynamicSubjects();
+        renderDashboard();
+        renderTableView();
+        if (typeof renderTimeLogs === 'function') renderTimeLogs();
+        if (typeof updateExamCountdowns === 'function') updateExamCountdowns();
+        if (typeof updateExamCountdown === 'function') updateExamCountdown(); // fallback
+        if (typeof updateStreakUI === 'function') updateStreakUI();
+    }
+}
+
+function setupRealtimeSubscription(userId) {
+    if (!supabaseClient || realtimeChannel) return;
+    realtimeChannel = supabaseClient.channel('custom-user-data-channel')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'user_data', filter: `user_id=eq.${userId}` },
+        async (payload) => {
+            console.log("🔄 Realtime update received from another device/tab:", payload);
+            if (payload.new && payload.new.data) {
+                await applyCloudData(payload.new.data);
+                showToast("Data synced from cloud! ☁️", "success");
+            }
+        }
+      )
+      .subscribe();
+}
+
+function teardownRealtimeSubscription() {
+    if (realtimeChannel) {
+        supabaseClient.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+    }
+}
 
 async function syncDataWithCloud(isInitialLoad = false) {
     if (!supabaseClient || !currentSession) return;
@@ -314,20 +375,8 @@ async function syncDataWithCloud(isInitialLoad = false) {
 
             if (cloudLen > 50 && cloudLen >= localLen) {
                 console.log("☁️ Downloading Cloud Master to Local...");
-                if (cloudRow.data.profile) saveProfile(cloudRow.data.profile);
-                studySessions = cloudRow.data.studySessions || [];
-                timeLogs = cloudRow.data.timeLogs || [];
-                aiRatingsHistory = cloudRow.data.aiRatingsHistory || [];
+                await applyCloudData(cloudRow.data);
                 
-                localStorage.setItem('studySessions', JSON.stringify(studySessions));
-                localStorage.setItem('timeLogs', JSON.stringify(timeLogs));
-                localStorage.setItem('aiRatingsHistory', JSON.stringify(aiRatingsHistory));
-                if(cloudRow.data.dbMigrationDone) localStorage.setItem('dbMigrationDone', cloudRow.data.dbMigrationDone);
-
-                // Update IDB mirror
-                await idb.set('studySessions', studySessions).catch(()=>{});
-                await idb.set('timeLogs', timeLogs).catch(()=>{});
-
                 showToast("Cloud Data Synced! ☁️", "success");
                 shouldUpload = false; // We just downloaded, no need to upload immediately
             }
