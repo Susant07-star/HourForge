@@ -208,13 +208,13 @@ let currentSession = null;
 // Listen for Auth changes
 if (supabaseClient) {
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        const wasLoggedOut = !currentSession && session;
         currentSession = session;
         updateAuthUI();
-        if (event === 'SIGNED_IN') {
-            await syncDataWithCloud();
+        if (event === 'SIGNED_IN' || wasLoggedOut) {
+            await syncDataWithCloud(true);
         } else if (event === 'SIGNED_OUT') {
-            // Optional: clear local data on sign out? Usually better to keep it for offline use in single-user devices.
-            // For now, we will leave local data intact so they can keep using it offline.
+            // Leave local data intact for offline use.
         }
     });
 
@@ -223,13 +223,15 @@ if (supabaseClient) {
         currentSession = session;
         updateAuthUI();
         if (session) {
-            syncDataWithCloud();
+            syncDataWithCloud(true);
         }
     });
 }
 
 // Data Sync Logic: Push to / Pull from Supabase
-async function syncDataWithCloud() {
+let isAppInitialized = false;
+
+async function syncDataWithCloud(isInitialLoad = false) {
     if (!supabaseClient || !currentSession) return;
     
     try {
@@ -245,6 +247,10 @@ async function syncDataWithCloud() {
 
         if (fetchErr && fetchErr.code !== 'PGRST116') { // Ignore "Rows not found" error
             console.error("Cloud Fetch Error:", fetchErr);
+            if (isInitialLoad && !isAppInitialized) {
+                init(); // Fallback: load local if fetch fails
+                isAppInitialized = true;
+            }
             return;
         }
 
@@ -281,17 +287,15 @@ async function syncDataWithCloud() {
                 await idb.set('studySessions', studySessions).catch(()=>{});
                 await idb.set('timeLogs', timeLogs).catch(()=>{});
 
-                // Refresh UI
-                updateTotals();
-                populateTopicFilter();
-                refreshAllTopicLists();
-                renderTable();
-                initChart();
-                checkRevisionsAndRemind();
-                
                 showToast("Cloud Data Synced! ☁️", "success");
                 shouldUpload = false; // We just downloaded, no need to upload immediately
             }
+        }
+
+        // Initialize App UI now that data is ready (only on initial load)
+        if (isInitialLoad && !isAppInitialized) {
+            init();
+            isAppInitialized = true;
         }
 
         // 2. Upload Local to Cloud
@@ -3448,8 +3452,7 @@ function renderStarRating(score) {
     container.style.display = 'flex';
 }
 
-// Bootstrap Application
-init();
+// Bootstrap Application is now handled inside syncDataWithCloud()
 
 // ==========================================
 // PSYCHOLOGY & MOTIVATION FEATURES
