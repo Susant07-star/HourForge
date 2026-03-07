@@ -56,6 +56,8 @@ body::after {
     z-index: -1;
     opacity: 0.5;
     animation: drift 20s infinite alternate;
+    will-change: transform;
+    pointer-events: none;
 }
 
 body::before {
@@ -89,6 +91,7 @@ body::after {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Header */
@@ -265,7 +268,8 @@ body::after {
     border: 1px solid var(--glass-border);
     border-radius: 1.5rem;
     padding: 2rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.4);
+    transform: translateZ(0); /* Hardware acceleration hint */
 }
 
 .glass-panel h2 {
@@ -3571,4 +3575,38 @@ main#hourLogView.active {
 /* Ensure Pomodoro modal isn't hidden under bottom nav */
 .pomodoro-modal-backdrop {
     z-index: 400 !important;
+}
+
+/* ============================================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   ============================================================ */
+@media (max-width: 768px) {
+    /* Disable massive animated blurs on mobile GPU */
+    body::before, body::after {
+        animation: none !important;
+        filter: blur(40px) !important;
+        opacity: 0.3 !important;
+    }
+
+    /* Downgrade/Reduce glassmorphism expense to 60fps */
+    .glass-panel,
+    .dashboard-stat-card,
+    .bottom-sheet {
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+        background: rgba(18, 16, 44, 0.85) !important; /* more opaque fallback */
+    }
+
+    .bottom-nav {
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        background: rgba(10, 8, 32, 0.98) !important;
+    }
+    
+    .top-bar {
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        background: rgba(15, 12, 41, 0.95) !important;
+    }
 }
