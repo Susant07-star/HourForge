@@ -404,18 +404,22 @@ if (btnSignOut) btnSignOut.addEventListener('click', async () => {
 });
 
 function updateAuthUI() {
-    if (!btnLoginIcon || !activeUserDisplay) return;
+    if (!btnLoginIcon) return;
     if (currentSession) {
-        btnLoginIcon.style.display = 'none';
-        btnProfileIcon.style.display = 'flex';
-        activeUserDisplay.style.display = 'flex';
-        authForm.style.display = 'none';
+        // Logged In — change Sync icon to indicate connected
+        btnLoginIcon.innerHTML = '<i class="fa-solid fa-cloud" style="color:#34d399;"></i><span class="header-icon-label">Synced</span>';
+        btnLoginIcon.title = 'Cloud Sync — Connected';
+        btnLoginIcon.style.borderColor = 'rgba(52, 211, 153, 0.3)';
+        if (activeUserDisplay) activeUserDisplay.style.display = 'flex';
+        if (authForm) authForm.style.display = 'none';
         if (currentUserEmail) currentUserEmail.textContent = currentSession.user.email;
     } else {
-        btnLoginIcon.style.display = 'flex';
-        btnProfileIcon.style.display = 'none';
-        activeUserDisplay.style.display = 'none';
-        authForm.style.display = 'block';
+        // Logged Out — show default cloud icon
+        btnLoginIcon.innerHTML = '<i class="fa-solid fa-cloud"></i><span class="header-icon-label">Sync</span>';
+        btnLoginIcon.title = 'Cloud Sync / Login';
+        btnLoginIcon.style.borderColor = '';
+        if (activeUserDisplay) activeUserDisplay.style.display = 'none';
+        if (authForm) authForm.style.display = 'block';
     }
 }
 
