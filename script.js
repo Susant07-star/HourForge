@@ -196,7 +196,7 @@ const idb = {
 // SUPABASE: CLIENT INITIALIZATION
 // ==========================================
 const supabaseUrl = 'https://dkhofhvqjhpwhmurlmtj.supabase.co';
-const supabaseKey = 'sb_publishable_iKrSXmlesEVVxZqGsk3QTg_pb1E86FT';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRraG9maHZxamhwd2htdXJsbXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NzU4OTgsImV4cCI6MjA4ODQ1MTg5OH0.5PNGiH4UdL0LEeIjf8gJV9sNkZecxN8M8wcamjqsjn4';
 const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
 
 let currentSession = null;
