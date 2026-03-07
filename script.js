@@ -661,28 +661,57 @@ function handleSwipe() {
 }
 
 // --- STREAK UI UPDATE ---
-// Temporarily mock the streak logic if it's missing from the main codebase.
-// Since we removed it or it wasn't there, we just read from timeLogs array.
+function calcCurrentStreak() {
+    if (!timeLogs || timeLogs.length === 0) return 0;
+    // Get unique study days sorted descending
+    const days = [...new Set(timeLogs.map(l => l.date))].sort().reverse();
+    let streak = 0;
+    let expected = getLocalDateStr(new Date());
+    for (const day of days) {
+        if (day === expected) {
+            streak++;
+            // Step back one calendar day
+            const d = new Date(expected + 'T12:00:00');
+            d.setDate(d.getDate() - 1);
+            expected = getLocalDateStr(d);
+        } else if (day < expected) {
+            // Gap — check if yesterday was the start (allow today not yet logged)
+            if (streak === 0) {
+                // Still on today — allow yesterday as start
+                const d = new Date(expected + 'T12:00:00');
+                d.setDate(d.getDate() - 1);
+                expected = getLocalDateStr(d);
+                if (day === expected) {
+                    streak++;
+                    const d2 = new Date(expected + 'T12:00:00');
+                    d2.setDate(d2.getDate() - 1);
+                    expected = getLocalDateStr(d2);
+                    continue;
+                }
+            }
+            break;
+        }
+    }
+    return streak;
+}
+
 function updateStreakUI() {
-    if (!timeLogs || timeLogs.length === 0) return;
-    
-    // Simple mock logic: count unique days in timeLogs
-    const uniqueDays = new Set(timeLogs.map(l => l.date)).size;
-    const streakDays = Math.min(uniqueDays, 30); // simplistic mock
+    const streakDays = calcCurrentStreak();
     
     // Sidebar streak
     const sBadge = document.getElementById('streakBadge');
     const sCount = document.getElementById('streakCount');
-    if (sBadge && sCount && streakDays > 0) {
+    if (sBadge && sCount) {
         sCount.textContent = streakDays;
         sBadge.style.display = 'inline-flex';
     }
 
-    // Top bar streak
+    // Top bar streak — always show it
     const topBadge = document.getElementById('topBarStreak');
     const topCount = document.getElementById('topBarStreakCount');
-    if (topBadge && topCount && streakDays > 0) {
+    if (topBadge && topCount) {
         topCount.textContent = streakDays;
+        topBadge.style.removeProperty('display'); // clear any inline hide
         topBadge.style.display = 'inline-flex';
     }
 }
