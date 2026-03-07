@@ -3,16 +3,8 @@
 // ==========================================
 if (typeof Sentry !== 'undefined') {
     Sentry.init({
-        dsn: "https://5434c8fc905e9805887e8d156ecdfab6@o4508930847952896.ingest.us.sentry.io/4508930850705408", // Sentry handles DSN internally via the injected script, but providing empty config initializes it.
-        integrations: [
-            Sentry.browserTracingIntegration(),
-            Sentry.replayIntegration(),
-        ],
-        // Performance Monitoring
-        tracesSampleRate: 1.0, // Capture 100% of the transactions
-        // Session Replay
-        replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
-        replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+        dsn: "https://5434c8fc905e9805887e8d156ecdfab6@o4508930847952896.ingest.us.sentry.io/4508930850705408",
+        // The basic CDN bundle does not include Tracing/Replay by default, so we remove those integrations to prevent the 'not a function' error.
     });
 }
 
@@ -128,7 +120,7 @@ let aiRatingsHistory = JSON.parse(localStorage.getItem('aiRatingsHistory')) || [
     if (changed || deduped.length !== aiRatingsHistory.length) {
         aiRatingsHistory = deduped;
         localStorage.setItem('aiRatingsHistory', JSON.stringify(aiRatingsHistory));
-        uploadDataToCloud(); // Sync
+        // Note: uploadDataToCloud() will be called after Supabase initializes if user is logged in
     }
 }
 
@@ -197,103 +189,21 @@ const idb = {
             req.onsuccess = () => resolve();
             req.onerror = () => reject(req.error);
         });
+    }
 };
 
 // ==========================================
-// SUPABASE: AUTH & CLOUD SYNC UI HANDLERS
+// SUPABASE: CLIENT INITIALIZATION
 // ==========================================
-const loginModal = document.getElementById('loginModal');
-const btnLoginIcon = document.getElementById('btnLoginIcon');
-const btnCloseLogin = document.getElementById('btnCloseLogin');
-const authForm = document.getElementById('authForm');
-const toggleAuthMode = document.getElementById('toggleAuthMode');
-const authEmail = document.getElementById('authEmail');
-const authPassword = document.getElementById('authPassword');
-const btnAuthSubmit = document.getElementById('btnAuthSubmit');
-const authMessage = document.getElementById('authMessage');
-const activeUserDisplay = document.getElementById('activeUserDisplay');
-const currentUserEmail = document.getElementById('currentUserEmail');
-const btnSignOut = document.getElementById('btnSignOut');
-const btnProfileIcon = document.getElementById('btnProfileIcon');
-
-let isSignUpMode = false;
-
-if (btnLoginIcon) btnLoginIcon.addEventListener('click', () => {
-    loginModal.style.display = 'flex';
-    authMessage.style.display = 'none';
-});
-if (btnCloseLogin) btnCloseLogin.addEventListener('click', () => loginModal.style.display = 'none');
-
-if (toggleAuthMode) toggleAuthMode.addEventListener('click', (e) => {
-    e.preventDefault();
-    isSignUpMode = !isSignUpMode;
-    toggleAuthMode.textContent = isSignUpMode ? 'Log In' : 'Sign Up';
-    btnAuthSubmit.textContent = isSignUpMode ? 'Create Account' : 'Sign In';
-    authMessage.style.display = 'none';
-});
-
-if (authForm) authForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!supabase) return;
-    
-    authMessage.style.display = 'block';
-    authMessage.style.color = 'var(--text-secondary)';
-    authMessage.textContent = 'Processing...';
-    btnAuthSubmit.disabled = true;
-
-    const email = authEmail.value;
-    const password = authPassword.value;
-
-    try {
-        if (isSignUpMode) {
-            const { data, error } = await supabase.auth.signUp({ email, password });
-            if (error) throw error;
-            authMessage.style.color = '#34d399';
-            authMessage.textContent = 'Success! Please check your email to verify (or log in if auto-verified).';
-        } else {
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-            loginModal.style.display = 'none';
-            authForm.reset();
-        }
-    } catch (error) {
-        authMessage.style.color = '#ef4444';
-        authMessage.textContent = error.message;
-    } finally {
-        btnAuthSubmit.disabled = false;
-    }
-});
-
-if (btnSignOut) btnSignOut.addEventListener('click', async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
-    // Don't wipe local DB so they can keep working offline
-    showToast('Signed out. Local data preserved.', 'info');
-});
-
-function updateAuthUI() {
-    if (!btnLoginIcon || !activeUserDisplay) return;
-    if (currentSession) {
-        // Logged In
-        btnLoginIcon.style.display = 'none';
-        btnProfileIcon.style.display = 'flex';
-        activeUserDisplay.style.display = 'flex';
-        authForm.style.display = 'none';
-        if (currentUserEmail) currentUserEmail.textContent = currentSession.user.email;
-    } else {
-        // Logged Out
-        btnLoginIcon.style.display = 'flex';
-        btnProfileIcon.style.display = 'none'; // We keep the UI clean, only show login icon
-        activeUserDisplay.style.display = 'none';
-        authForm.style.display = 'block';
-    }
-}
-
 const supabaseUrl = 'https://dkhofhvqjhpwhmurlmtj.supabase.co';
 const supabaseKey = 'sb_publishable_iKrSXmlesEVVxZqGsk3QTg_pb1E86FT';
 const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
 
 let currentSession = null;
+
+// ==========================================
+// SUPABASE: AUTH & CLOUD SYNC UI HANDLERS
+// ==========================================
 
 // Listen for Auth changes
 if (supabase) {
@@ -422,8 +332,92 @@ async function uploadDataToCloud() {
     }
 }
 
-// Inject uploadDataToCloud into existing save/mutate functions
-// (We will hook this into updateTotals and other save routines later)
+// ==========================================
+// SUPABASE: AUTH UI EVENT HANDLERS
+// ==========================================
+const loginModal = document.getElementById('loginModal');
+const btnLoginIcon = document.getElementById('btnLoginIcon');
+const btnCloseLogin = document.getElementById('btnCloseLogin');
+const authForm = document.getElementById('authForm');
+const toggleAuthMode = document.getElementById('toggleAuthMode');
+const authEmail = document.getElementById('authEmail');
+const authPassword = document.getElementById('authPassword');
+const btnAuthSubmit = document.getElementById('btnAuthSubmit');
+const authMessage = document.getElementById('authMessage');
+const activeUserDisplay = document.getElementById('activeUserDisplay');
+const currentUserEmail = document.getElementById('currentUserEmail');
+const btnSignOut = document.getElementById('btnSignOut');
+const btnProfileIcon = document.getElementById('btnProfileIcon');
+
+let isSignUpMode = false;
+
+if (btnLoginIcon) btnLoginIcon.addEventListener('click', () => {
+    loginModal.style.display = 'flex';
+    authMessage.style.display = 'none';
+});
+if (btnCloseLogin) btnCloseLogin.addEventListener('click', () => loginModal.style.display = 'none');
+
+if (toggleAuthMode) toggleAuthMode.addEventListener('click', (e) => {
+    e.preventDefault();
+    isSignUpMode = !isSignUpMode;
+    toggleAuthMode.textContent = isSignUpMode ? 'Log In' : 'Sign Up';
+    btnAuthSubmit.textContent = isSignUpMode ? 'Create Account' : 'Sign In';
+    authMessage.style.display = 'none';
+});
+
+if (authForm) authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!supabase) return;
+    
+    authMessage.style.display = 'block';
+    authMessage.style.color = 'var(--text-secondary)';
+    authMessage.textContent = 'Processing...';
+    btnAuthSubmit.disabled = true;
+
+    const email = authEmail.value;
+    const password = authPassword.value;
+
+    try {
+        if (isSignUpMode) {
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            if (error) throw error;
+            authMessage.style.color = '#34d399';
+            authMessage.textContent = 'Success! Please check your email to verify (or log in if auto-verified).';
+        } else {
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            loginModal.style.display = 'none';
+            authForm.reset();
+        }
+    } catch (error) {
+        authMessage.style.color = '#ef4444';
+        authMessage.textContent = error.message;
+    } finally {
+        btnAuthSubmit.disabled = false;
+    }
+});
+
+if (btnSignOut) btnSignOut.addEventListener('click', async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    showToast('Signed out. Local data preserved.', 'info');
+});
+
+function updateAuthUI() {
+    if (!btnLoginIcon || !activeUserDisplay) return;
+    if (currentSession) {
+        btnLoginIcon.style.display = 'none';
+        btnProfileIcon.style.display = 'flex';
+        activeUserDisplay.style.display = 'flex';
+        authForm.style.display = 'none';
+        if (currentUserEmail) currentUserEmail.textContent = currentSession.user.email;
+    } else {
+        btnLoginIcon.style.display = 'flex';
+        btnProfileIcon.style.display = 'none';
+        activeUserDisplay.style.display = 'none';
+        authForm.style.display = 'block';
+    }
+}
 
 // ==========================================
 // DB MIGRATION (StudyTracker -> HourForge)
