@@ -566,12 +566,20 @@ function closeSidebar() {
 if (btnHamburger) btnHamburger.addEventListener('click', openSidebar);
 if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
 
-// Sidebar profile button → open profile modal
+// Sidebar profile button → open profile drawer
 const btnSidebarProfileOpen = document.getElementById('btnSidebarProfileOpen');
 if (btnSidebarProfileOpen) {
     btnSidebarProfileOpen.addEventListener('click', () => {
         closeSidebar();
-        if (typeof showProfileModal === 'function') showProfileModal();
+        if (typeof openProfileDrawer === 'function') openProfileDrawer();
+    });
+}
+
+// Top bar profile button → open profile drawer
+const btnProfileTop = document.getElementById('btnProfileIcon');
+if (btnProfileTop) {
+    btnProfileTop.addEventListener('click', () => {
+        if (typeof openProfileDrawer === 'function') openProfileDrawer();
     });
 }
 
@@ -607,14 +615,6 @@ function loadUserAvatarAndName(session) {
     const emailEl = document.getElementById('sidebarUserEmail');
     if (nameEl) nameEl.textContent = name;
     if (emailEl) emailEl.textContent = email;
-}
-
-// Wire profile button in top bar to open profile modal
-const btnProfileTop = document.getElementById('btnProfileIcon');
-if (btnProfileTop) {
-    btnProfileTop.addEventListener('click', () => {
-        if (typeof showProfileModal === 'function') showProfileModal();
-    });
 }
 
 // --- Swipe Gestures for Mobile Tab Switching ---
@@ -1303,16 +1303,24 @@ function showProfileModal() {
 
     _profileModalSubjects = [...(profile.subjects || [])];
     renderProfileSubjectTags();
-
-    // Animate in
-    setTimeout(() => modal.classList.add('active'), 10);
 }
 
-function hideProfileModal() {
-    const modal = document.getElementById('profileModal');
-    if (!modal) return;
-    modal.classList.remove('active');
-    setTimeout(() => { modal.style.display = 'none'; }, 300);
+// ==========================================
+// STUDENT PROFILE DRAWER
+// ==========================================
+function openProfileDrawer() {
+    initProfileForm();
+    const drawer = document.getElementById('profileDrawer');
+    const overlay = document.getElementById('profileDrawerOverlay');
+    if (drawer) drawer.classList.add('open');
+    if (overlay) overlay.classList.add('active');
+}
+
+function closeProfileDrawer() {
+    const drawer = document.getElementById('profileDrawer');
+    const overlay = document.getElementById('profileDrawerOverlay');
+    if (drawer) drawer.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
 }
 
 function renderProfileSubjectTags() {
@@ -1331,8 +1339,12 @@ function renderProfileSubjectTags() {
     });
 }
 
-// Profile icon click
-document.getElementById('btnProfileIcon').addEventListener('click', showProfileModal);
+// Wire the drawer close buttons
+document.getElementById('btnCloseProfile')?.addEventListener('click', closeProfileDrawer);
+document.getElementById('profileDrawerOverlay')?.addEventListener('click', closeProfileDrawer);
+
+// Top bar icon click handled early in the file, but just in case:
+document.getElementById('btnProfileIcon')?.addEventListener('click', openProfileDrawer);
 
 // ==========================================
 // INFO MODAL
@@ -1601,11 +1613,11 @@ document.getElementById('profileNewSubject').addEventListener('keydown', (e) => 
 });
 
 // Save profile
-document.getElementById('profileForm').addEventListener('submit', (e) => {
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     if (_profileModalSubjects.length === 0) {
-        alert('Please add at least one subject.');
+        showToast('Please add at least one subject.', 'warning');
         return;
     }
 
@@ -1616,7 +1628,7 @@ document.getElementById('profileForm').addEventListener('submit', (e) => {
         facultyValue = customFacultyVal;
     }
 
-    const profile = {
+    const profileData = {
         name: document.getElementById('profileName').value.trim(),
         grade: document.getElementById('profileGrade').value,
         faculty: facultyValue,
@@ -1625,20 +1637,60 @@ document.getElementById('profileForm').addEventListener('submit', (e) => {
         exam1Date: document.getElementById('profileExam1Date').value,
         exam2Label: document.getElementById('profileExam2Label').value.trim(),
         exam2Date: document.getElementById('profileExam2Date').value,
-        setupComplete: true
+        setupComplete: true,
+        updatedAt: new Date().toISOString()
     };
 
-    saveProfile(profile);
+    // Save to local storage for immediate offline access
+    localStorage.setItem('hourForge_studentProfile', JSON.stringify(profileData));
+    
+    // Sync to Supabase user_data record if logged in
+    if (currentSession && supabaseClient) {
+        try {
+            const btn = document.querySelector('.profile-save-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing...';
+            btn.disabled = true;
 
-    // Refresh all dynamic UI
+            const { error } = await supabaseClient
+                .from('user_data')
+                .upsert({
+                    id: currentSession.user.id,
+                    student_profile: profileData,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'id' });
+                
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            if (error) {
+                console.error("Failed to sync profile:", error);
+                showToast('Profile saved locally. Cloud sync failed.', 'warning');
+            } else {
+                showToast('Profile saved and synced successfully! 🎓', 'success');
+            }
+        } catch (err) {
+            console.error("Profile sync exception:", err);
+            showToast('Profile saved locally.', 'success');
+        }
+    } else {
+        showToast('Profile saved locally! 🎓', 'success');
+    }
+
+    // Update UI elements dependent on profile state
     renderDynamicSubjects();
     renderDashboard();
     renderTableView();
-    renderTimeLogs();
-    updateExamCountdowns();
+    if (typeof renderTimeLogs === 'function') renderTimeLogs();
+    
+    // Attempt exam countdown update if available
+    if (typeof updateExamCountdowns === 'function') {
+        updateExamCountdowns();
+    } else if (typeof updateExamCountdown === 'function') {
+        updateExamCountdown();
+    }
 
-    hideProfileModal();
-    showToast('Profile saved! Subjects & exams updated. 🎓', 'success');
+    closeProfileDrawer();
 });
 
 // Navigation — wired at top level (not inside init) to avoid timing issues

@@ -499,20 +499,19 @@
         </main>
     </div>
 
-    <!-- Profile Setup Modal -->
-    <div id="profileModal" class="profile-modal-overlay" style="display: none;">
-        <div class="profile-modal glass-panel">
-            <div class="profile-modal-header">
-                <h2><i class="fa-solid fa-user-graduate" style="color: #6366f1;"></i> Student Profile</h2>
-                <button id="btnCloseProfile" class="profile-close-btn" title="Close"><i
-                        class="fa-solid fa-xmark"></i></button>
-            </div>
-            <p class="profile-modal-desc">Set up your profile to personalize subjects, AI feedback, and exam tracking.
-            </p>
+    <!-- =================== SLIDE-UP PROFILE DRAWER =================== -->
+    <div id="profileDrawerOverlay" class="bottom-sheet-overlay" style="display: none;"></div>
+    <div id="profileDrawer" class="bottom-sheet">
+        <div class="bottom-sheet-handle"></div>
+        <div class="bottom-sheet-header">
+            <h2><i class="fa-solid fa-user-graduate" style="color: #6366f1;"></i> My Study Profile</h2>
+            <button id="btnCloseProfile" class="sheet-close-btn" title="Close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="bottom-sheet-content">
+            <p class="profile-desc">Set up your profile to personalize subjects, AI feedback, and exam tracking. Your profile syncs automatically.</p>
             <form id="profileForm" class="profile-form">
                 <div class="form-group">
-                    <label for="profileName">Your Name <span
-                            style="font-size: 0.8em; opacity: 0.6;">(optional)</span></label>
+                    <label for="profileName">Your Name <span style="font-size: 0.8em; opacity: 0.6;">(optional)</span></label>
                     <input type="text" id="profileName" placeholder="e.g. Susant" autocomplete="off">
                 </div>
                 <div class="form-row">
@@ -536,38 +535,36 @@
                             <option value="Master">Master</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="profileFaculty">Faculty</label>
-                        <select id="profileFaculty">
-                            <option value="">Select...</option>
-                            <option value="Science">Science</option>
-                            <option value="Management">Management</option>
-                            <option value="Humanities">Humanities</option>
-                            <option value="Education">Education</option>
-                            <option value="Law">Law</option>
-                            <option value="Custom">Custom (pick your own)</option>
-                        </select>
-                        <input type="text" id="profileCustomFaculty" placeholder="Type your faculty name..."
-                            style="display: none; margin-top: 0.5rem;" autocomplete="off">
-                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="profileFaculty">Faculty</label>
+                    <select id="profileFaculty">
+                        <option value="">Select...</option>
+                        <option value="Science">Science</option>
+                        <option value="Management">Management</option>
+                        <option value="Humanities">Humanities</option>
+                        <option value="Education">Education</option>
+                        <option value="Law">Law</option>
+                        <option value="Custom">Custom (pick your own)</option>
+                    </select>
+                    <input type="text" id="profileCustomFaculty" placeholder="Type your faculty name..."
+                        style="display: none; margin-top: 0.5rem;" autocomplete="off">
                 </div>
 
                 <div class="form-group">
-                    <label>Subjects <span style="font-size: 0.8em; opacity: 0.6;">(auto-filled from faculty,
-                            editable)</span></label>
+                    <label>Subjects <span style="font-size: 0.8em; opacity: 0.6;">(auto-filled from faculty)</span></label>
                     <div id="profileSubjectTags" class="profile-subject-tags">
                         <!-- Tags rendered dynamically -->
                     </div>
                     <div class="profile-add-subject-row">
                         <input type="text" id="profileNewSubject" placeholder="Add a subject..." autocomplete="off">
-                        <button type="button" id="btnAddSubject" class="btn-add-subject"><i
-                                class="fa-solid fa-plus"></i></button>
+                        <button type="button" id="btnAddSubject" class="btn-add-subject"><i class="fa-solid fa-plus"></i></button>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Exam Dates <span style="font-size: 0.8em; opacity: 0.6;">(optional — leave blank if
-                            none)</span></label>
+                <div class="form-group" style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <label>Exam Dates <span style="font-size: 0.8em; opacity: 0.6;">(optional)</span></label>
                     <div class="form-row">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label for="profileExam1Label" style="font-size: 0.8rem;">Exam 1 Name</label>
@@ -590,8 +587,9 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary profile-save-btn" style="margin-top: 0.5rem;"><i
-                        class="fa-solid fa-check"></i> Save Profile</button>
+                <button type="submit" class="btn-primary profile-save-btn" style="margin-top: 1.5rem; width: 100%; border-radius: 1rem; padding: 1rem;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Save & Sync Profile
+                </button>
             </form>
         </div>
     </div>
@@ -964,7 +962,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v6';
+            const CURRENT_SW_VERSION = 'v7';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh
