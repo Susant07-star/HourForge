@@ -80,6 +80,7 @@ function buildSubjectColors() {
 
 // Constants & State (dynamic)
 let SUBJECT_COLORS = buildSubjectColors().colors;
+let SUBJECT_CHART_COLORS = buildSubjectColors().chartColors;
 
 // Timezone-safe local date string (YYYY-MM-DD) — avoids toISOString() UTC drift
 function getLocalDateStr(d) {
@@ -1338,7 +1339,7 @@ function showProfileModal() {
 // STUDENT PROFILE DRAWER
 // ==========================================
 function openProfileDrawer() {
-    initProfileForm();
+    showProfileModal(); // reuse existing init logic to populate the form
     const drawer = document.getElementById('profileDrawer');
     const overlay = document.getElementById('profileDrawerOverlay');
     if (drawer) drawer.classList.add('open');
@@ -1594,13 +1595,11 @@ document.getElementById('pomoMiniOpen').addEventListener('click', showPomodoroMo
 
 
 
-// Close button
-document.getElementById('btnCloseProfile').addEventListener('click', hideProfileModal);
+// Close button (drawer)
+document.getElementById('btnCloseProfile')?.addEventListener('click', closeProfileDrawer);
 
-// Click outside to close
-document.getElementById('profileModal').addEventListener('click', (e) => {
-    if (e.target.classList.contains('profile-modal-overlay')) hideProfileModal();
-});
+// Click overlay to close
+document.getElementById('profileDrawerOverlay')?.addEventListener('click', closeProfileDrawer);
 
 // Faculty change → auto-fill subjects and show/hide custom faculty input
 document.getElementById('profileFaculty').addEventListener('change', (e) => {
@@ -2724,7 +2723,7 @@ const CHART_COLORS = {
     red: { bg: 'rgba(239, 68, 68, 0.2)', border: '#ef4444' },
 };
 
-let SUBJECT_CHART_COLORS = buildSubjectColors().chartColors;
+SUBJECT_CHART_COLORS = buildSubjectColors().chartColors;
 
 // Chart.js global defaults for dark theme
 Chart.defaults.color = 'rgba(255,255,255,0.6)';
