@@ -268,7 +268,7 @@ async function syncDataWithCloud(isInitialLoad = false) {
         
         // Timeout helper — if Supabase hangs for 4s, abort and boot locally
         const timeout = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Supabase timeout')), 4000)
+            setTimeout(() => reject(new Error('Supabase timeout')), 3000)
         );
 
         // 1. Fetch Cloud Data (race against timeout)
