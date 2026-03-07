@@ -886,31 +886,42 @@ function updateExamCountdowns() {
 
 // Initialize App
 async function init() {
-    // Attempt migration from old DB name if needed
-    await migrateDatabaseIfNeeded();
+    try {
+        // Attempt migration from old DB name if needed
+        if (typeof migrateDatabaseIfNeeded === 'function') {
+            await migrateDatabaseIfNeeded();
+        }
+    } catch (e) { console.warn('DB Migration skipped:', e); }
 
-    // CRITICAL: Restore backup handle FIRST so recovery can use it
-    await restoreAutoBackupSettings();
+    try {
+        // CRITICAL: Restore backup handle FIRST so recovery can use it
+        if (typeof restoreAutoBackupSettings === 'function') {
+            await restoreAutoBackupSettings();
+        }
+    } catch (e) { console.warn('Backup restore skipped:', e); }
 
-    // Run data recovery before anything else renders 
-    const recovered = await recoverDataIfNeeded();
+    try {
+        // Run data recovery before anything else renders 
+        const recovered = await (typeof recoverDataIfNeeded === 'function' ? recoverDataIfNeeded() : Promise.resolve(null));
+        if (recovered === 'indexeddb') {
+            showToast('Data recovered automatically from backup! 🔄', 'success');
+        } else if (recovered === 'backup-file') {
+            showToast('Data recovered from your linked backup folder! 📂', 'success');
+        }
+    } catch (e) { console.warn('Data recovery skipped:', e); }
 
-    if (recovered === 'indexeddb') {
-        showToast('Data recovered automatically from backup! 🔄', 'success');
-    } else if (recovered === 'backup-file') {
-        showToast('Data recovered from your linked backup folder! 📂', 'success');
-    }
+    // ---- UI RENDERING (always runs even if above steps fail) ----
 
     // Render dynamic subjects from profile
     renderDynamicSubjects();
 
     // Set today's date in form by default
     const today = getLocalDateStr();
-    dateReadInput.value = today;
+    if (dateReadInput) dateReadInput.value = today;
 
     // Display current date in header gracefully
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    currentDateDisplay.textContent = new Date().toLocaleDateString('en-US', options);
+    if (currentDateDisplay) currentDateDisplay.textContent = new Date().toLocaleDateString('en-US', options);
 
     // Start 1-minute interval to refresh UI (specifically for 5-min delete window & exam countdown)
     setInterval(() => {
@@ -923,8 +934,8 @@ async function init() {
     }, 60000);
 
     // Set default date for Time Tracker to today
-    document.getElementById('timeDateInput').value = getLocalDateStr();
-    document.getElementById('historyDateFilter').value = getLocalDateStr();
+    if (document.getElementById('timeDateInput')) document.getElementById('timeDateInput').value = getLocalDateStr();
+    if (document.getElementById('historyDateFilter')) document.getElementById('historyDateFilter').value = getLocalDateStr();
 
     // Initial render
     renderDashboard();
@@ -936,14 +947,19 @@ async function init() {
     if (typeof renderDailyInsight === 'function') renderDailyInsight();
     if (typeof calculateAndRenderStreak === 'function') calculateAndRenderStreak();
 
-    // Event Listeners
-    addSessionForm.addEventListener('submit', handleAddSession);
+    // Event Listeners — only attach once
+    if (addSessionForm && !addSessionForm.dataset.listenerAdded) {
+        addSessionForm.addEventListener('submit', handleAddSession);
+        addSessionForm.dataset.listenerAdded = 'true';
+    }
 
     // Show profile modal on first visit
     const profile = getProfile();
     if (!profile.setupComplete) {
         setTimeout(() => showProfileModal(), 800);
     }
+    
+    console.log('✅ HourForge init complete!');
 }
 
 // ==========================================
