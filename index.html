@@ -20,6 +20,7 @@
     <!-- Sentry Error Tracking -->
     <script src="https://js.sentry-cdn.com/5434c8fc905e9805887e8d156ecdfab6.min.js" crossorigin="anonymous"></script>
     <!-- PostHog Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group reset groups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags resetGroups set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTrace recordTrace recordSpan".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
         posthog.init('phc_98w4KC5f2ucfgjLBWQ7QSk9tiAP5mdAQbmtSlZQVnD2', {
@@ -48,7 +49,11 @@
                     <i class="fa-solid fa-circle-info"></i>
                     <span class="header-icon-label">Info</span>
                 </button>
-                <button id="btnProfileIcon" class="header-icon-btn profile-icon-btn" title="Student Profile">
+                <button id="btnLoginIcon" class="header-icon-btn login-icon-btn" title="Login / Sign Up">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span class="header-icon-label">Login</span>
+                </button>
+                <button id="btnProfileIcon" class="header-icon-btn profile-icon-btn" title="Student Profile" style="display:none;">
                     <i class="fa-solid fa-user-graduate"></i>
                     <span class="header-icon-label">Profile</span>
                 </button>
@@ -843,6 +848,47 @@
         <button id="pomoMiniOpen" class="pomo-mini-open" title="Open Timer">
             <i class="fa-solid fa-up-right-from-square"></i>
         </button>
+    </div>
+
+    <!-- =================== LOGIN / SIGNUP MODAL =================== -->
+    <div id="loginModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box login-modal" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="justify-content: center; position: relative;">
+                <h2><i class="fa-solid fa-cloud" style="color:#6366f1;"></i> Cloud Sync</h2>
+                <button id="btnCloseLogin" class="modal-close-btn" style="position: absolute; right: 0; top: 0;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">Log in to automatically sync your study data across devices securely.</p>
+            
+            <form id="authForm" style="text-align: left;">
+                <div class="form-group">
+                    <label for="authEmail">Email Address</label>
+                    <input type="email" id="authEmail" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="authPassword">Password</label>
+                    <input type="password" id="authPassword" required autocomplete="current-password">
+                </div>
+                
+                <!-- Helper messages for auth state (errors or success) -->
+                <div id="authMessage" style="font-size: 0.85rem; margin-bottom: 1rem; text-align: center; display: none;"></div>
+
+                <button type="submit" id="btnAuthSubmit" class="btn-primary" style="margin-bottom: 1rem;">
+                    Sign In
+                </button>
+                <div style="text-align: center; font-size: 0.9rem; color: var(--text-secondary);">
+                    Don't have an account? <a href="#" id="toggleAuthMode" style="color: var(--accent-primary); text-decoration: none; font-weight: 600;">Sign Up</a>
+                </div>
+            </form>
+            
+            <!-- Active User Display (Hidden when logged out) -->
+            <div id="activeUserDisplay" style="display: none; flex-direction: column; gap: 1rem;">
+                <p>Logged in as: <strong id="currentUserEmail" style="color: var(--text-primary);"></strong></p>
+                <button id="btnSignOut" class="btn-utility" style="width: 100%; border-radius: 0.75rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Main Logic Script -->
