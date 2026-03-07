@@ -2333,75 +2333,106 @@ main#hourLogView.active {
 }
 
 /* ==========================================
-   INFO MODAL
+   PROFILE BOTTOM SHEET (SLIDE-UP DRAWER)
    ========================================== */
-.info-modal {
-    max-width: 640px;
-    max-height: 88vh;
+.bottom-sheet-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
 }
 
-.info-modal::-webkit-scrollbar {
-    width: 5px;
+.bottom-sheet-overlay.active {
+    opacity: 1;
+    visibility: visible;
 }
 
-.info-modal::-webkit-scrollbar-thumb {
-    background: rgba(99, 102, 241, 0.3);
+.bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-top: 1px solid var(--glass-border);
+    border-radius: 24px 24px 0 0;
+    z-index: 1001;
+    padding: 1rem 1.5rem 2rem;
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+}
+
+.bottom-sheet.open {
+    transform: translateY(0);
+}
+
+.bottom-sheet-handle {
+    width: 40px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
+    margin: 0 auto 1.5rem;
 }
 
-.info-section {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
+.bottom-sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
-.info-section:last-of-type {
-    border-bottom: none;
-}
-
-.info-section-title {
-    font-size: 1rem;
+.bottom-sheet-header h2 {
+    font-size: 1.35rem;
     font-weight: 700;
-    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.85rem;
+    margin: 0;
 }
 
-.info-section-title i {
-    color: #6366f1;
-}
-
-.info-text {
+.sheet-close-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
     color: var(--text-secondary);
-    font-size: 0.95rem;
-    line-height: 1.7;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.info-text strong {
+.sheet-close-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
     color: var(--text-primary);
 }
 
-/* Feature grid */
-.info-features-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
+.profile-desc {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
 }
 
-.info-feature-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 0.85rem;
-    padding: 0.85rem;
-    transition: border-color 0.2s;
-}
-
-.info-feature-card:hover {
-    border-color: rgba(99, 102, 241, 0.25);
+/* Form overrides for bottom sheet */
+.bottom-sheet .form-group input,
+.bottom-sheet .form-group select {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    border-radius: 12px;
 }
 
 .info-feature-icon {
@@ -3483,14 +3514,22 @@ main#hourLogView.active {
 
 .main-content.view-section,
 .insights-layout {
-    padding-top: calc(56px + 1rem) !important;
-    padding-bottom: calc(64px + 1rem + env(safe-area-inset-bottom)) !important;
+    padding-top: calc(56px + 1.5rem) !important;
+    padding-bottom: calc(75px + 1.5rem + env(safe-area-inset-bottom)) !important;
 }
 
 /* Hide the old top-nav / app-nav completely */
 .top-nav, .app-nav, .backup-controls, .tagline,
 .header-icon-group, .logo {
     display: none !important;
+}
+
+/* Extra clearance for mobile view to ensure headers aren't caught under the blur */
+@media (max-width: 768px) {
+    .main-content.view-section {
+        padding-top: 5.5rem !important; /* 88px */
+        padding-bottom: 7rem !important; /* 112px */
+    }
 }
 
 /* ---- MOBILE SPACING TWEAKS ---- */
