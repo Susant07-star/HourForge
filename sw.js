@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hourforge-v8';
+const CACHE_NAME = 'hourforge-v9';
 const ASSETS = [
     './',
     './index.html',
@@ -36,12 +36,28 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-    // Network-first for HTML/JS files (so updates are always fresh), cache-first for assets
+    // Ignore non-GET requests (like Supabase POST/PATCH)
+    if (e.request.method !== 'GET') return;
+
     const url = new URL(e.request.url);
+
+    // Ignore external APIs (Supabase, Sentry, PostHog, Google)
+    if (
+        url.hostname.includes('supabase.co') || 
+        url.hostname.includes('sentry.io') || 
+        url.hostname.includes('posthog.com') ||
+        url.hostname.includes('google.com') ||
+        url.hostname.includes('googleapis.com')
+    ) {
+        return;
+    }
+
+    // Network-first for HTML/JS files (so updates are always fresh), cache-first for assets
     if (url.pathname.endsWith('.html') || url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname === '/') {
         // Network first — try fresh, fall back to cache
         e.respondWith(
             fetch(e.request).then((response) => {
+                // Must clone response to put it in cache because body can only be read once
                 const clone = response.clone();
                 caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
                 return response;
