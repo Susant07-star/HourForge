@@ -1,4 +1,22 @@
 // ==========================================
+// ERROR TRACKING (Sentry)
+// ==========================================
+if (typeof Sentry !== 'undefined') {
+    Sentry.init({
+        dsn: "https://5434c8fc905e9805887e8d156ecdfab6@o4508930847952896.ingest.us.sentry.io/4508930850705408", // Sentry handles DSN internally via the injected script, but providing empty config initializes it.
+        integrations: [
+            Sentry.browserTracingIntegration(),
+            Sentry.replayIntegration(),
+        ],
+        // Performance Monitoring
+        tracesSampleRate: 1.0, // Capture 100% of the transactions
+        // Session Replay
+        replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+        replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+    });
+}
+
+// ==========================================
 // STUDENT PROFILE SYSTEM
 // ==========================================
 
