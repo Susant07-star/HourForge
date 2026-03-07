@@ -1445,6 +1445,11 @@ function saveToLocalStorage() {
     // REDUNDANT SAVE: Mirror to IndexedDB so data survives localStorage wipes
     idb.set('studySessions', studySessions).catch(e => console.warn('IDB mirror save failed:', e));
     idb.set('timeLogs', timeLogs).catch(e => console.warn('IDB mirror save failed:', e));
+    
+    // Auto-sync to Cloud implicitly on every save
+    if (typeof uploadDataToCloud === 'function' && currentSession) {
+        setTimeout(uploadDataToCloud, 500);
+    }
 }
 
 // Form Submission Handler
