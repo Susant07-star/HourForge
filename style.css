@@ -1708,6 +1708,11 @@ main#hourLogView.active {
         font-size: 0.8rem;
     }
 
+    /* Dashboard top widgets: collapse to single column on mobile */
+    .dashboard-top-widgets {
+        grid-template-columns: 1fr !important;
+    }
+
     /* Dashboard Revision Cards */
     .revision-cards {
         grid-template-columns: 1fr;

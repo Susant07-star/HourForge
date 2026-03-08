@@ -2627,6 +2627,28 @@ function deleteSession(id) {
     }
 }
 
+// Permanent deletion for Revision Cards (no 5-min window restriction)
+function deleteRevisionCard(event, id) {
+    if (event) {
+        event.stopPropagation();
+        if (!confirm("Are you sure you want to delete this study session and its revision cycle?")) return;
+    }
+
+    const sessionIndex = studySessions.findIndex(s => s.id === id);
+    if (sessionIndex === -1) return;
+
+    studySessions.splice(sessionIndex, 1);
+    saveToLocalStorage();
+    renderDashboard();
+    renderTableView();
+    autoBackupSync();
+    
+    if (typeof showToast === 'function') {
+        showToast('Revision session deleted.', 'info');
+    }
+}
+
+
 /**
  * Calculates strict day differences, dropping time components.
  */
@@ -2798,8 +2820,20 @@ function renderTodayRevisions() {
         }
 
         card.innerHTML = `
-            <div class="card-subject">${session.subject}</div>
-            <div class="card-topic">${session.topic}</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                <div>
+                    <div class="card-subject">${session.subject}</div>
+                    <div class="card-topic">${session.topic}</div>
+                </div>
+                <!-- Delete button: always visible on desktop, also accessible after long-press on mobile -->
+                <button class="btn-delete-revision" title="Delete this revision card"
+                    onclick="deleteRevisionCard(event, '${session.id}')"
+                    style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171;
+                           border-radius: 0.5rem; padding: 0.35rem 0.6rem; font-size: 0.8rem; cursor: pointer;
+                           white-space: nowrap; transition: all 0.2s; flex-shrink: 0; margin-left: 0.5rem;">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </div>
             <div class="card-meta">
                 <span class="revision-badge">${session.revisionLabel}</span>
                 ${overdueBadge}
@@ -2809,6 +2843,20 @@ function renderTodayRevisions() {
                 <i class="fa-solid fa-check"></i> Mark Completed
             </button>
         `;
+
+        // Long-press on mobile (600ms hold) — alternative delete trigger for touch screens
+        let longPressTimer;
+        card.addEventListener('touchstart', (e) => {
+            longPressTimer = setTimeout(() => {
+                if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+                if (confirm(`Delete revision card for "${session.topic}"? This cannot be undone.`)) {
+                    deleteRevisionCard(null, session.id);
+                }
+            }, 600);
+        }, { passive: true });
+        card.addEventListener('touchend', () => clearTimeout(longPressTimer), { passive: true });
+        card.addEventListener('touchmove', () => clearTimeout(longPressTimer), { passive: true });
+
         todayRevisionList.appendChild(card);
     });
 }
