@@ -268,14 +268,80 @@ let isAppInitialized = false;
 // --- Supabase Realtime Sync ---
 let realtimeChannel = null;
 
+function deepMergeArrays(localArr, cloudArr) {
+    if (!localArr) localArr = [];
+    if (!cloudArr) cloudArr = [];
+    const map = new Map();
+    // Add all local items
+    for (const item of localArr) {
+        if (item.id) map.set(item.id, item);
+    }
+    // Merge cloud items
+    for (const item of cloudArr) {
+        if (item.id) {
+            const existing = map.get(item.id);
+            if (!existing) {
+                map.set(item.id, item);
+            } else {
+                // If both exist, pick the newest one based on timestamps
+                const getLatestStamp = (obj) => {
+                    let latest = obj.createdAt ? new Date(obj.createdAt).getTime() : 0;
+                    if (obj.updatedAt) latest = Math.max(latest, new Date(obj.updatedAt).getTime());
+                    if (obj.revisions) {
+                        for (const rev of Object.values(obj.revisions)) {
+                            if (rev && typeof rev === 'object' && rev.completedAt) {
+                                latest = Math.max(latest, new Date(rev.completedAt).getTime());
+                            }
+                        }
+                    }
+                    return latest;
+                };
+                
+                const localStr = JSON.stringify(existing);
+                const cloudStr = JSON.stringify(item);
+                
+                if (localStr === cloudStr) continue;
+                
+                const localDate = getLatestStamp(existing);
+                const cloudDate = getLatestStamp(item);
+                
+                if (cloudDate > localDate) {
+                    map.set(item.id, item);
+                } else if (cloudDate === localDate) {
+                    if (cloudStr.length > localStr.length) {
+                        map.set(item.id, item);
+                    }
+                }
+            }
+        }
+    }
+    return Array.from(map.values()).sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA; 
+    });
+}
+
 async function applyCloudData(cloudData) {
     if (!cloudData) return;
     
     // Save to local vars
     if (cloudData.profile) saveProfile(cloudData.profile);
-    studySessions = cloudData.studySessions || [];
-    timeLogs = cloudData.timeLogs || [];
-    aiRatingsHistory = cloudData.aiRatingsHistory || [];
+    
+    // Deep Merge Arrays instead of overwriting
+    studySessions = deepMergeArrays(studySessions, cloudData.studySessions);
+    timeLogs = deepMergeArrays(timeLogs, cloudData.timeLogs);
+    
+    // Merge AI Ratings
+    const mergedAI = [...(cloudData.aiRatingsHistory || []), ...aiRatingsHistory];
+    const aiMap = {};
+    mergedAI.forEach(r => {
+        const key = `${r.dateLabel}_${r.period}`;
+        if (!aiMap[key] || r.timestamp > aiMap[key].timestamp) {
+            aiMap[key] = r;
+        }
+    });
+    aiRatingsHistory = Object.values(aiMap);
     
     // Save to LocalStorage
     localStorage.setItem('studySessions', JSON.stringify(studySessions));
@@ -354,32 +420,11 @@ async function syncDataWithCloud(isInitialLoad = false) {
             return;
         }
 
-        // Gather all local data
-        const localData = {
-            profile: getProfile(),
-            studySessions,
-            timeLogs,
-            aiRatingsHistory,
-            dbMigrationDone: localStorage.getItem('dbMigrationDone')
-        };
-        
-        let shouldUpload = true;
-
-        // Compare timestamps strategy (simple approach: if cloud exists, we download if it's "newer", but tracking local mutations is complex.)
-        // For V1 Sync: Cloud wins on Login if it exists. (A more robust CRDT sync is ideal for V2).
+        // 2. Perform Deep Merge of Data
         if (cloudRow && cloudRow.data) {
-            // Only overwrite local if cloud data is substantially different or "newer" by some metric.
-            // For now, let's assume Cloud is the master backup.
-            const cloudLen = JSON.stringify(cloudRow.data).length;
-            const localLen = JSON.stringify(localData).length;
-
-            if (cloudLen > 50 && cloudLen >= localLen) {
-                console.log("☁️ Downloading Cloud Master to Local...");
-                await applyCloudData(cloudRow.data);
-                
-                showToast("Cloud Data Synced! ☁️", "success");
-                shouldUpload = false; // We just downloaded, no need to upload immediately
-            }
+            console.log("☁️ Merging Cloud Data with Local Data...");
+            await applyCloudData(cloudRow.data);
+            showToast("Cloud Data Synced! ☁️", "success");
         }
 
         // Initialize App UI now that data is ready (only on initial load)
@@ -388,10 +433,8 @@ async function syncDataWithCloud(isInitialLoad = false) {
             isAppInitialized = true;
         }
 
-        // 2. Upload Local to Cloud
-        if (shouldUpload) {
-            uploadDataToCloud();
-        }
+        // 3. Upload merged outcome back to cloud to keep cloud mathematically aligned
+        uploadDataToCloud();
 
     } catch (e) {
         console.error("Sync caught error:", e);
