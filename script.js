@@ -1879,18 +1879,23 @@ async function init() {
     if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
 
     // Premium Time/Date Pickers via Flatpickr
-    // Replaces native browser clocks with a smooth, easy-to-use UI on mobile
+    // disableMobile: true FORCES Flatpickr's scroll-wheel UI on ALL devices (mobile AND desktop)
+    // This prevents the native browser clock from ever appearing.
     if (typeof flatpickr !== 'undefined') {
         const timePickerConfig = {
             enableTime: true,
             noCalendar: true,
-            dateFormat: 'H:i',
-            time_24hr: true,
+            dateFormat: 'H:i',       // Internal storage stays HH:mm for JS compatibility
+            altInput: true,          // Show a friendly display value to the user
+            altFormat: 'h:i K',      // What the USER sees: "1:30 PM"
+            time_24hr: false,        // Show AM/PM in the picker wheel
             minuteIncrement: 5,
-            disableMobile: false, // Force nice UI even on mobile
+            disableMobile: true,     // CRITICAL: Forces Flatpickr UI on mobile instead of native clock
             onChange: function(selectedDates, dateStr, instance) {
-                // Keep the native input value in sync for all other JS to read
+                // Keep the native input value in sync (HH:mm format) for all other JS logic
                 instance.element.value = dateStr;
+                // Fire native input event so the task/subject autofill listeners also trigger
+                instance.element.dispatchEvent(new Event('input', { bubbles: true }));
             }
         };
         
@@ -1903,7 +1908,9 @@ async function init() {
         if (dateEl && !dateEl._flatpickr) {
             flatpickr(dateEl, {
                 dateFormat: 'Y-m-d',
-                disableMobile: false,
+                altInput: true,
+                altFormat: 'F j, Y',  // Shows "March 9, 2026"
+                disableMobile: true,
                 onChange: function(selectedDates, dateStr, instance) {
                     instance.element.value = dateStr;
                 }

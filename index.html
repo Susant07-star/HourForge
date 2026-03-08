@@ -370,22 +370,23 @@
                         </select>
                     </div>
 
-                    <div class="form-row" style="width: 100%; max-width: 100%;">
-                        <div class="form-group" style="min-width: 0;">
-                            <label>Start Time</label>
-                            <input type="time" id="timeStartInput" required style="width: 100%; box-sizing: border-box;">
+                    <!-- Start Time: its own full row -->
+                    <div class="form-group">
+                        <label>Start Time</label>
+                        <input type="time" id="timeStartInput" required style="width: 100%; box-sizing: border-box;">
+                    </div>
+
+                    <!-- End Time: its own row, with smart duration buttons above -->
+                    <div class="form-group">
+                        <label>End Time</label>
+                        <!-- Intelligent Quick Duration Buttons -->
+                        <div id="quickDurationContainer" class="quick-duration-container" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; justify-content: flex-start;">
+                            <button type="button" class="btn-duration" data-mins="15">+15m</button>
+                            <button type="button" class="btn-duration" data-mins="30">+30m</button>
+                            <button type="button" class="btn-duration" data-mins="45">+45m</button>
+                            <button type="button" class="btn-duration" data-mins="60">+1h</button>
                         </div>
-                        <div class="form-group" style="min-width: 0;">
-                            <label>End Time</label>
-                            <!-- Intelligent Quick Duration Buttons -->
-                            <div id="quickDurationContainer" class="quick-duration-container" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; justify-content: flex-start;">
-                                <button type="button" class="btn-duration" data-mins="15">+15m</button>
-                                <button type="button" class="btn-duration" data-mins="30">+30m</button>
-                                <button type="button" class="btn-duration" data-mins="45">+45m</button>
-                                <button type="button" class="btn-duration" data-mins="60">+1h</button>
-                            </div>
-                            <input type="time" id="timeEndInput" required style="width: 100%; box-sizing: border-box;">
-                        </div>
+                        <input type="time" id="timeEndInput" required style="width: 100%; box-sizing: border-box;">
                     </div>
 
                     <div class="form-group">
