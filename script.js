@@ -1403,21 +1403,43 @@ function renderQuickActivityChips() {
     topTasks.forEach(({task, subject, note}) => {
         const chip = document.createElement('div');
         chip.className = 'chip';
-        // Add ⚡ icon for common tasks
+        chip.dataset.task = task;
+        chip.dataset.subject = subject;
+        chip.dataset.note = note;
         chip.innerHTML = `<i class="fa-solid fa-bolt" style="color: #fbbf24; font-size: 0.8em;"></i> ${task}`;
         
         chip.addEventListener('click', () => {
             if (navigator.vibrate) navigator.vibrate(15);
-            document.getElementById('timeTaskInput').value = task;
-            
+            const taskInput = document.getElementById('timeTaskInput');
             const subjectSelect = document.getElementById('timeSubjectInput');
-            const hasOption = Array.from(subjectSelect.options).some(opt => opt.value === subject);
-            if (hasOption) subjectSelect.value = subject;
+            const notesInput = document.getElementById('timeNotesInput');
             
-            document.getElementById('timeNotesInput').value = note; // Populates the last exact note used
-            autoFillSmartTimes(); // Refresh times just in case
-            if (typeof renderIntelligentDurations === 'function') {
-                renderIntelligentDurations(task); // Refresh duration buttons based on this specific task
+            const isSelected = chip.classList.contains('chip-selected');
+            
+            if (isSelected) {
+                // DESELECT: clear the fields this chip filled and reset the chip UI
+                taskInput.value = '';
+                subjectSelect.value = '';
+                notesInput.value = '';
+                chip.classList.remove('chip-selected');
+                chip.innerHTML = `<i class="fa-solid fa-bolt" style="color: #fbbf24; font-size: 0.8em;"></i> ${task}`;
+                if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
+            } else {
+                // DESELECT any other chip first
+                container.querySelectorAll('.chip-selected').forEach(c => {
+                    c.classList.remove('chip-selected');
+                    c.innerHTML = `<i class="fa-solid fa-bolt" style="color: #fbbf24; font-size: 0.8em;"></i> ${c.dataset.task}`;
+                });
+                
+                // SELECT this chip
+                taskInput.value = task;
+                const hasOption = Array.from(subjectSelect.options).some(opt => opt.value === subject);
+                if (hasOption) subjectSelect.value = subject;
+                notesInput.value = note;
+                chip.classList.add('chip-selected');
+                chip.innerHTML = `<i class="fa-solid fa-xmark" style="color: #f87171; font-size: 0.8em;"></i> ${task}`;
+                autoFillSmartTimes();
+                if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations(task);
             }
         });
         
