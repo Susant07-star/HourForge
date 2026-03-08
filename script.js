@@ -456,7 +456,7 @@ async function syncDataWithCloud(isInitialLoad = false) {
         if (cloudRow && cloudRow.data) {
             console.log("☁️ Merging Cloud Data with Local Data...");
             await applyCloudData(cloudRow.data);
-            showToast("Cloud Data Synced! ☁️", "success");
+            // No toast here — this runs silently on every refresh and would be annoying.
         }
 
         // Initialize App UI now that data is ready (only on initial load)
@@ -628,32 +628,37 @@ async function migrateDatabaseIfNeeded() {
 }
 
 // ==========================================
-// MOBILE NAVIGATION — Bottom Tab Bar + Sidebar
+// MOBILE NAVIGATION — Bottom Tab Bar + Swipe
 // ==========================================
+
+// Ordered list of swipeable tab IDs (matches bottom nav order, excluding pomodoro)
+const SWIPE_TABS = ['dashboardView', 'tableView', 'hourLogView', 'insightsView'];
 
 // Keep old selectors alive for any existing code that references them
 const navBtns = document.querySelectorAll('.nav-btn');
 const viewSections = document.querySelectorAll('.view-section');
 
-// --- Tab switching (used by bottom nav AND sidebar) ---
-function switchTab(viewId) {
-    // Show the right view section
+// Track current tab index
+let currentTabIndex = 0;
+
+// --- Tab switching (used by bottom nav, sidebar, AND swipe) ---
+function switchTab(viewId, animate = true) {
+    const idx = SWIPE_TABS.indexOf(viewId);
+    if (idx !== -1) currentTabIndex = idx;
+
     document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
     const target = document.getElementById(viewId);
     if (target) target.classList.add('active');
 
-    // Update bottom nav active state
     document.querySelectorAll('.bottom-nav-item').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.view === viewId);
     });
 
-    // Update sidebar nav active state
     document.querySelectorAll('.sidebar-nav-item').forEach(btn => {
         btn.classList.remove('active-sidebar-item');
     });
 
-    // Scroll to top of view
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: animate ? 'smooth' : 'auto' });
 }
 
 // --- Bottom nav click handler ---
@@ -661,7 +666,6 @@ document.querySelectorAll('.bottom-nav-item').forEach(btn => {
     btn.addEventListener('click', () => {
         const view = btn.dataset.view;
         if (view === 'pomodoroView') {
-            // Trigger Pomodoro modal instead of switching view
             const pomoBtn = document.getElementById('btnPomodoroIcon');
             if (pomoBtn) pomoBtn.click();
         } else {
@@ -674,6 +678,127 @@ document.querySelectorAll('.bottom-nav-item').forEach(btn => {
 navBtns.forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.view));
 });
+
+// ==========================================
+// INSTAGRAM-STYLE HORIZONTAL SWIPE
+// ==========================================
+(function initSwipe() {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchCurrentX = 0;
+    let intentDetected = false;   // 'horizontal' | 'vertical' | false
+    let isSwiping = false;
+    const SWIPE_THRESHOLD = 50;   // px to commit a tab change
+    const INTENT_THRESHOLD = 8;   // px movement before we decide H vs V
+
+    // Get all view sections as an ordered array
+    function getViewEls() {
+        return SWIPE_TABS.map(id => document.getElementById(id)).filter(Boolean);
+    }
+
+    // Translate all views as a strip without animation (during drag)
+    function applyDrag(deltaX) {
+        const views = getViewEls();
+        const w = window.innerWidth;
+        views.forEach((el, i) => {
+            const base = (i - currentTabIndex) * w;
+            el.style.transition = 'none';
+            el.style.transform = `translateX(${base + deltaX}px)`;
+            el.style.display = 'block';
+            el.style.position = 'fixed';
+            el.style.width = '100%';
+            el.style.top = '0';
+            el.style.left = '0';
+        });
+    }
+
+    // Snap to a tab index with spring animation then restore normal layout
+    function snapTo(targetIndex) {
+        const views = getViewEls();
+        const w = window.innerWidth;
+        const clampedIndex = Math.max(0, Math.min(SWIPE_TABS.length - 1, targetIndex));
+
+        // Apply the slide‑out animation
+        views.forEach((el, i) => {
+            el.style.transition = 'transform 0.32s cubic-bezier(0.25, 1, 0.5, 1)';
+            el.style.transform = `translateX(${(i - clampedIndex) * w}px)`;
+        });
+
+        // After animation, restore normal layout and let CSS handle display
+        setTimeout(() => {
+            views.forEach(el => {
+                el.style.transition = '';
+                el.style.transform = '';
+                el.style.display = '';
+                el.style.position = '';
+                el.style.width = '';
+                el.style.top = '';
+                el.style.left = '';
+            });
+            switchTab(SWIPE_TABS[clampedIndex], false);
+        }, 320);
+    }
+
+    // Attach to document so swipe works even from inside tables, forms, etc.
+    document.addEventListener('touchstart', e => {
+        // Ignore if a modal or drawer is open
+        const modals = document.querySelectorAll('.modal-overlay[style*="flex"], .sidebar-drawer.open, .profile-drawer.open');
+        if (modals.length > 0) return;
+
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchCurrentX = touchStartX;
+        intentDetected = false;
+        isSwiping = false;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', e => {
+        if (!touchStartX) return;
+
+        const dx = e.touches[0].clientX - touchStartX;
+        const dy = e.touches[0].clientY - touchStartY;
+        touchCurrentX = e.touches[0].clientX;
+
+        // Detect intent once we have enough movement
+        if (!intentDetected && (Math.abs(dx) > INTENT_THRESHOLD || Math.abs(dy) > INTENT_THRESHOLD)) {
+            intentDetected = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
+        }
+
+        if (intentDetected !== 'horizontal') return;
+
+        // Don't start a drag that would go out of bounds with no room
+        if (dx > 0 && currentTabIndex === 0) return;
+        if (dx < 0 && currentTabIndex === SWIPE_TABS.length - 1) return;
+
+        isSwiping = true;
+        // Add resistance at the edges — rubber band feel
+        const resistance = 0.3;
+        const atEdge = (dx > 0 && currentTabIndex === 0) || (dx < 0 && currentTabIndex === SWIPE_TABS.length - 1);
+        const effectiveDx = atEdge ? dx * resistance : dx;
+
+        applyDrag(effectiveDx);
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+        if (!isSwiping) {
+            touchStartX = 0;
+            return;
+        }
+
+        const dx = touchCurrentX - touchStartX;
+        isSwiping = false;
+        touchStartX = 0;
+
+        if (Math.abs(dx) >= SWIPE_THRESHOLD) {
+            // Enough movement — commit the tab change
+            snapTo(dx < 0 ? currentTabIndex + 1 : currentTabIndex - 1);
+        } else {
+            // Not enough — snap back to current tab
+            snapTo(currentTabIndex);
+        }
+    }, { passive: true });
+})();
+
 
 // --- Sidebar open / close ---
 const sidebarDrawer = document.getElementById('sidebarDrawer');
