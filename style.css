@@ -92,6 +92,7 @@ body::after {
     margin: 0 auto;
     padding: 2rem;
     -webkit-overflow-scrolling: touch;
+    overflow-x: hidden; /* Prevents app container from scrolling natively */
 }
 
 /* Header */
@@ -707,6 +708,8 @@ option {
 .view-section {
     display: none;
     animation: fadeIn 0.3s ease-out forwards;
+    touch-action: pan-y; /* Prevents whole-app horizontal rubber banding during JS swipe */
+    width: 100%; /* Ensures width calculation is exact */
 }
 
 .view-section.active {

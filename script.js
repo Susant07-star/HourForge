@@ -734,9 +734,9 @@ function switchTab(viewId, animate = true) {
     });
     
     // Auto-load charts if navigating to Insights tab
-    if (viewId === 'insightsView' && typeof renderCharts === 'function') {
+    if (viewId === 'insightsView' && typeof renderAllCharts === 'function') {
         // slight delay to let the slide animation run smooth before heavy chart painting
-        setTimeout(renderCharts, 50); 
+        setTimeout(renderAllCharts, 100); 
     }
 
     if (animate) {
@@ -797,8 +797,8 @@ navBtns.forEach(btn => {
 
     function applyDrag(deltaX) {
         const views = getViewEls();
-        const w = window.innerWidth;
         const currentEl = views[currentTabIndex];
+        const w = currentEl.offsetWidth; // Must use element width so siblings abut perfectly regardless of padding
 
         // Ensure current element keeps its layout but translates
         currentEl.style.transition = 'none';
@@ -816,8 +816,8 @@ navBtns.forEach(btn => {
 
     function snapTo(targetIndex) {
         const views = getViewEls();
-        const w = window.innerWidth;
         const currentEl = views[currentTabIndex];
+        const w = currentEl.offsetWidth;
         const nextEl = views[currentTabIndex + 1];
         const prevEl = views[currentTabIndex - 1];
 
