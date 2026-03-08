@@ -2820,20 +2820,8 @@ function renderTodayRevisions() {
         }
 
         card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                <div>
-                    <div class="card-subject">${session.subject}</div>
-                    <div class="card-topic">${session.topic}</div>
-                </div>
-                <!-- Delete button: always visible on desktop, also accessible after long-press on mobile -->
-                <button class="btn-delete-revision" title="Delete this revision card"
-                    onclick="deleteRevisionCard(event, '${session.id}')"
-                    style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171;
-                           border-radius: 0.5rem; padding: 0.35rem 0.6rem; font-size: 0.8rem; cursor: pointer;
-                           white-space: nowrap; transition: all 0.2s; flex-shrink: 0; margin-left: 0.5rem;">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            </div>
+            <div class="card-subject">${session.subject}</div>
+            <div class="card-topic">${session.topic}</div>
             <div class="card-meta">
                 <span class="revision-badge">${session.revisionLabel}</span>
                 ${overdueBadge}
@@ -2843,20 +2831,6 @@ function renderTodayRevisions() {
                 <i class="fa-solid fa-check"></i> Mark Completed
             </button>
         `;
-
-        // Long-press on mobile (600ms hold) — alternative delete trigger for touch screens
-        let longPressTimer;
-        card.addEventListener('touchstart', (e) => {
-            longPressTimer = setTimeout(() => {
-                if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
-                if (confirm(`Delete revision card for "${session.topic}"? This cannot be undone.`)) {
-                    deleteRevisionCard(null, session.id);
-                }
-            }, 600);
-        }, { passive: true });
-        card.addEventListener('touchend', () => clearTimeout(longPressTimer), { passive: true });
-        card.addEventListener('touchmove', () => clearTimeout(longPressTimer), { passive: true });
-
         todayRevisionList.appendChild(card);
     });
 }
@@ -2901,14 +2875,8 @@ function renderAllTopics() {
         const rev4Icon = rev4Done ? '<i class="fa-solid fa-check"></i>' : '4d';
         const rev7Icon = rev7Done ? '<i class="fa-solid fa-check"></i>' : '7d';
 
-        // 5-minute undo/delete window check
-        let deleteBtnHtml = '';
-        if (session.createdAt) {
-            const diffMins = (Date.now() - new Date(session.createdAt).getTime()) / (1000 * 60);
-            if (diffMins <= 5) {
-                deleteBtnHtml = `<button class="btn-delete" title="Undo Log (Valid for 5 mins)" onclick="deleteSession('${session.id}')"><i class="fa-solid fa-trash-can"></i> Delete</button>`;
-            }
-        }
+        // Persistent Delete Button (no 5-min window)
+        const deleteBtnHtml = `<button class="btn-delete" title="Delete Ongoing Revision" onclick="deleteRevisionCard(event, '${session.id}')" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2); color: #f87171; border-radius: 0.5rem; padding: 0.3rem 0.6rem; font-size: 0.75rem;"><i class="fa-solid fa-trash-can"></i></button>`;
 
         item.innerHTML = `
             <div class="topic-info-main">
@@ -2932,6 +2900,20 @@ function renderAllTopics() {
                 </div>
             </div>
         `;
+
+        // Long-press on mobile (600ms hold) — alternative delete trigger for touch screens in Ongoing Revisions
+        let longPressTimer;
+        item.addEventListener('touchstart', (e) => {
+            longPressTimer = setTimeout(() => {
+                if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+                if (confirm(`Delete ongoing revision for "${session.topic}"?`)) {
+                    deleteRevisionCard(null, session.id);
+                }
+            }, 600);
+        }, { passive: true });
+        item.addEventListener('touchend', () => clearTimeout(longPressTimer), { passive: true });
+        item.addEventListener('touchmove', () => clearTimeout(longPressTimer), { passive: true });
+
         fragment.appendChild(item);
     });
     allTopicsList.appendChild(fragment);
