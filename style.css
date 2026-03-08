@@ -810,6 +810,12 @@ main#hourLogView.active {
     transform: scale(0.98);
 }
 
+.chip-selected {
+    background: rgba(248, 113, 113, 0.15) !important;
+    border-color: rgba(248, 113, 113, 0.4) !important;
+    color: #fca5a5 !important;
+}
+
 .quick-duration-container::-webkit-scrollbar {
     display: none;
 }
@@ -1736,7 +1742,14 @@ main#hourLogView.active {
     .table-container {
         padding-bottom: 0.5rem;
         width: 100%;
-        overflow-x: visible;
+        overflow-x: hidden;
+    }
+
+    .revision-table {
+        width: 100%;
+        min-width: 0 !important; /* Override desktop min-width so it fits phone */
+        table-layout: fixed;
+        margin-top: 0.5rem;
     }
 
     .revision-table,
@@ -1798,7 +1811,7 @@ main#hourLogView.active {
     .revision-table tbody tr {
         display: grid !important;
         grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
-        gap: 0.5rem;
+        gap: 0;
     }
 
     /* Chapter and Date take full width */
@@ -3679,7 +3692,7 @@ main#hourLogView.active {
 
 /* Consistent card spacing */
 .glass-panel {
-    margin-bottom: 1rem;
+    margin-bottom: 0;
 }
 
 /* Extra clearance for mobile view to ensure headers aren't caught under the blur */
