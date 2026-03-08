@@ -768,6 +768,12 @@ main#hourLogView.active {
 }
 
 /* Time Tracker Specifics & Frictionless Data Entry */
+.quick-activity-chips, .quick-duration-container {
+    max-width: 100%;
+    /* Ensure scrolling momentum on iOS */
+    -webkit-overflow-scrolling: touch;
+}
+
 .quick-activity-chips::-webkit-scrollbar {
     display: none;
 }
@@ -1672,7 +1678,7 @@ main#hourLogView.active {
 
     .form-row {
         grid-template-columns: 1fr;
-        gap: 0rem;
+        gap: 1rem;
     }
 
     /* Dashboard Revision Cards */
