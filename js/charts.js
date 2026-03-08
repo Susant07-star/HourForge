@@ -512,7 +512,17 @@ async function generateAIInsights() {
 
     btn.disabled = true;
     loadingEl.style.display = 'flex';
-    contentEl.innerHTML = '<div class="ai-placeholder"><p>Analyzing your study data...</p></div>';
+    contentEl.innerHTML = `
+        <div class="skeleton-container">
+            <div class="skeleton-block title"></div>
+            <div class="skeleton-block p1"></div>
+            <div class="skeleton-block p2"></div>
+            <div class="skeleton-block p3"></div>
+            <div class="skeleton-block title" style="margin-top: 1rem;"></div>
+            <div class="skeleton-block p2"></div>
+            <div class="skeleton-block p1"></div>
+        </div>
+    `;
 
     let aiChartData = null; // Track chart data for saving
 

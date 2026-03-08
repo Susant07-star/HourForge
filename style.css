@@ -247,6 +247,40 @@ body::after {
     animation: none; /* Stop bounce on hover since CSS transitions take over */
 }
 
+/* Skeleton Loaders for AI */
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+.skeleton-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.skeleton-block {
+    height: 1.5rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.03) 25%, 
+        rgba(255, 255, 255, 0.08) 50%, 
+        rgba(255, 255, 255, 0.03) 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+}
+
+.skeleton-block.title {
+    width: 40%;
+    height: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-block.p1 { width: 90%; }
+.skeleton-block.p2 { width: 80%; }
+.skeleton-block.p3 { width: 95%; height: 4rem; margin-top: 0.5rem; }
+
 
 /* Main Layout */
 .main-content {
