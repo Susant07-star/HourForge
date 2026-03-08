@@ -531,52 +531,41 @@ async function generateAIInsights() {
         const logs = getFilteredLogs(currentPeriod);
         const periodLabel = currentPeriod === 'today' ? "today" : currentPeriod === 'week' ? "the past 7 days" : "the past 30 days";
 
-        // Build data summary
+        // -- Build data summary -- pre-merge overnight pairs so AI sees correct totals --
         let totalHours = 0;
         const taskSummaries = [];
         const dailyBreakdown = {};
+        const seenOvernightGroupsForMerge = new Set();
 
         logs.forEach(log => {
+            // Overnight pair: merge both halves into ONE line so AI sees the real total
+            if (log.overnightGroup) {
+                if (seenOvernightGroupsForMerge.has(log.overnightGroup)) return;
+                seenOvernightGroupsForMerge.add(log.overnightGroup);
+
+                const paired = timeLogs.filter(l => l.overnightGroup === log.overnightGroup);
+                const realTotal = parseFloat((log.overnightTotal || paired.reduce((s, l) => s + l.duration, 0)).toFixed(2));
+                const origStart = log.overnightOriginalStart || log.startTime;
+                const partnerLog = paired.find(l => l.id !== log.id) || log;
+                const origEnd = log.overnightOriginalEnd || partnerLog.endTime;
+                const subjectTag = (log.subject && log.subject !== 'General / Other') ? ` [Tagged: ${log.subject}]` : '';
+                const cleanedNote = log.notes ? ' -- ' + log.notes.replace(' (continued from previous night)', '') : '';
+
+                taskSummaries.push(`${log.date} | ${origStart}->${origEnd} (overnight, crosses midnight) | ${realTotal}h | "${log.task}"${subjectTag}${cleanedNote}`);
+                totalHours += realTotal;
+                dailyBreakdown[log.date] = (dailyBreakdown[log.date] || 0) + realTotal;
+                return;
+            }
+
+            // Normal single-day entry
             totalHours += log.duration;
             const timeSlot = `${log.startTime}-${log.endTime}`;
             const subjectTag = (log.subject && log.subject !== 'General / Other') ? ` [Tagged: ${log.subject}]` : '';
-            taskSummaries.push(`${log.date} | ${timeSlot} | ${log.duration}h | "${log.task}"${subjectTag}${log.notes ? ' — ' + log.notes : ''}`);
+            taskSummaries.push(`${log.date} | ${timeSlot} | ${log.duration}h | "${log.task}"${subjectTag}${log.notes ? ' -- ' + log.notes : ''}`);
             dailyBreakdown[log.date] = (dailyBreakdown[log.date] || 0) + log.duration;
         });
 
-        // Aggregate overnight entries (e.g. sleep 10PM→5AM split across midnight)
-        // so the AI sees the REAL total, not just the partial after-midnight portion
-        const overnightNotes = [];
-        const seenOvernightGroups = new Set();
-        const allLogs_forOvernight = timeLogs; // search ALL logs, not just filtered period
-        logs.forEach(log => {
-            if (log.overnightGroup && !seenOvernightGroups.has(log.overnightGroup)) {
-                seenOvernightGroups.add(log.overnightGroup);
-                // Find the paired entry (could be on a different date)
-                const paired = allLogs_forOvernight.filter(l => l.overnightGroup === log.overnightGroup);
-                if (paired.length === 2) {
-                    const totalH = log.overnightTotal || paired.reduce((s, l) => s + l.duration, 0);
-                    const origStart = log.overnightOriginalStart || paired[0].startTime;
-                    const origEnd = log.overnightOriginalEnd || paired[paired.length - 1].endTime;
-                    const taskName = log.task;
-                    const subj = log.subject || '';
-                    overnightNotes.push(`⚠️ "${taskName}"${subj ? ' [' + subj + ']' : ''} was logged overnight (${origStart}→${origEnd}), total: ${totalH}h. It was split across midnight into two entries — evaluate the TOTAL (${totalH}h), not the individual parts.`);
-                }
-            }
-        });
-        const overnightContext = overnightNotes.length > 0
-            ? '\n## ⚠️ OVERNIGHT ENTRIES (USE TOTAL DURATION, NOT PARTIAL)\n' + overnightNotes.join('\n') + '\n'
-            : '';
-
-        // Study sessions summary
-        let revDone = 0, revTotal = 0;
-        studySessions.forEach(s => {
-            ['rev2', 'rev4', 'rev7'].forEach(r => {
-                revTotal++;
-                const rev = typeof s.revisions[r] === 'boolean' ? { done: s.revisions[r] } : s.revisions[r];
-                if (rev.done) revDone++;
-            });
-        });
+        const overnightContext = ''; // Overnight entries are pre-merged above
 
         const rawLogData = taskSummaries.length > 0 ? taskSummaries.join('\n') : 'No activities logged.';
 
