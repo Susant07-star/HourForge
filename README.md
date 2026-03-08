@@ -149,6 +149,12 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 ---
 
+## 👨‍💻 For Developers & AIs
+
+If you are a developer (or an AI assistant) looking to contribute, add features, or debug code, please read the **[Developer & AI Guide (DEVELOPER.md)](DEVELOPER.md)** first. It contains critical architectural context, sync logic rules, and debugging tips to save you time and prevent regressions.
+
+---
+
 <div align="center">
 
 Built with ❤️ for students everywhere

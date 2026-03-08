@@ -1,0 +1,84 @@
+# 🧠 HourForge Developer & AI Guide
+
+Welcome to the HourForge codebase! If you are a human developer or an AI assistant (like ChatGPT, Claude, or Antigravity) tasked with maintaining or expanding this app, **read this document first**.
+
+This guide is designed to save you API credits, prevent regressions, and make debugging effortless.
+
+---
+
+## 🏗️ Architecture Overview
+
+HourForge is a **Vanilla JS Single Page Application (SPA)** with Progressive Web App (PWA) capabilities. It has no build step (no Webpack, Vite, or React).
+
+**Core Files:**
+- `index.html`: The monolithic view layer containing all markup, dialogs, and the PWA loading sequence. Views are toggled via CSS `.active` classes.
+- `style.css`: All styling. Uses CSS variables for theming and standard glassmorphism UI.
+- `script.js`: The central "brain". Handles state management, local database wrappers, Supabase auth/sync, and DOM event wiring.
+- `js/charts.js`: Extracted logic for all `Chart.js` rendering and Groq AI API calls.
+- `sw.js`: The Service Worker handling offline caching.
+
+---
+
+## 💾 Data Flow & State Management
+
+**DO NOT ATTEMPT TO REWRITE THE SYNC LOGIC WITHOUT UNDERSTANDING THIS.**
+
+The app uses a hybrid "Offline-First" storage model:
+1. **Primary Storage**: `localStorage` (for `studySessions`, `timeLogs`, `studentProfile`, etc.).
+2. **Secondary/Migration**: `IndexedDB` (via a lightweight wrapper in `script.js`) is used for larger objects, though most current logic relies on `localStorage`.
+3. **Cloud Sync**: Supabase (PostgreSQL).
+
+### The Deep Merge Strategy (Critical) ⚠️
+We use a function called `deepMergeArrays()` in `script.js`. 
+- Every database record (study session, time log) **must** have a unique `id` (`crypto.randomUUID()`) and an `updated_at` timestamp (Unix epoch in ms).
+- When syncing, local and cloud arrays are merged by `id`. The record with the newer `updated_at` wins. 
+- *Never* use array length or sequence to determine which dataset is "newer". 
+
+---
+
+## 🧭 Code Map (`script.js`)
+
+`script.js` is large. Navigate it using these distinct regions:
+
+1. **Setup & Initialization**: Sentry error tracking, Profile defaults, dynamic color generation.
+2. **Global State**: Retrieving `studySessions`, `timeLogs`, `aiRatingsHistory`.
+3. **Storage Wrappers**: IndexedDB helper (`idb`).
+4. **Supabase Auth & Sync**: `onAuthStateChange` listeners, `syncDataWithCloud()`, Realtime subscriptions. Note: Auth relies *only* on `onAuthStateChange(INITIAL_SESSION)`, never `getSession()` (to prevent race conditions).
+5. **App Initialization (`init`)**: Sets UI dates, updates dashboard, calculates streaks.
+6. **Mobile Navigation (Swipe Logic)**: Custom Instagram-style horizontal swipe implementation attached to `document` to prevent scroll dead-zones.
+7. **Core Logic (CRUD)**: Adding sessions, logging time, Pomodoro timer management.
+8. **Render Functions**: `renderAllTopics()`, `renderTimeLogs()`, etc.
+
+---
+
+## 🤖 Directives for Future AI Models
+
+If you are an AI reading this, adhere strictly to these rules:
+
+1. **DOM Manipulation Performance**: When rendering lists (like `renderTimeLogs` or `renderTableView`), **do not use `container.innerHTML += ...` in a loop.** This causes severe reflow lag. Always use a `DocumentFragment` to batch DOM appends as currently implemented.
+2. **Tab Navigation (Swipe)**: The app uses an Instagram-style horizontal drag swipe. All view translation logic uses `position: absolute` on sibling elements while leaving the active element in normal flow. **Do not use `position: fixed` for swipe tabs**, as it breaks the header layout. 
+3. **Global Scope**: `script.js` and `js/charts.js` share globals (`studySessions`, `timeLogs`, etc.). Do not wrap `script.js` in a closed IIFE or ES Module unless you explicitly export/mount these globals to `window`, as `charts.js` relies on them.
+4. **Error Handling**: Use the built-in `showToast(msg, type)` function for user-facing errors rather than native alerts. 
+
+---
+
+## 🐛 Debugging Guide
+
+### Hard Resetting the App
+If state becomes corrupted:
+1. Open DevTools -> Application -> Storage -> Clear site data.
+2. This wipes `localStorage`, IndexedDB, and the Service Worker.
+3. Refresh the page. It will boot cleanly as a new guest.
+
+### Bypassing Supabase (Offline Mode)
+If you need to test pure offline functionality without Supabase initializing:
+- Block the Supabase JS CDN URL in your browser's network tab.
+- The app has a 2.5-second fallback timer that will automatically boot into offline mode.
+
+### Clearing the PWA Cache
+If CSS or JS changes aren't reflecting:
+- Open `index.html` and bump the `CURRENT_SW_VERSION` string. This forces users' browsers to delete the old cache and install the new service worker assets.
+
+---
+
+*Written to ensure HourForge remains stable, fast, and delightful to develop for.*
