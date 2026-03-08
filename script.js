@@ -1856,6 +1856,39 @@ async function init() {
     if (typeof renderQuickActivityChips === 'function') renderQuickActivityChips();
     if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
 
+    // Premium Time/Date Pickers via Flatpickr
+    // Replaces native browser clocks with a smooth, easy-to-use UI on mobile
+    if (typeof flatpickr !== 'undefined') {
+        const timePickerConfig = {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: 'H:i',
+            time_24hr: true,
+            minuteIncrement: 5,
+            disableMobile: false, // Force nice UI even on mobile
+            onChange: function(selectedDates, dateStr, instance) {
+                // Keep the native input value in sync for all other JS to read
+                instance.element.value = dateStr;
+            }
+        };
+        
+        const startEl = document.getElementById('timeStartInput');
+        const endEl = document.getElementById('timeEndInput');
+        const dateEl = document.getElementById('timeDateInput');
+        
+        if (startEl && !startEl._flatpickr) flatpickr(startEl, timePickerConfig);
+        if (endEl && !endEl._flatpickr) flatpickr(endEl, timePickerConfig);
+        if (dateEl && !dateEl._flatpickr) {
+            flatpickr(dateEl, {
+                dateFormat: 'Y-m-d',
+                disableMobile: false,
+                onChange: function(selectedDates, dateStr, instance) {
+                    instance.element.value = dateStr;
+                }
+            });
+        }
+    }
+
     // Feature initializations
     updateExamCountdowns();
     if (typeof renderDailyInsight === 'function') renderDailyInsight();
