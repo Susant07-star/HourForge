@@ -1216,10 +1216,15 @@ const AUTO_SUBJECT_DICTIONARY = {
     'sleep': 'Sleep', 'nap': 'Sleep', 'rest': 'Sleep'
 };
 
-// Auto-select subject when typing task
+// Auto-select subject and intelligent durations when typing task
 document.getElementById('timeTaskInput').addEventListener('input', (e) => {
     const taskName = e.target.value.trim().toLowerCase();
     const subjectSelect = document.getElementById('timeSubjectInput');
+    
+    // Dynamically update generic durations based on typing
+    if (typeof renderIntelligentDurations === 'function') {
+        renderIntelligentDurations(taskName);
+    }
     
     // Reset to generic if they cleared the input
     if (!taskName) {
@@ -1266,29 +1271,86 @@ function autoFillSmartTimes() {
     }
 }
 
-// 3. Quick-Duration Buttons (No-Tap Time Entry)
-document.querySelectorAll('.btn-duration').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const minsToAdd = parseInt(e.target.dataset.mins);
-        const startInput = document.getElementById('timeStartInput');
-        const endInput = document.getElementById('timeEndInput');
+// 3. Quick-Duration Buttons (Ultra-Intelligent Auto-Scaling)
+function renderIntelligentDurations(currentTask = '') {
+    const container = document.getElementById('quickDurationContainer');
+    if (!container) return;
+    
+    // Default standard blocks if history is missing/empty
+    let targetDurationsMins = [15, 30, 45, 60, 90, 120];
+    
+    if (timeLogs && timeLogs.length > 0) {
+        // Filter history by current task (or use all if empty)
+        const relevantLogs = currentTask ? timeLogs.filter(log => log.task.toLowerCase() === currentTask.toLowerCase()) : timeLogs;
         
-        if (!startInput.value) return;
+        if (relevantLogs.length > 0) {
+            // Count frequency of durations
+            const durationCounts = {};
+            relevantLogs.forEach(log => {
+                if (!log.duration) return;
+                const mins = Math.round(log.duration * 60);
+                if (mins > 0 && mins <= 480) { // Keep sensible limits (under 8 hours)
+                    durationCounts[mins] = (durationCounts[mins] || 0) + 1;
+                }
+            });
+            
+            // Sort by most frequently logged durations for this specific task
+            const popularMins = Object.entries(durationCounts)
+                .sort((a,b) => b[1] - a[1])
+                .map(entry => parseInt(entry[0]));
+            
+            if (popularMins.length > 0) {
+                // Take top 3, then fill the rest of the array up to 5 buttons with sensible defaults
+                const intelligentSet = new Set(popularMins.slice(0, 3));
+                for (const def of [15, 30, 45, 60, 90, 120]) {
+                    if (intelligentSet.size >= 5) break;
+                    intelligentSet.add(def);
+                }
+                targetDurationsMins = Array.from(intelligentSet).sort((a,b) => a - b);
+            }
+        }
+    }
+    
+    // Generate Button HTML
+    container.innerHTML = '';
+    
+    targetDurationsMins.forEach(mins => {
+        // Format beautifully (e.g., 90m -> 1.5h)
+        let label = `+${mins}m`;
+        if (mins % 60 === 0) label = `+${mins / 60}h`;
+        else if (mins > 60) label = `+${parseFloat((mins / 60).toFixed(1))}h`;
+        
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-duration';
+        btn.dataset.mins = mins;
+        btn.textContent = label;
+        
+        // Attach logic
+        btn.addEventListener('click', (e) => {
+            const minsToAdd = parseInt(e.target.dataset.mins);
+            const startInput = document.getElementById('timeStartInput');
+            const endInput = document.getElementById('timeEndInput');
+            
+            if (!startInput.value) return;
 
-        // Calculate new end time
-        const startParts = startInput.value.split(':');
-        const startDate = new Date();
-        startDate.setHours(parseInt(startParts[0]), parseInt(startParts[1]), 0, 0);
+            // Calculate new end time relative to the START time box
+            const startParts = startInput.value.split(':');
+            const startDate = new Date();
+            startDate.setHours(parseInt(startParts[0]), parseInt(startParts[1]), 0, 0);
+            
+            const newEndDate = new Date(startDate.getTime() + (minsToAdd * 60000));
+            endInput.value = `${String(newEndDate.getHours()).padStart(2, '0')}:${String(newEndDate.getMinutes()).padStart(2, '0')}`;
+            
+            // Brief haptic/visual feedback
+            if (navigator.vibrate) navigator.vibrate(30);
+            e.target.style.transform = 'scale(1.1)';
+            setTimeout(() => e.target.style.transform = 'scale(1)', 150);
+        });
         
-        const newEndDate = new Date(startDate.getTime() + (minsToAdd * 60000));
-        endInput.value = `${String(newEndDate.getHours()).padStart(2, '0')}:${String(newEndDate.getMinutes()).padStart(2, '0')}`;
-        
-        // Brief haptic/visual feedback
-        if (navigator.vibrate) navigator.vibrate(30);
-        e.target.style.transform = 'scale(1.1)';
-        setTimeout(() => e.target.style.transform = 'scale(1)', 150);
+        container.appendChild(btn);
     });
-});
+}
 
 // 4. Quick Activity Chips
 function renderQuickActivityChips() {
@@ -1354,6 +1416,9 @@ function renderQuickActivityChips() {
             
             document.getElementById('timeNotesInput').value = note; // Populates the last exact note used
             autoFillSmartTimes(); // Refresh times just in case
+            if (typeof renderIntelligentDurations === 'function') {
+                renderIntelligentDurations(task); // Refresh duration buttons based on this specific task
+            }
         });
         
         container.appendChild(chip);
@@ -1472,6 +1537,7 @@ addTimeLogForm.addEventListener('submit', (e) => {
     document.getElementById('timeDateInput').value = getLocalDateStr();
     autoFillSmartTimes(); // Reset to smart times instead of blank
     renderQuickActivityChips(); // Refresh chips in case a new pattern emerged
+    if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations(); // Reset to generalized popular durations
 
     // Reset textarea height after clearing
     const notesEl = document.getElementById('timeNotesInput');
@@ -1788,6 +1854,7 @@ async function init() {
     // Frictionless Data Entry Initialization
     if (typeof autoFillSmartTimes === 'function') autoFillSmartTimes();
     if (typeof renderQuickActivityChips === 'function') renderQuickActivityChips();
+    if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
 
     // Feature initializations
     updateExamCountdowns();
