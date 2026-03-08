@@ -116,6 +116,57 @@ function isNonStudyLog(log) {
     return /\b(sleep|slept|nap|sleeping)\b/.test(taskLower);
 }
 
+// ==========================================
+// [1] ENVIRONMENT, TYPES & GLOBAL STATE
+// ==========================================
+
+/**
+ * @typedef {Object} RevisionStatus
+ * @property {boolean} done - Whether this revision step is completed.
+ * @property {string|null} completedAt - ISO timestamp when it was checked off.
+ */
+
+/**
+ * @typedef {Object} StudySession
+ * @property {string} id - UUID generated via crypto.randomUUID(). Critical for deep merge sync.
+ * @property {string} subject - e.g. "Physics".
+ * @property {string} topic - e.g. "Newton's Laws".
+ * @property {string} dateRead - YYYY-MM-DD.
+ * @property {number} updated_at - Unix timestamp of the last local modification.
+ * @property {string} [createdAt] - ISO timestamp when originally created.
+ * @property {Object} revisions - Holds 2-day, 4-day, and 7-day status.
+ * @property {RevisionStatus} revisions.rev2
+ * @property {RevisionStatus} revisions.rev4
+ * @property {RevisionStatus} revisions.rev7
+ */
+
+/**
+ * @typedef {Object} TimeLog
+ * @property {string} id - UUID.
+ * @property {string} subject - e.g. "Physics" or "Sleep" or "".
+ * @property {string} task - e.g. "Solving equations".
+ * @property {string} date - YYYY-MM-DD.
+ * @property {string} startTime - HH:MM (24-hour).
+ * @property {string} endTime - HH:MM (24-hour).
+ * @property {number} duration - Calculated hours in decimal.
+ * @property {string} notes - Optional notes.
+ * @property {number} updated_at - Unix timestamp.
+ * @property {string} [createdAt] - ISO timestamp.
+ */
+
+/**
+ * @typedef {Object} StudentProfile
+ * @property {string} name
+ * @property {string} grade
+ * @property {string} faculty
+ * @property {string[]} subjects
+ * @property {string} exam1Label
+ * @property {string} exam1Date
+ * @property {string} exam2Label
+ * @property {string} exam2Date
+ * @property {boolean} setupComplete
+ */
+
 let studySessions = JSON.parse(localStorage.getItem('studySessions')) || [];
 let timeLogs = JSON.parse(localStorage.getItem('timeLogs')) || [];
 let aiRatingsHistory = JSON.parse(localStorage.getItem('aiRatingsHistory')) || [];
@@ -2062,14 +2113,38 @@ filterBtns.forEach(btn => {
     });
 });
 
+/**
+ * @typedef {object} RevisionState
+ * @property {boolean} done - Whether the revision is completed.
+ * @property {string|null} completedAt - ISO string of completion date, or null.
+ */
+
+/**
+ * @typedef {object} StudySession
+ * @property {string} id - Unique ID for the session.
+ * @property {string} subject - The subject of the session.
+ * @property {string} topic - The topic studied.
+ * @property {string} dateRead - Date the topic was read (YYYY-MM-DD).
+ * @property {string} createdAt - ISO string of when the session was created.
+ * @property {{rev2: RevisionState, rev4: RevisionState, rev7: RevisionState}} revisions - Revision states.
+ */
+
+/**
+ * @typedef {object} TimeLog
+ * @property {string} id - Unique ID for the time log.
+ * @property {string} task - Description of the task.
+ * @property {string} subject - The subject of the task.
+ * @property {string} startTime - Start time (HH:MM).
+ * @property {string} endTime - End time (HH:MM).
+ * @property {string} date - Date of the log (YYYY-MM-DD).
+ * @property {string} [notes] - Optional notes for the log.
+ * @property {string} createdAt - ISO string of when the log was created.
+ */
+
 // Persist data reliably using localStorage + IndexedDB mirror
 function saveToLocalStorage() {
     localStorage.setItem('studySessions', JSON.stringify(studySessions));
     localStorage.setItem('timeLogs', JSON.stringify(timeLogs));
-    // REDUNDANT SAVE: Mirror to IndexedDB so data survives localStorage wipes
-    idb.set('studySessions', studySessions).catch(e => console.warn('IDB mirror save failed:', e));
-    idb.set('timeLogs', timeLogs).catch(e => console.warn('IDB mirror save failed:', e));
-    
     // Auto-sync to Cloud implicitly on every save
     if (typeof uploadDataToCloud === 'function' && currentSession) {
         setTimeout(uploadDataToCloud, 500);
