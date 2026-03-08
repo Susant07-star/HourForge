@@ -1374,7 +1374,17 @@ main#hourLogView.active {
     font-size: 1.5rem;
     color: var(--text-secondary);
     margin-bottom: 0.5rem;
+    flex-wrap: wrap; /* Stars wrap on very small screens instead of overflowing */
+    justify-content: center;
 }
+
+@media (max-width: 420px) {
+    .ai-rating-score { font-size: 2rem; }
+    .ai-rating-total { font-size: 1.1rem; }
+    .ai-rating-stars { font-size: 1.1rem; gap: 0.15rem; }
+    .ai-rating-container { padding: 1rem; }
+}
+
 
 .ai-rating-stars .fa-star.filled {
     color: #fbbf24;
@@ -1525,12 +1535,14 @@ main#hourLogView.active {
 @media (max-width: 1024px) {
     .app-container {
         padding: 1.5rem;
+        padding-top: 64px; /* Preserve fixed top-bar clearance */
     }
 }
 
 @media (max-width: 768px) {
     .app-container {
         padding: 0.5rem;
+        padding-top: 64px !important; /* CRITICAL: keep fixed top-bar clearance on small screens */
     }
 
     /* Header & Navigation */
