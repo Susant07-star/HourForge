@@ -348,15 +348,16 @@
             <section class="add-session-section glass-panel">
                 <h2><i class="fa-solid fa-stopwatch" style="color: var(--color-computer);"></i> Log Activity</h2>
                 <form id="addTimeLogForm">
-                    <!-- Quick Activity Chips (Auto-populated by JS based on history) -->
-                    <div id="quickActivityChips" class="quick-activity-chips" style="display: none; margin-bottom: 1rem; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start; padding-bottom: 0.25rem;">
-                        <!-- Chips injected here -->
-                    </div>
 
                     <div class="form-group">
                         <label>Task / Activity Name</label>
                         <input type="text" id="timeTaskInput" required
                             placeholder="e.g. Math homework, Coding side-project" autocomplete="off">
+                    </div>
+
+                    <!-- Quick Activity Chips (shown below task input as smart suggestions) -->
+                    <div id="quickActivityChips" class="quick-activity-chips" style="display: none; margin-bottom: 0.8rem; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-start;">
+                        <!-- Chips injected here -->
                     </div>
 
                     <div class="form-group">

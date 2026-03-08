@@ -3687,8 +3687,8 @@ main#hourLogView.active {
     .main-content.view-section {
         padding-top: 0.8rem !important;
         padding-bottom: 7.5rem !important;
-        padding-left: 0.7rem;
-        padding-right: 0.7rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
     }
     .view-section > h2:first-child,
     .view-section > h1:first-child {
