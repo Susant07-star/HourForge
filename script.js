@@ -3,6 +3,9 @@
  * =========================================================================
  * ⚠️ DEVELOPER & AI NOTICE ⚠️
  * Before modifying this file, please read DEVELOPER.md in the root directory.
+ * AI DIRECTIVE: If you modify the core architecture or the Storage Schemas below, 
+ * you MUST update this Table of Contents, the JSDocs, AND DEVELOPER.md to reflect your changes.
+ * 
  * This file is monolithic. Use this Table of Contents to navigate:
  * 
  * [1] Environment & Global State (Profile, Colors, Arrays)
