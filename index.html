@@ -332,6 +332,11 @@
             <section class="add-session-section glass-panel">
                 <h2><i class="fa-solid fa-stopwatch" style="color: var(--color-computer);"></i> Log Activity</h2>
                 <form id="addTimeLogForm">
+                    <!-- Quick Activity Chips (Auto-populated by JS based on history) -->
+                    <div id="quickActivityChips" class="quick-activity-chips" style="display: none; margin-bottom: 1rem; gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 0.5rem;">
+                        <!-- Chips injected here -->
+                    </div>
+
                     <div class="form-group">
                         <label>Task / Activity Name</label>
                         <input type="text" id="timeTaskInput" required
@@ -346,6 +351,15 @@
                             <!-- Subjects populated dynamically from profile -->
                             <option value="Sleep">😴 Sleep</option>
                         </select>
+                        <!-- Quick Duration Buttons (1-Tap Time Entry) -->
+                        <div class="quick-duration-container" style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem; overflow-x: auto; padding-bottom: 0.25rem;">
+                            <button type="button" class="btn-duration" data-mins="15">+15m</button>
+                            <button type="button" class="btn-duration" data-mins="30">+30m</button>
+                            <button type="button" class="btn-duration" data-mins="45">+45m</button>
+                            <button type="button" class="btn-duration" data-mins="60">+1h</button>
+                            <button type="button" class="btn-duration" data-mins="90">+1.5h</button>
+                            <button type="button" class="btn-duration" data-mins="120">+2h</button>
+                        </div>
                     </div>
 
                     <div class="form-row">

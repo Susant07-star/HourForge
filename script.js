@@ -1202,6 +1202,143 @@ const timeLogFeed = document.getElementById('timeLogFeed');
 const totalHoursTodayEl = document.getElementById('totalHoursToday');
 const historyDateFilter = document.getElementById('historyDateFilter');
 
+// --- FRICTIONLESS DATA ENTRY LOGIC ---
+
+// 1. Global Smart Categorization Dictionary (Privacy-Safe)
+const AUTO_SUBJECT_DICTIONARY = {
+    'math': 'Math', 'calculus': 'Math', 'algebra': 'Math', 'geometry': 'Math',
+    'physics': 'Physics', 'mechanics': 'Physics', 'thermodynamics': 'Physics',
+    'chemistry': 'Chemistry', 'organic': 'Chemistry',
+    'biology': 'Biology', 'anatomy': 'Biology',
+    'code': 'Computer', 'coding': 'Computer', 'programming': 'Computer', 'react': 'Computer', 'python': 'Computer', 'leetcode': 'Computer', 'js': 'Computer',
+    'read': 'Reading', 'book': 'Reading', 'novel': 'Reading',
+    'gym': 'Exercise', 'workout': 'Exercise', 'run': 'Exercise', 'walk': 'Exercise',
+    'sleep': 'Sleep', 'nap': 'Sleep', 'rest': 'Sleep'
+};
+
+// Auto-select subject when typing task
+document.getElementById('timeTaskInput').addEventListener('input', (e) => {
+    const taskName = e.target.value.toLowerCase();
+    const subjectSelect = document.getElementById('timeSubjectInput');
+    
+    // Check personal history first
+    const historicalMatch = timeLogs.find(log => log.task.toLowerCase() === taskName && log.subject);
+    if (historicalMatch) {
+        subjectSelect.value = historicalMatch.subject;
+        return;
+    }
+
+    // Fall back to Global Dictionary
+    for (const [key, category] of Object.entries(AUTO_SUBJECT_DICTIONARY)) {
+        if (taskName.includes(key)) {
+            // Check if this category exists in the user's profile subjects
+            const hasOption = Array.from(subjectSelect.options).some(opt => opt.value === category);
+            if (hasOption) subjectSelect.value = category;
+            break;
+        }
+    }
+});
+
+// 2. Smart Time Autofill
+function autoFillSmartTimes() {
+    const startInput = document.getElementById('timeStartInput');
+    const endInput = document.getElementById('timeEndInput');
+    const now = new Date();
+    
+    // Default End Time is ALWAYS exactly Right Now
+    endInput.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    // Default Start Time snaps to the End Time of the most recent log today, otherwise exactly 1 hour ago
+    const todayStr = getLocalDateStr();
+    const todaysLogs = timeLogs.filter(log => log.date === todayStr).sort((a,b) => b.endTime.localeCompare(a.endTime));
+    
+    if (todaysLogs.length > 0) {
+        startInput.value = todaysLogs[0].endTime; // Snap exactly to end of last session
+    } else {
+        const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000));
+        startInput.value = `${String(oneHourAgo.getHours()).padStart(2, '0')}:${String(oneHourAgo.getMinutes()).padStart(2, '0')}`;
+    }
+}
+
+// 3. Quick-Duration Buttons (No-Tap Time Entry)
+document.querySelectorAll('.btn-duration').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const minsToAdd = parseInt(e.target.dataset.mins);
+        const startInput = document.getElementById('timeStartInput');
+        const endInput = document.getElementById('timeEndInput');
+        
+        if (!startInput.value) return;
+
+        // Calculate new end time
+        const startParts = startInput.value.split(':');
+        const startDate = new Date();
+        startDate.setHours(parseInt(startParts[0]), parseInt(startParts[1]), 0, 0);
+        
+        const newEndDate = new Date(startDate.getTime() + (minsToAdd * 60000));
+        endInput.value = `${String(newEndDate.getHours()).padStart(2, '0')}:${String(newEndDate.getMinutes()).padStart(2, '0')}`;
+        
+        // Brief haptic/visual feedback
+        if (navigator.vibrate) navigator.vibrate(30);
+        e.target.style.transform = 'scale(1.1)';
+        setTimeout(() => e.target.style.transform = 'scale(1)', 150);
+    });
+});
+
+// 4. Quick Activity Chips
+function renderQuickActivityChips() {
+    const container = document.getElementById('quickActivityChips');
+    if (!timeLogs || timeLogs.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    // Find top 5 most frequent tasks
+    const taskCounts = {};
+    timeLogs.forEach(log => {
+        if (!log.task) return;
+        const key = `${log.task}|${log.subject}`; // Store task+subject combination
+        taskCounts[key] = (taskCounts[key] || 0) + 1;
+    });
+
+    const topTasks = Object.entries(taskCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(entry => {
+            const [task, subject] = entry[0].split('|');
+            return { task, subject };
+        });
+
+    if (topTasks.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.innerHTML = '';
+    topTasks.forEach(({task, subject}) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        // Add ⚡ icon for common tasks
+        chip.innerHTML = `<i class="fa-solid fa-bolt" style="color: #fbbf24; font-size: 0.8em;"></i> ${task}`;
+        
+        chip.addEventListener('click', () => {
+            if (navigator.vibrate) navigator.vibrate(15);
+            document.getElementById('timeTaskInput').value = task;
+            
+            const subjectSelect = document.getElementById('timeSubjectInput');
+            const hasOption = Array.from(subjectSelect.options).some(opt => opt.value === subject);
+            if (hasOption) subjectSelect.value = subject;
+            
+            document.getElementById('timeNotesInput').value = `General ${task}`; // Light default note
+            autoFillSmartTimes(); // Refresh times just in case
+        });
+        
+        container.appendChild(chip);
+    });
+    container.style.display = 'flex';
+}
+
+// ------------------------------------------
+
 historyDateFilter.addEventListener('change', renderTimeLogs);
 
 addTimeLogForm.addEventListener('submit', (e) => {
@@ -1309,6 +1446,9 @@ addTimeLogForm.addEventListener('submit', (e) => {
 
     addTimeLogForm.reset();
     document.getElementById('timeDateInput').value = getLocalDateStr();
+    autoFillSmartTimes(); // Reset to smart times instead of blank
+    renderQuickActivityChips(); // Refresh chips in case a new pattern emerged
+
     // Reset textarea height after clearing
     const notesEl = document.getElementById('timeNotesInput');
     notesEl.style.height = 'auto';
@@ -1620,6 +1760,10 @@ async function init() {
     renderDashboard();
     renderTableView();
     renderTimeLogs();
+    
+    // Frictionless Data Entry Initialization
+    if (typeof autoFillSmartTimes === 'function') autoFillSmartTimes();
+    if (typeof renderQuickActivityChips === 'function') renderQuickActivityChips();
 
     // Feature initializations
     updateExamCountdowns();
