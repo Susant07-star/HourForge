@@ -90,10 +90,15 @@ body::after {
 .app-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
-    padding-top: 64px; /* 56px fixed top-bar + 8px breathing room */
+    /* Horizontal/bottom padding for desktop breathing room. */
+    /* padding-top is carefully set to just clear the 56px fixed top-bar */
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    padding-top: 64px; /* 56px fixed top-bar + 8px gap — NEVER reduce this */
     -webkit-overflow-scrolling: touch;
     overflow-x: hidden; /* Prevents app container from scrolling natively */
+
+    /* ── Unified spacing token used by all view section grids ── */
+    --card-gap: 1.25rem;
 }
 
 /* Header */
@@ -283,11 +288,11 @@ body::after {
 .skeleton-block.p3 { width: 95%; height: 4rem; margin-top: 0.5rem; }
 
 
-/* Main Layout */
+/* Main Layout — used by dashboard and hour log views */
 .main-content {
     display: grid;
     grid-template-columns: 1fr 2fr;
-    gap: 2rem;
+    gap: var(--card-gap, 1.25rem);
 }
 
 @media (max-width: 1100px) {
@@ -395,7 +400,7 @@ option {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--card-gap, 1.25rem);
 }
 
 .panel-header h2 {
@@ -405,7 +410,6 @@ option {
 .highlight-panel {
     border: 1px solid rgba(236, 72, 153, 0.3);
     box-shadow: 0 0 30px rgba(236, 72, 153, 0.1);
-    margin-bottom: 2rem;
 }
 
 .highlight-panel h2 i {
@@ -424,7 +428,7 @@ option {
 .revision-cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
+    gap: var(--card-gap, 1.25rem);
 }
 
 .revision-card {
@@ -749,7 +753,8 @@ option {
 
 .view-section.active {
     display: grid;
-    /* For main-content */
+    gap: var(--card-gap, 1.25rem);
+    align-content: start; /* Prevents grid from stretching items if height is large */
 }
 
 main#tableView.active {
@@ -769,7 +774,6 @@ main#hourLogView.active {
     border-radius: 1.5rem;
     padding: 2rem;
     text-align: center;
-    margin-bottom: 2rem;
     box-shadow: 0 10px 30px rgba(16, 185, 129, 0.05);
 }
 
@@ -1278,7 +1282,7 @@ main#hourLogView.active {
 .insights-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+    gap: var(--card-gap, 1.25rem);
 }
 
 @media (max-width: 768px) {
@@ -1324,7 +1328,7 @@ main#hourLogView.active {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--card-gap, 1.25rem);
 }
 
 .ai-feedback-header h3 {
@@ -1341,7 +1345,7 @@ main#hourLogView.active {
     border: 1px solid rgba(251, 191, 36, 0.3);
     border-radius: 1rem;
     padding: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: var(--card-gap, 1.25rem);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1534,14 +1538,14 @@ main#hourLogView.active {
 
 @media (max-width: 1024px) {
     .app-container {
-        padding: 1.5rem;
+        padding: 0 1rem 1rem 1rem;
         padding-top: 64px; /* Preserve fixed top-bar clearance */
     }
 }
 
 @media (max-width: 768px) {
     .app-container {
-        padding: 0.5rem;
+        padding: 0 0.75rem 1rem 0.75rem;
         padding-top: 64px !important; /* CRITICAL: keep fixed top-bar clearance on small screens */
     }
 
