@@ -591,6 +591,7 @@ Return ONLY valid JSON:
 
 Only include subjects with hours > 0. Use exact decimal hours from the logs.`;
 
+        console.debug('🤖 [AI Engine] Chart Prompt Context sent to Groq:', chartPrompt);
         const chartResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
@@ -605,6 +606,7 @@ Only include subjects with hours > 0. Use exact decimal hours from the logs.`;
         if (chartResponse.ok) {
             const chartResult = await chartResponse.json();
             const chartText = chartResult.choices?.[0]?.message?.content || '';
+            console.info('🤖 [AI Engine] Chart Subject JSON received from Groq:', chartText);
             try {
                 // Extract JSON from response (handle markdown code blocks)
                 const jsonMatch = chartText.match(/\{[\s\S]*\}/);
@@ -879,7 +881,7 @@ Where X is a number from 1 to 10. This is mandatory — never skip it.` : `
 Do NOT include any [[RATING]] tag. This is a ${periodLabel} summary — ratings are only generated for individual days.`}`;
 
 
-
+        console.debug('🤖 [AI Engine] Main Coach Prompt Context sent to Groq:', feedbackPrompt);
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
