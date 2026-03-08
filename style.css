@@ -3667,7 +3667,7 @@ main#hourLogView.active {
 
 .main-content.view-section,
 .insights-layout {
-    padding-top: calc(56px + 0.5rem) !important;
+    padding-top: 0.8rem !important;
     padding-bottom: calc(80px + 1.5rem + env(safe-area-inset-bottom)) !important;
 }
 
@@ -3685,10 +3685,10 @@ main#hourLogView.active {
 /* Extra clearance for mobile view to ensure headers aren't caught under the blur */
 @media (max-width: 768px) {
     .main-content.view-section {
-        padding-top: calc(56px + 0.5rem) !important;  /* Keep flush to the mobile top bar */
-        padding-bottom: 7.5rem !important; /* Above the fixed bottom nav */
-        padding-left: 0.6rem;
-        padding-right: 0.6rem;
+        padding-top: 0.8rem !important;
+        padding-bottom: 7.5rem !important;
+        padding-left: 0.7rem;
+        padding-right: 0.7rem;
     }
     .view-section > h2:first-child,
     .view-section > h1:first-child {
