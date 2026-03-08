@@ -30,7 +30,8 @@ A personal academic productivity web app that helps students study smarter — c
 | 👤 **Student Profiles** | Configure your grade, faculty, and subjects — app auto-fills relevant subjects |
 | 💾 **Auto Backup** | Link a local folder and your data auto-saves — never lose your progress |
 | 📤 **Export / Import** | Download your data as JSON or restore from a backup file at any time |
-| 🔒 **100% Private** | All data stored locally on your device. No account, no cloud, no tracking |
+| ☁️ **Cloud Sync** | Sign in with Google to sync your data across devices via Supabase |
+| 📱 **PWA Support** | Install HourForge as a native app on Android/iOS — works offline! |
 
 ---
 
@@ -118,22 +119,26 @@ HourForge uses the **Groq API** for AI-powered insights. It's completely free:
 
 ```
 HourForge/
-├── index.html        # Main app — all views (Dashboard, Time Tracker, AI Insights)
-├── style.css         # All styles — glassmorphism dark UI
-├── script.js         # All logic — data management, charts, AI calls
-├── favicon.ico       # App icon
-├── logo.png          # App logo
-└── README.md         # You are here
+├── index.html          # Main app — all views (Dashboard, Time Tracker, AI Insights)
+├── style.css           # All styles — glassmorphism dark UI
+├── script.js           # Core logic — data management, UI rendering, sync
+├── js/
+│   └── charts.js       # Chart rendering (Chart.js) & AI insights logic
+├── sw.js               # Service worker for offline PWA support
+├── manifest.json       # PWA manifest
+├── favicon.ico         # App icon
+├── logo.png            # App logo
+└── README.md           # You are here
 ```
 
 ---
 
 ## 🗺️ Roadmap
 
-- [ ] PWA support (installable as an app on Android/iOS)
+- [x] PWA support (installable as an app on Android/iOS)
+- [x] Cloud sync (Google Auth + Supabase)
 - [ ] Multiple profile support (for families or shared devices)
 - [ ] Weekly planner / goal-setting module
-- [ ] Cloud sync option (optional, user-controlled)
 - [ ] More AI models support (Gemini, OpenAI)
 
 ---
