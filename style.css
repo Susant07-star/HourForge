@@ -91,6 +91,7 @@ body::after {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    padding-top: 64px; /* 56px fixed top-bar + 8px breathing room */
     -webkit-overflow-scrolling: touch;
     overflow-x: hidden; /* Prevents app container from scrolling natively */
 }
@@ -1122,6 +1123,10 @@ main#hourLogView.active {
     align-items: center;
     gap: 0.5rem;
     font-weight: 500;
+    flex-wrap: wrap; /* Allow text to wrap if it overflows */
+    justify-content: center;
+    font-size: 0.95rem; /* Slightly smaller to fit better on standard mobile */
+    text-align: center;
 }
 
 /* API Key Config */
