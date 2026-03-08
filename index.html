@@ -168,7 +168,7 @@
         <!-- Dashboard View -->
         <main id="dashboardView" class="main-content view-section active">
             <!-- Dashboard Header -->
-            <div class="view-header" style="grid-column: 1 / -1; margin-bottom: 0.25rem; padding: 0.5rem 0.5rem 0 0.5rem;">
+            <div class="view-header" style="grid-column: 1 / -1; margin-bottom: 0.75rem; padding: 0;">
                 <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; letter-spacing: -0.5px;">Dashboard</h1>
                 <p style="color: var(--text-secondary); font-size: 0.95rem;">Focus on today's priorities and track your progress.</p>
             </div>
@@ -328,9 +328,9 @@
         <!-- Time Tracker View -->
         <main id="hourLogView" class="main-content view-section">
             <!-- Time Tracker Header -->
-            <div class="view-header" style="grid-column: 1 / -1; margin-bottom: 0.25rem; padding: 0.5rem 0.5rem 0 0.5rem;">
+            <div class="view-header" style="grid-column: 1 / -1; margin-bottom: 0.75rem; padding: 0;">
                 <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; letter-spacing: -0.5px;">Log Activity</h1>
-                <p style="color: var(--text-secondary); font-size: 0.95rem;">Log your study sessions effortlessly to build your streak.</p>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Log your study sessions / Activity effortlessly to build your streak.</p>
             </div>
 
             <!-- Analytics Summary - MOVED TO TOP -->
@@ -345,7 +345,7 @@
                 <h2><i class="fa-solid fa-stopwatch" style="color: var(--color-computer);"></i> Log Activity</h2>
                 <form id="addTimeLogForm">
                     <!-- Quick Activity Chips (Auto-populated by JS based on history) -->
-                    <div id="quickActivityChips" class="quick-activity-chips" style="display: none; margin-bottom: 1rem; gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 0.5rem;">
+                    <div id="quickActivityChips" class="quick-activity-chips" style="display: none; margin-bottom: 1rem; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start; padding-bottom: 0.25rem;">
                         <!-- Chips injected here -->
                     </div>
 
@@ -364,7 +364,7 @@
                             <option value="Sleep">Sleep</option>
                         </select>
                         <!-- Quick Duration Buttons (1-Tap Time Entry) -->
-                        <div class="quick-duration-container" style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem; overflow-x: auto; padding-bottom: 0.25rem;">
+                        <div class="quick-duration-container" style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; justify-content: flex-start;">
                             <button type="button" class="btn-duration" data-mins="15">+15m</button>
                             <button type="button" class="btn-duration" data-mins="30">+30m</button>
                             <button type="button" class="btn-duration" data-mins="45">+45m</button>
