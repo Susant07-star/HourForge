@@ -1,9 +1,10 @@
-const CACHE_NAME = 'hourforge-v21';
+const CACHE_NAME = 'hourforge-v22';
 const ASSETS = [
     './',
     './index.html',
     './style.css',
     './script.js',
+    './js/charts.js',
     './manifest.json',
     './favicon.ico',
     './logo.png',

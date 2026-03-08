@@ -961,13 +961,14 @@
 
     <!-- Main Logic Script -->
     <script src="script.js"></script>
+    <script src="js/charts.js"></script>
     
     <!-- PWA Service Worker: Force-clear old caches, then register fresh -->
     <script>
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v12';
+            const CURRENT_SW_VERSION = 'v13';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh
