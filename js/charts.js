@@ -1,3 +1,20 @@
+/**
+ * HOURFORGE - CHARTS & AI ENGINE (js/charts.js)
+ * =========================================================================
+ * ⚠️ DEVELOPER & AI NOTICE ⚠️
+ * This file relies on global variables declared in `script.js` (e.g. `studySessions`, `timeLogs`).
+ * Do not wrap this file in an IIFE unless you pass in the globals.
+ * 
+ * Table of Contents:
+ * [1] Chart Colors & Global defaults
+ * [2] Study Hours Trend Chart (Bar/Line)
+ * [3] Subject Distribution Chart (Doughnut)
+ * [4] Peak Hours Chart (Bar)
+ * [5] AI Growth Rating Chart (Line)
+ * [6] Groq AI Integration (generateAIInsights, Prompt Construction, Error Handling)
+ * =========================================================================
+ */
+
 // --- Chart Colors ---
 const CHART_COLORS = {
     indigo: { bg: 'rgba(99, 102, 241, 0.2)', border: '#6366f1', fill: 'rgba(99, 102, 241, 0.1)' },

@@ -1,3 +1,24 @@
+/**
+ * HOURFORGE - MAIN ENGINE (script.js)
+ * =========================================================================
+ * ⚠️ DEVELOPER & AI NOTICE ⚠️
+ * Before modifying this file, please read DEVELOPER.md in the root directory.
+ * This file is monolithic. Use this Table of Contents to navigate:
+ * 
+ * [1] Environment & Global State (Profile, Colors, Arrays)
+ * [2] IndexedDB Wrapper (idb) - Heavy Object Storage
+ * [3] Supabase Data Sync (Deep Merge Strategy) & Auth
+ * [4] App Initialization (init(), Streaks, Exam Countdowns)
+ * [5] Mobile Navigation (Instagram-style Drag Swipe)
+ * [6] Modals & UI Toggles
+ * [7] Dashboard Render Logic (renderTodayRevisions, Topics)
+ * [8] Time Tracking Logic (renderTimeLogs, Metrics)
+ * [9] CRUD Functions (addTimeLog, addStudySession)
+ * [10] Pomodoro Timer System
+ * [11] Local Backup / Export System
+ * =========================================================================
+ */
+
 // ==========================================
 // ERROR TRACKING (Sentry)
 // ==========================================
