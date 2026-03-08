@@ -32,8 +32,27 @@
 </head>
 
 <body>
-    <!-- Full-Screen Login Gate -->
-    <div id="loginGate" class="login-gate" style="display: flex;">
+    <!-- Auth Loading Overlay: shown until Supabase resolves session -->
+    <div id="authLoader" style="
+        position: fixed; inset: 0; z-index: 9999;
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 1.5rem; transition: opacity 0.3s ease;
+    ">
+        <i class="fa-solid fa-brain" style="font-size: 3rem; color: #6366f1;"></i>
+        <div style="
+            width: 40px; height: 40px;
+            border: 3px solid rgba(99,102,241,0.3);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        "></div>
+        <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; font-family: Outfit, sans-serif;">Loading HourForge...</p>
+    </div>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+
+    <!-- Full-Screen Login Gate: hidden until auth resolves to NOT LOGGED IN -->
+    <div id="loginGate" class="login-gate" style="display: none;">
         <div class="login-gate-content">
             <div class="login-gate-logo">
                 <i class="fa-solid fa-brain"></i>

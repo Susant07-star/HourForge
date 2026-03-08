@@ -193,6 +193,10 @@ const idb = {
     }
 };
 
+// App-level state (declared early — referenced by Supabase auth handlers)
+let isAppInitialized = false;
+let realtimeChannel = null;
+
 // ==========================================
 // SUPABASE: CLIENT INITIALIZATION
 // ==========================================
@@ -206,67 +210,95 @@ let currentSession = null;
 // SUPABASE: AUTH & CLOUD SYNC UI HANDLERS
 // ==========================================
 
-// Listen for Auth changes
-if (supabaseClient) {
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-        const wasLoggedOut = !currentSession && session;
-        currentSession = session;
-        updateAuthUI();
-        loadUserAvatarAndName(session);
-        if (event === 'SIGNED_IN' || wasLoggedOut) {
-            await syncDataWithCloud(true);
-            setupRealtimeSubscription(session.user.id);
-        } else if (event === 'SIGNED_OUT') {
-            // Leave local data intact for offline use.
-            teardownRealtimeSubscription();
-        }
-    });
+// Helper: dismisses the auth loader and shows either the gate or the app
+function resolveAuthUI(hasSession) {
+    const loader = document.getElementById('authLoader');
+    if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => { loader.style.display = 'none'; }, 300);
+    }
+    updateAuthUI();
+}
 
-    // Check initial session on load
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        currentSession = session;
-        updateAuthUI();
-        loadUserAvatarAndName(session);
-        if (session) {
-            syncDataWithCloud(true);
-            setupRealtimeSubscription(session.user.id);
-        } else if (!isAppInitialized) {
-            // No session: show login gate but boot local app after 1s
-            setTimeout(() => {
-                if (!isAppInitialized) {
-                    init();
-                    isAppInitialized = true;
-                }
-            }, 1000);
-        }
-    }).catch(() => {
-        // Supabase getSession failed — boot locally
-        if (!isAppInitialized) {
-            init();
-            isAppInitialized = true;
-        }
-    });
-} else {
-    // Supabase CDN failed to load — bypass login gate and boot app from local data
-    console.warn('⚠️ Supabase unavailable. Booting in offline mode.');
-    setTimeout(() => {
-        if (!isAppInitialized) {
-            // Hide the google login gate, show app
-            const gate = document.getElementById('loginGate');
-            const app = document.getElementById('mainAppContainer');
+// Hard failsafe: if Supabase hasn't resolved in 2.5s, boot locally
+const authFallbackTimer = setTimeout(() => {
+    if (!isAppInitialized) {
+        console.warn('⚠️ Supabase auth timeout — booting from local data');
+        resolveAuthUI(false);
+        const gate = document.getElementById('loginGate');
+        const app = document.getElementById('mainAppContainer');
+        // If there's a locally cached session hint, show app; otherwise show gate
+        const hasLocalHint = !!localStorage.getItem('supabase.auth.token') ||
+                              !!sessionStorage.getItem('supabase.auth.token') ||
+                              [...Object.keys(localStorage)].some(k => k.startsWith('sb-'));
+        if (hasLocalHint) {
             if (gate) gate.style.display = 'none';
             if (app) app.style.display = 'block';
             init();
             isAppInitialized = true;
+        } else {
+            if (gate) gate.style.display = 'flex';
+            if (app) app.style.display = 'none';
         }
-    }, 500);
+    }
+}, 2500);
+
+if (supabaseClient) {
+    // onAuthStateChange is the SINGLE source of truth for auth state.
+    // Supabase v2 guarantees it fires once on page load with event 'INITIAL_SESSION'.
+    // We do NOT call getSession() separately — that caused the race condition / random logouts.
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        clearTimeout(authFallbackTimer); // Auth resolved — cancel the failsafe
+
+        const prevSession = currentSession;
+        currentSession = session;
+
+        if (event === 'INITIAL_SESSION') {
+            // Page load: Supabase has restored (or confirmed absence of) session from storage
+            resolveAuthUI(!!session);
+            loadUserAvatarAndName(session);
+            if (session) {
+                await syncDataWithCloud(true);
+                setupRealtimeSubscription(session.user.id);
+            } else if (!isAppInitialized) {
+                // Not signed in — show login gate (already handled by resolveAuthUI → updateAuthUI)
+                // Still initialize app so offline/local data works if they close the gate
+                setTimeout(() => {
+                    if (!isAppInitialized) { init(); isAppInitialized = true; }
+                }, 800);
+            }
+        } else if (event === 'SIGNED_IN') {
+            // Explicit sign-in (OAuth redirect or email)
+            resolveAuthUI(true);
+            loadUserAvatarAndName(session);
+            if (!prevSession) {
+                await syncDataWithCloud(true);
+                setupRealtimeSubscription(session.user.id);
+            }
+        } else if (event === 'SIGNED_OUT') {
+            resolveAuthUI(false);
+            teardownRealtimeSubscription();
+        } else if (event === 'TOKEN_REFRESHED') {
+            // Silent token refresh — don't re-init the app, just update session reference
+            currentSession = session;
+        }
+    });
+} else {
+    // Supabase CDN failed to load — bypass login gate and boot app from local data
+    clearTimeout(authFallbackTimer);
+    console.warn('⚠️ Supabase unavailable. Booting in offline mode.');
+    const loader = document.getElementById('authLoader');
+    if (loader) loader.style.display = 'none';
+    const gate = document.getElementById('loginGate');
+    const app = document.getElementById('mainAppContainer');
+    if (gate) gate.style.display = 'none';
+    if (app) app.style.display = 'block';
+    setTimeout(() => {
+        if (!isAppInitialized) { init(); isAppInitialized = true; }
+    }, 100);
 }
 
-// Data Sync Logic: Push to / Pull from Supabase
-let isAppInitialized = false;
-
 // --- Supabase Realtime Sync ---
-let realtimeChannel = null;
 
 function deepMergeArrays(localArr, cloudArr) {
     if (!localArr) localArr = [];
