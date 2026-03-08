@@ -295,6 +295,13 @@ body::after {
     gap: var(--card-gap, 1.25rem);
 }
 
+/* CRITICAL MOBILE FIX: Prevent CSS Grid blowout. 
+   Grid items default to min-width: auto and will stretch if children overflow (like scrolling chips). */
+.main-content > *,
+.view-section > * {
+    min-width: 0;
+}
+
 @media (max-width: 1100px) {
     .main-content {
         grid-template-columns: 1fr;
@@ -345,6 +352,9 @@ body::after {
     font-family: inherit;
     font-size: 1rem;
     transition: all 0.3s ease;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 /* For browser styling overrides */

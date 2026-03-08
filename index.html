@@ -167,6 +167,12 @@
 
         <!-- Dashboard View -->
         <main id="dashboardView" class="main-content view-section active">
+            <!-- Dashboard Header -->
+            <div class="view-header" style="grid-column: 1 / -1; margin-bottom: 0.25rem; padding: 0.5rem 0.5rem 0 0.5rem;">
+                <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; letter-spacing: -0.5px;">Dashboard</h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Focus on today's priorities and track your progress.</p>
+            </div>
+
             <!-- Exam Countdown Headers -->
             <div class="exam-countdown-container" style="grid-column: 1 / -1;">
                 <div class="glass-panel countdown-panel"
@@ -321,6 +327,12 @@
 
         <!-- Time Tracker View -->
         <main id="hourLogView" class="main-content view-section">
+            <!-- Time Tracker Header -->
+            <div class="view-header" style="grid-column: 1 / -1; margin-bottom: 0.25rem; padding: 0.5rem 0.5rem 0 0.5rem;">
+                <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; letter-spacing: -0.5px;">Log Activity</h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Log your study sessions effortlessly to build your streak.</p>
+            </div>
+
             <!-- Analytics Summary - MOVED TO TOP -->
             <div class="time-tracker-analytics glass-panel highlight-panel"
                 style="grid-column: 1 / -1; padding: 1.5rem;">
@@ -362,14 +374,14 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
+                    <div class="form-row" style="width: 100%; max-width: 100%;">
+                        <div class="form-group" style="min-width: 0;">
                             <label>Start Time</label>
-                            <input type="time" id="timeStartInput" required>
+                            <input type="time" id="timeStartInput" required style="width: 100%; box-sizing: border-box;">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="min-width: 0;">
                             <label>End Time</label>
-                            <input type="time" id="timeEndInput" required>
+                            <input type="time" id="timeEndInput" required style="width: 100%; box-sizing: border-box;">
                         </div>
                     </div>
 
