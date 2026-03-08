@@ -732,8 +732,18 @@ function switchTab(viewId, animate = true) {
     document.querySelectorAll('.sidebar-nav-item').forEach(btn => {
         btn.classList.remove('active-sidebar-item');
     });
+    
+    // Auto-load charts if navigating to Insights tab
+    if (viewId === 'insightsView' && typeof renderCharts === 'function') {
+        // slight delay to let the slide animation run smooth before heavy chart painting
+        setTimeout(renderCharts, 50); 
+    }
 
-    window.scrollTo({ top: 0, behavior: animate ? 'smooth' : 'auto' });
+    if (animate) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        window.scrollTo(0, 0);
+    }
 }
 
 // --- Bottom nav click handler ---
@@ -781,6 +791,8 @@ navBtns.forEach(btn => {
         el.style.minHeight = '100vh'; // Prevent seeing body background if scrolled
         el.style.transform = `translateX(${offsetX}px)`;
         el.style.zIndex = '10';       // Ensure siblings sit above random static content
+        el.style.animation = 'none';  // Disable the default fadeIn CSS animation during swipe
+        el.style.opacity = '1';       // Ensure full visibility while dragging
     }
 
     function applyDrag(deltaX) {
@@ -842,6 +854,19 @@ navBtns.forEach(btn => {
 
         // Wait for animation, then cleanup and commit tab switch
         setTimeout(() => {
+            if (!isSame) {
+                // Pre-emptively set the DOM state so there is NO FLASH when we strip the absolute positioning
+                const targetViewId = SWIPE_TABS[targetIndex];
+                document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+                const targetEl = document.getElementById(targetViewId);
+                if (targetEl) targetEl.classList.add('active');
+
+                // Now execute the logical switch (which will update the bottom nav UI and trigger charts)
+                // Pass false for 'animate' so switchTab doesn't override our smooth scroll position
+                switchTab(targetViewId, false);
+            }
+
+            // Clean up the inline styles we used for dragging
             [currentEl, nextEl, prevEl].filter(Boolean).forEach(el => {
                 el.style.transition = '';
                 el.style.transform = '';
@@ -852,11 +877,10 @@ navBtns.forEach(btn => {
                 el.style.width = '';
                 el.style.minHeight = '';
                 el.style.zIndex = '';
+                el.style.animation = ''; // restore normal CSS animation rules
+                el.style.opacity = '';
             });
 
-            if (!isSame) {
-                switchTab(SWIPE_TABS[targetIndex], false);
-            }
         }, 360);
     }
 
