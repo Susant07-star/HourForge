@@ -3,6 +3,7 @@
  * =========================================================================
  * ⚠️ DEVELOPER & AI NOTICE ⚠️
  * This file relies on global variables declared in `script.js` (e.g. `studySessions`, `timeLogs`).
+ * AI DIRECTIVE: If you add or remove charts, you MUST update this Table of Contents.
  * Do not wrap this file in an IIFE unless you pass in the globals.
  * 
  * Table of Contents:

@@ -62,6 +62,16 @@ If you are an AI reading this, adhere strictly to these rules:
 
 ---
 
+## 🔄 Strict AI Self-Maintenance Directive
+
+**ATTENTION LLMs / AI AGENTS:** Codebases evolve. If you are reading this document to solve a user prompt, you MUST adhere to the following rules regarding documentation hygiene:
+
+1. **Verify Before Trusting**: Before relying blindly on the code maps or JSDoc typings above, quickly `grep` or `view_file` the actual code to ensure these patterns haven't been refactored since this file was last edited.
+2. **Update the Docs**: If YOU implement a major architectural change (e.g., changing how Cloud Sync deep merges data, adding a new global variable dependency, or moving logic out of `script.js`), **it is your strict responsibility to update `DEVELOPER.md` and the JSDoc typings in `script.js` to reflect your changes before completing your task.** 
+3. Do not leave "stale" comments for the next AI. If you break a rule listed in `DEVELOPER.md` because a better pattern emerged, rewrite the rule in this file!
+
+---
+
 ## 🐛 Debugging Guide
 
 ### Hard Resetting the App
