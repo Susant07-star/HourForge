@@ -1218,9 +1218,15 @@ const AUTO_SUBJECT_DICTIONARY = {
 
 // Auto-select subject when typing task
 document.getElementById('timeTaskInput').addEventListener('input', (e) => {
-    const taskName = e.target.value.toLowerCase();
+    const taskName = e.target.value.trim().toLowerCase();
     const subjectSelect = document.getElementById('timeSubjectInput');
     
+    // Reset to generic if they cleared the input
+    if (!taskName) {
+        subjectSelect.value = '';
+        return;
+    }
+
     // Check personal history first
     const historicalMatch = timeLogs.find(log => log.task.toLowerCase() === taskName && log.subject);
     if (historicalMatch) {
@@ -1292,20 +1298,38 @@ function renderQuickActivityChips() {
         return;
     }
 
-    // Find top 5 most frequent tasks
-    const taskCounts = {};
+    const currentHour = new Date().getHours();
+    
+    // Find top tasks, giving heavy 3x score multiplier to tasks historically done around THIS time of day
+    const taskScores = {};
+    const latestNotes = {};
+    
     timeLogs.forEach(log => {
         if (!log.task) return;
-        const key = `${log.task}|${log.subject}`; // Store task+subject combination
-        taskCounts[key] = (taskCounts[key] || 0) + 1;
+        const key = `${log.task}|${log.subject}`;
+        
+        let timeBonus = 1;
+        if (log.startTime) {
+            const logHour = parseInt(log.startTime.split(':')[0]);
+            // Calculate shortest hour distance (handling midnight wrapping)
+            const hourDiff = Math.min(Math.abs(currentHour - logHour), Math.abs(currentHour + 24 - logHour), Math.abs(currentHour - 24 - logHour));
+            if (hourDiff <= 2) timeBonus = 3; // 3x weight for contextual time matches!
+        }
+        
+        taskScores[key] = (taskScores[key] || 0) + timeBonus;
+        
+        // Store the most recent authentic note used for this task combination
+        if (!latestNotes[key] && log.notes && !log.notes.startsWith('General ')) {
+            latestNotes[key] = log.notes;
+        }
     });
 
-    const topTasks = Object.entries(taskCounts)
-        .sort((a, b) => b[1] - a[1])
+    const topTasks = Object.entries(taskScores)
+        .sort((a, b) => b[1] - a[1]) // Sort by score (frequency * time-context)
         .slice(0, 5)
         .map(entry => {
             const [task, subject] = entry[0].split('|');
-            return { task, subject };
+            return { task, subject, note: latestNotes[entry[0]] || `General ${task}` };
         });
 
     if (topTasks.length === 0) {
@@ -1314,7 +1338,7 @@ function renderQuickActivityChips() {
     }
 
     container.innerHTML = '';
-    topTasks.forEach(({task, subject}) => {
+    topTasks.forEach(({task, subject, note}) => {
         const chip = document.createElement('div');
         chip.className = 'chip';
         // Add ⚡ icon for common tasks
@@ -1328,7 +1352,7 @@ function renderQuickActivityChips() {
             const hasOption = Array.from(subjectSelect.options).some(opt => opt.value === subject);
             if (hasOption) subjectSelect.value = subject;
             
-            document.getElementById('timeNotesInput').value = `General ${task}`; // Light default note
+            document.getElementById('timeNotesInput').value = note; // Populates the last exact note used
             autoFillSmartTimes(); // Refresh times just in case
         });
         
