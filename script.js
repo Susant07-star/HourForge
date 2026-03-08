@@ -1888,13 +1888,11 @@ async function init() {
             dateFormat: 'H:i',       // Internal storage stays HH:mm for JS compatibility
             altInput: true,          // Show a friendly display value to the user
             altFormat: 'h:i K',      // What the USER sees: "1:30 PM"
-            time_24hr: false,        // Show AM/PM in the picker wheel
+            time_24hr: false,
             minuteIncrement: 5,
-            disableMobile: true,     // CRITICAL: Forces Flatpickr UI on mobile instead of native clock
+            disableMobile: false,    // Let mobile OS use its own native scroll-wheel picker
             onChange: function(selectedDates, dateStr, instance) {
-                // Keep the native input value in sync (HH:mm format) for all other JS logic
                 instance.element.value = dateStr;
-                // Fire native input event so the task/subject autofill listeners also trigger
                 instance.element.dispatchEvent(new Event('input', { bubbles: true }));
             }
         };

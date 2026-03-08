@@ -206,9 +206,9 @@
                 </div>
             </div>
 
-            <!-- Dashboard Top: AI Insight → Today's Revisions (conditional) → Timer -->
+            <!-- Dashboard Top: AI Insight + Timer in a 2-col row, Revisions below -->
             <div class="dashboard-top-widgets"
-                style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: var(--card-gap, 1.25rem);">
+                style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: var(--card-gap, 1rem);">
                 <!-- AI Psychology Insight -->
                 <div class="glass-panel ai-insight-widget"
                     style="border-color: rgba(236, 72, 153, 0.3); background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(236, 72, 153, 0.05));">
@@ -222,8 +222,6 @@
                         style="font-size: 0.95rem; color: var(--text-primary); line-height: 1.5; font-style: italic;">
                         "Loading insight..."</p>
                 </div>
-                <!-- Slot: JS moves Today's Revisions here when due -->
-                <div id="todayRevisionsSlot"></div>
                 <!-- 5-Minute Timer -->
                 <div class="glass-panel timer-widget"
                     style="text-align: center; border-color: rgba(16, 185, 129, 0.3);">
@@ -246,6 +244,8 @@
                                 class="fa-solid fa-rotate-right"></i> Reset</button>
                     </div>
                 </div>
+                <!-- Slot: JS moves Today's Revisions here when due — spans full width -->
+                <div id="todayRevisionsSlot" style="grid-column: 1 / -1;"></div>
             </div>
 
             <!-- Left Column: Add New Study Session Form -->
