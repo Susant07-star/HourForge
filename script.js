@@ -934,6 +934,8 @@ navBtns.forEach(btn => {
         touchStartX = 0;
 
         if (Math.abs(dx) >= SWIPE_THRESHOLD) {
+            // Trigger haptic feedback for a successful swipe
+            if (navigator.vibrate) navigator.vibrate(20);
             snapTo(dx < 0 ? currentTabIndex + 1 : currentTabIndex - 1);
         } else {
             snapTo(currentTabIndex);
@@ -1012,48 +1014,76 @@ function loadUserAvatarAndName(session) {
     if (emailEl) emailEl.textContent = email;
 }
 
-// --- Swipe Gestures for Mobile Tab Switching ---
-let touchStartX = 0;
-let touchEndX = 0;
-let touchStartY = 0;
-let touchEndY = 0;
+// --- Pull-to-Refresh (Sync Data) ---
+const tableView = document.getElementById('tableView');
 
-const viewsOrder = ['dashboardView', 'tableView', 'hourLogView', 'insightsView'];
+let pullStartY = 0;
+let pullStartScroll = 0;
+let isPulling = false;
+const REFRESH_THRESHOLD = 80;
 
-document.addEventListener('touchstart', e => {
-    // Only capture if we are touching a view section (not modals or sidebar)
-    if (!e.target.closest('.view-section')) return;
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-}, {passive: true});
-
-document.addEventListener('touchend', e => {
-    if (!e.target.closest('.view-section')) return;
-    touchEndX = e.changedTouches[0].screenX;
-    touchEndY = e.changedTouches[0].screenY;
-    handleSwipe();
-}, {passive: true});
-
-function handleSwipe() {
-    const xDiff = touchEndX - touchStartX;
-    const yDiff = touchEndY - touchStartY;
-    
-    // Ensure horizontal swipe is much larger than vertical swipe (not scrolling)
-    if (Math.abs(xDiff) > 70 && Math.abs(xDiff) > Math.abs(yDiff) * 2) {
-        // Find current active view index
-        const currentViewId = document.querySelector('.view-section.active')?.id;
-        if (!currentViewId) return;
-        
-        const currentIndex = viewsOrder.indexOf(currentViewId);
-        if (currentIndex === -1) return;
-
-        if (xDiff < 0 && currentIndex < viewsOrder.length - 1) {
-            switchTab(viewsOrder[currentIndex + 1]);
-        } else if (xDiff > 0 && currentIndex > 0) {
-            switchTab(viewsOrder[currentIndex - 1]);
-        }
+tableView.addEventListener('touchstart', e => {
+    if (tableView.scrollTop === 0) {
+        pullStartY = e.touches[0].clientY;
+        pullStartScroll = tableView.scrollTop;
+        isPulling = true;
     }
-}
+}, { passive: true });
+
+tableView.addEventListener('touchmove', e => {
+    if (!isPulling) return;
+    
+    const y = e.touches[0].clientY;
+    const dy = y - pullStartY;
+    
+    // If pulling down while at the top
+    if (dy > 0 && tableView.scrollTop === 0) {
+        // Apply resistance
+        const translateY = Math.min(dy * 0.4, REFRESH_THRESHOLD + 20);
+        tableView.style.transform = `translateY(${translateY}px)`;
+        
+        // Optional: vibrate if we cross the threshold
+        if (translateY >= REFRESH_THRESHOLD && navigator.vibrate) {
+            navigator.vibrate(10);
+        }
+    } else {
+        isPulling = false;
+        tableView.style.transform = '';
+    }
+}, { passive: true });
+
+tableView.addEventListener('touchend', e => {
+    if (!isPulling) return;
+    isPulling = false;
+    
+    const y = e.changedTouches[0].clientY;
+    const dy = y - pullStartY;
+    
+    if (dy * 0.4 >= REFRESH_THRESHOLD) {
+        // Threshold met: Trigger Sync
+        tableView.style.transition = 'transform 0.3s ease';
+        tableView.style.transform = `translateY(${REFRESH_THRESHOLD / 2}px)`; // Hold it open slightly
+        
+        if (typeof showToast === 'function') {
+            showToast('🔄 Syncing with Cloud...', 'info');
+        }
+        
+        // Sync and snap back
+        if (typeof syncDataWithCloud === 'function') {
+            syncDataWithCloud().finally(() => {
+                setTimeout(() => {
+                    tableView.style.transform = '';
+                    setTimeout(() => tableView.style.transition = '', 300);
+                }, 500);
+            });
+        }
+    } else {
+        // Snap back immediately
+        tableView.style.transition = 'transform 0.3s ease';
+        tableView.style.transform = '';
+        setTimeout(() => tableView.style.transition = '', 300);
+    }
+}, { passive: true });
 
 // --- STREAK UI UPDATE ---
 function calcCurrentStreak() {
