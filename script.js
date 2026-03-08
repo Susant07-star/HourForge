@@ -691,57 +691,101 @@ navBtns.forEach(btn => {
     const SWIPE_THRESHOLD = 50;   // px to commit a tab change
     const INTENT_THRESHOLD = 8;   // px movement before we decide H vs V
 
-    // Get all view sections as an ordered array
     function getViewEls() {
         return SWIPE_TABS.map(id => document.getElementById(id)).filter(Boolean);
     }
 
-    // Translate all views as a strip without animation (during drag)
+    function positionSibling(el, offsetX, baseTop) {
+        if (!el) return;
+        el.style.transition = 'none';
+        el.style.display = 'block';
+        el.style.position = 'absolute';
+        el.style.top = baseTop + 'px';
+        el.style.left = '0';
+        el.style.width = '100%';
+        el.style.minHeight = '100vh'; // Prevent seeing body background if scrolled
+        el.style.transform = `translateX(${offsetX}px)`;
+        el.style.zIndex = '10';       // Ensure siblings sit above random static content
+    }
+
     function applyDrag(deltaX) {
         const views = getViewEls();
         const w = window.innerWidth;
-        views.forEach((el, i) => {
-            const base = (i - currentTabIndex) * w;
-            el.style.transition = 'none';
-            el.style.transform = `translateX(${base + deltaX}px)`;
-            el.style.display = 'block';
-            el.style.position = 'fixed';
-            el.style.width = '100%';
-            el.style.top = '0';
-            el.style.left = '0';
-        });
+        const currentEl = views[currentTabIndex];
+
+        // Ensure current element keeps its layout but translates
+        currentEl.style.transition = 'none';
+        currentEl.style.transform = `translateX(${deltaX}px)`;
+
+        // We use currentEl.offsetTop so incoming tabs align perfectly under the header
+        const baseTop = currentEl.offsetTop;
+
+        const nextEl = views[currentTabIndex + 1];
+        if (nextEl) positionSibling(nextEl, w + deltaX, baseTop);
+
+        const prevEl = views[currentTabIndex - 1];
+        if (prevEl) positionSibling(prevEl, -w + deltaX, baseTop);
     }
 
-    // Snap to a tab index with spring animation then restore normal layout
     function snapTo(targetIndex) {
         const views = getViewEls();
         const w = window.innerWidth;
-        const clampedIndex = Math.max(0, Math.min(SWIPE_TABS.length - 1, targetIndex));
+        const currentEl = views[currentTabIndex];
+        const nextEl = views[currentTabIndex + 1];
+        const prevEl = views[currentTabIndex - 1];
 
-        // Apply the slide‑out animation
-        views.forEach((el, i) => {
-            el.style.transition = 'transform 0.32s cubic-bezier(0.25, 1, 0.5, 1)';
-            el.style.transform = `translateX(${(i - clampedIndex) * w}px)`;
-        });
+        const isNext = targetIndex > currentTabIndex;
+        const isPrev = targetIndex < currentTabIndex;
+        const isSame = targetIndex === currentTabIndex;
 
-        // After animation, restore normal layout and let CSS handle display
+        const duration = '0.35s';
+        const ease = 'cubic-bezier(0.25, 1, 0.5, 1)';
+
+        // Animate current sliding out (or snapping back)
+        if (currentEl) {
+            currentEl.style.transition = `transform ${duration} ${ease}`;
+            if (isNext) currentEl.style.transform = `translateX(${-w}px)`;
+            else if (isPrev) currentEl.style.transform = `translateX(${w}px)`;
+            else currentEl.style.transform = `translateX(0px)`;
+        }
+
+        // Animate next sliding in (or out)
+        if (nextEl) {
+            nextEl.style.transition = `transform ${duration} ${ease}`;
+            if (isNext) nextEl.style.transform = `translateX(0px)`;
+            else if (isPrev) nextEl.style.transform = `translateX(${2 * w}px)`;
+            else nextEl.style.transform = `translateX(${w}px)`;
+        }
+
+        // Animate prev sliding in (or out)
+        if (prevEl) {
+            prevEl.style.transition = `transform ${duration} ${ease}`;
+            if (isPrev) prevEl.style.transform = `translateX(0px)`;
+            else if (isNext) prevEl.style.transform = `translateX(${-2 * w}px)`;
+            else prevEl.style.transform = `translateX(${-w}px)`;
+        }
+
+        // Wait for animation, then cleanup and commit tab switch
         setTimeout(() => {
-            views.forEach(el => {
+            [currentEl, nextEl, prevEl].filter(Boolean).forEach(el => {
                 el.style.transition = '';
                 el.style.transform = '';
                 el.style.display = '';
                 el.style.position = '';
-                el.style.width = '';
                 el.style.top = '';
                 el.style.left = '';
+                el.style.width = '';
+                el.style.minHeight = '';
+                el.style.zIndex = '';
             });
-            switchTab(SWIPE_TABS[clampedIndex], false);
-        }, 320);
+
+            if (!isSame) {
+                switchTab(SWIPE_TABS[targetIndex], false);
+            }
+        }, 360);
     }
 
-    // Attach to document so swipe works even from inside tables, forms, etc.
     document.addEventListener('touchstart', e => {
-        // Ignore if a modal or drawer is open
         const modals = document.querySelectorAll('.modal-overlay[style*="flex"], .sidebar-drawer.open, .profile-drawer.open');
         if (modals.length > 0) return;
 
@@ -759,19 +803,20 @@ navBtns.forEach(btn => {
         const dy = e.touches[0].clientY - touchStartY;
         touchCurrentX = e.touches[0].clientX;
 
-        // Detect intent once we have enough movement
         if (!intentDetected && (Math.abs(dx) > INTENT_THRESHOLD || Math.abs(dy) > INTENT_THRESHOLD)) {
             intentDetected = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
         }
 
         if (intentDetected !== 'horizontal') return;
 
-        // Don't start a drag that would go out of bounds with no room
         if (dx > 0 && currentTabIndex === 0) return;
         if (dx < 0 && currentTabIndex === SWIPE_TABS.length - 1) return;
 
+        // Only lock scrolling vertically once horizontal intent is confirmed. 
+        // We can't actually preventDefault() here since listener is passive. 
+        // But applying the CSS transform gives immediate feedback.
         isSwiping = true;
-        // Add resistance at the edges — rubber band feel
+
         const resistance = 0.3;
         const atEdge = (dx > 0 && currentTabIndex === 0) || (dx < 0 && currentTabIndex === SWIPE_TABS.length - 1);
         const effectiveDx = atEdge ? dx * resistance : dx;
@@ -790,10 +835,8 @@ navBtns.forEach(btn => {
         touchStartX = 0;
 
         if (Math.abs(dx) >= SWIPE_THRESHOLD) {
-            // Enough movement — commit the tab change
             snapTo(dx < 0 ? currentTabIndex + 1 : currentTabIndex - 1);
         } else {
-            // Not enough — snap back to current tab
             snapTo(currentTabIndex);
         }
     }, { passive: true });
