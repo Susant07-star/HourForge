@@ -680,12 +680,21 @@ Only include subjects with hours > 0. Use exact decimal hours from the logs.`;
 
         const overdueRevisions = [];
         const dueTodayRevisions = [];
+        let revDone = 0;
+        let revTotal = 0;
 
         const sessionsContext = studySessions.slice(0, 30).map(s => {
             const baseDate = new Date(s.dateRead); baseDate.setHours(0, 0, 0, 0);
             const rev2 = typeof s.revisions.rev2 === 'boolean' ? { done: s.revisions.rev2, completedAt: null } : s.revisions.rev2;
             const rev4 = typeof s.revisions.rev4 === 'boolean' ? { done: s.revisions.rev4, completedAt: null } : s.revisions.rev4;
             const rev7 = typeof s.revisions.rev7 === 'boolean' ? { done: s.revisions.rev7, completedAt: null } : s.revisions.rev7;
+
+            // Track global revision completion stats for this coach prompt
+            [rev2, rev4, rev7].forEach(rev => {
+                if (!rev) return;
+                revTotal += 1;
+                if (rev.done) revDone += 1;
+            });
 
             const revDetails = [];
 
