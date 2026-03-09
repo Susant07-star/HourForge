@@ -14,6 +14,14 @@ const dom = new JSDOM(html, {
         // Mock Chart.js
         window.Chart = function() { return { destroy: () => {}, update: () => {} }; };
         window.Chart.register = () => {};
+
+        // Minimal performance API stub for PostHog web-vitals bundle
+        if (!window.performance) {
+            window.performance = {};
+        }
+        if (typeof window.performance.getEntriesByType !== 'function') {
+            window.performance.getEntriesByType = () => [];
+        }
         
         // Let's hook console.error so we definitely see it
         const originalError = window.console.error;
