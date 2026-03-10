@@ -732,6 +732,17 @@ function switchTab(viewId, animate = true) {
     document.querySelectorAll('.sidebar-nav-item').forEach(btn => {
         btn.classList.remove('active-sidebar-item');
     });
+
+    // When user navigates to the Time Tracker tab, pre-fill smart times and helpers
+    if (viewId === 'hourLogView') {
+        const dateEl = document.getElementById('timeDateInput');
+        if (dateEl && !dateEl.value) {
+            dateEl.value = getLocalDateStr();
+        }
+        autoFillSmartTimes();
+        if (typeof renderQuickActivityChips === 'function') renderQuickActivityChips();
+        if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
+    }
     
     // Auto-load charts if navigating to Insights tab
     if (viewId === 'insightsView' && typeof renderAllCharts === 'function') {
@@ -1254,18 +1265,25 @@ document.getElementById('timeTaskInput').addEventListener('input', (e) => {
 function autoFillSmartTimes() {
     const startInput = document.getElementById('timeStartInput');
     const endInput = document.getElementById('timeEndInput');
+    const dateInput = document.getElementById('timeDateInput');
+    if (!startInput || !endInput) return;
+
     const now = new Date();
-    
+
     // Default End Time is ALWAYS exactly Right Now
     endInput.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-    // Default Start Time snaps to the End Time of the most recent log today, otherwise exactly 1 hour ago
-    const todayStr = getLocalDateStr();
-    const todaysLogs = timeLogs.filter(log => log.date === todayStr).sort((a,b) => b.endTime.localeCompare(a.endTime));
-    
-    if (todaysLogs.length > 0) {
-        startInput.value = todaysLogs[0].endTime; // Snap exactly to end of last session
+    // Use the currently selected log date (backfill-friendly), falling back to today
+    const targetDateStr = (dateInput && dateInput.value) ? dateInput.value : getLocalDateStr();
+    const targetLogs = timeLogs
+        .filter(log => log.date === targetDateStr)
+        .sort((a, b) => b.endTime.localeCompare(a.endTime));
+
+    if (targetLogs.length > 0) {
+        // Snap exactly to end of last session for that date
+        startInput.value = targetLogs[0].endTime;
     } else {
+        // No logs yet for that date: default to 1 hour ago
         const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000));
         startInput.value = `${String(oneHourAgo.getHours()).padStart(2, '0')}:${String(oneHourAgo.getMinutes()).padStart(2, '0')}`;
     }
@@ -1311,7 +1329,7 @@ function renderIntelligentDurations(currentTask = '') {
         }
     }
     
-    // Generate Button HTML
+    // Generate Button HTML (replace any static buttons so all have JS handlers)
     container.innerHTML = '';
     
     targetDurationsMins.forEach(mins => {
@@ -1555,8 +1573,13 @@ addTimeLogForm.addEventListener('submit', (e) => {
     // Auto-backup trigger
     autoBackupSync();
 
+    // Preserve the date the user was logging for (important for backfilling)
+    const lastDateStr = dateStr;
     addTimeLogForm.reset();
-    document.getElementById('timeDateInput').value = getLocalDateStr();
+    const dateEl = document.getElementById('timeDateInput');
+    if (dateEl) {
+        dateEl.value = lastDateStr || getLocalDateStr();
+    }
     autoFillSmartTimes(); // Reset to smart times instead of blank
     renderQuickActivityChips(); // Refresh chips in case a new pattern emerged
     if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations(); // Reset to generalized popular durations
@@ -3474,4 +3497,4 @@ function formatDateLabel(dateStr) {
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
-
+
