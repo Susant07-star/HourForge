@@ -1431,6 +1431,7 @@ function renderQuickActivityChips() {
             const taskInput = document.getElementById('timeTaskInput');
             const subjectSelect = document.getElementById('timeSubjectInput');
             const notesInput = document.getElementById('timeNotesInput');
+            const endInput = document.getElementById('timeEndInput');
             
             const isSelected = chip.classList.contains('chip-selected');
             
@@ -1456,6 +1457,11 @@ function renderQuickActivityChips() {
                 notesInput.value = note;
                 chip.classList.add('chip-selected');
                 chip.innerHTML = `<i class="fa-solid fa-xmark" style="color: #f87171; font-size: 0.8em;"></i> ${task}`;
+                // Always refresh end time to "now" when picking a suggested activity
+                if (endInput) {
+                    const now = new Date();
+                    endInput.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                }
                 autoFillSmartTimes();
                 if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations(task);
             }
@@ -1575,11 +1581,24 @@ addTimeLogForm.addEventListener('submit', (e) => {
 
     // Preserve the date the user was logging for (important for backfilling)
     const lastDateStr = dateStr;
+    const lastEndTimeStr = endTimeStr;
     addTimeLogForm.reset();
     const dateEl = document.getElementById('timeDateInput');
     if (dateEl) {
         dateEl.value = lastDateStr || getLocalDateStr();
     }
+
+    // Hard-set times immediately so the form never appears blank after reset.
+    // Start time should continue from the last end time; end time should refresh to "now".
+    const startEl = document.getElementById('timeStartInput');
+    const endEl = document.getElementById('timeEndInput');
+    if (startEl && lastEndTimeStr) startEl.value = lastEndTimeStr;
+    if (endEl) {
+        const now = new Date();
+        endEl.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+
+    // Then run the smart autofill to normalize based on the selected date/history.
     autoFillSmartTimes(); // Reset to smart times instead of blank
     renderQuickActivityChips(); // Refresh chips in case a new pattern emerged
     if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations(); // Reset to generalized popular durations
