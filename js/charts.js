@@ -1075,14 +1075,24 @@ function markdownToHtml(md) {
 
 // --- Wire up Insights tab rendering ---
 // When switching to insights view, render charts
-const originalNavHandler = navBtns.forEach;
-navBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        if (btn.dataset.view === 'insightsView') {
-            setTimeout(renderAllCharts, 100);
-        }
+if (typeof navBtns !== 'undefined') {
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.dataset.view === 'insightsView') {
+                setTimeout(renderAllCharts, 100);
+            }
+        });
     });
-});
+} else {
+    // Fallback: Use querySelectorAll directly if navBtns isn't global
+    document.querySelectorAll('.nav-btn, .bottom-nav-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.dataset.view === 'insightsView') {
+                setTimeout(renderAllCharts, 100);
+            }
+        });
+    });
+}
 
 // Render Star Rating UI based on numeric score
 function renderStarRating(score) {

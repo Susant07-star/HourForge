@@ -298,14 +298,19 @@ let currentSession = null;
 
 // Helper: Restore last active tab and render it immediately
 function restoreSavedTab() {
-    const savedTab = localStorage.getItem('activeTab');
-    if (savedTab && document.getElementById(savedTab)) {
-        switchTab(savedTab, false);
-        // Force immediate render of the restored view using local data
-        if (savedTab === 'hourLogView' && typeof renderTimeLogs === 'function') renderTimeLogs();
-        else if (savedTab === 'tableView' && typeof renderTableView === 'function') renderTableView();
-        else if (savedTab === 'dashboardView' && typeof renderDashboard === 'function') renderDashboard();
-    } else {
+    try {
+        const savedTab = localStorage.getItem('activeTab');
+        if (savedTab && document.getElementById(savedTab)) {
+            switchTab(savedTab, false);
+            // Force immediate render of the restored view using local data
+            if (savedTab === 'hourLogView' && typeof renderTimeLogs === 'function') renderTimeLogs();
+            else if (savedTab === 'tableView' && typeof renderTableView === 'function') renderTableView();
+            else if (savedTab === 'dashboardView' && typeof renderDashboard === 'function') renderDashboard();
+        } else {
+            if (typeof renderDashboard === 'function') renderDashboard();
+        }
+    } catch (e) {
+        console.warn('Tab restoration failed, defaulting to Dashboard:', e);
         if (typeof renderDashboard === 'function') renderDashboard();
     }
 }
