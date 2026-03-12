@@ -1617,28 +1617,6 @@ function renderQuickActivityChips() {
     
     container.style.display = 'flex';
 }
-                
-                // SELECT this chip
-                taskInput.value = task;
-                const hasOption = Array.from(subjectSelect.options).some(opt => opt.value === subject);
-                if (hasOption) subjectSelect.value = subject;
-                notesInput.value = note;
-                chip.classList.add('chip-selected');
-                chip.innerHTML = `<i class="fa-solid fa-xmark" style="color: #f87171; font-size: 0.8em;"></i> ${task}`;
-                // Always refresh end time to "now" when picking a suggested activity
-                if (endInput) {
-                    const now = new Date();
-                    endInput.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                }
-                autoFillSmartTimes();
-                if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations(task);
-            }
-        });
-        
-        container.appendChild(chip);
-    });
-    container.style.display = 'flex';
-}
 
 // ------------------------------------------
 
