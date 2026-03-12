@@ -854,12 +854,11 @@
         </div>
     </div>
 
-    <!-- =================== POMODORO MODAL =================== -->
-    <div id="pomodoroModal" class="modal-overlay" style="display:none;">
-        <div class="modal-box pomodoro-modal">
-            <div class="modal-header">
+    <!-- =================== POMODORO MODAL (Converted to Tab) =================== -->
+    <main id="pomodoroView" class="view-section pomodoro-view">
+        <div class="glass-panel pomodoro-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
+            <div class="modal-header" style="width: 100%; justify-content: center; margin-bottom: 2rem;">
                 <h2><i class="fa-solid fa-hourglass-half" style="color:#ef4444;"></i> Pomodoro Timer</h2>
-                <button id="btnClosePomodoro" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <!-- Mode selector -->
@@ -869,24 +868,27 @@
                 <button class="pomo-mode-btn" data-mode="long" data-duration="900">Long Break</button>
             </div>
 
-            <!-- Custom time settings -->
-            <div class="pomo-settings-row">
-                <div class="pomo-setting">
-                    <label>Focus <span class="pomo-setting-unit">min</span></label>
-                    <input type="number" id="pomoFocusMin" class="pomo-setting-input" value="25" min="1" max="120">
+            <!-- Custom time settings (Collapsible) -->
+            <details class="pomo-settings-details" style="width: 100%; max-width: 400px; margin-top: 1rem; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 0.5rem 1rem;">
+                <summary style="cursor: pointer; color: var(--text-secondary); font-weight: 500; outline: none; padding: 0.5rem 0;">⚙️ Timer Settings</summary>
+                <div class="pomo-settings-row" style="margin-top: 1rem;">
+                    <div class="pomo-setting">
+                        <label>Focus <span class="pomo-setting-unit">min</span></label>
+                        <input type="number" id="pomoFocusMin" class="pomo-setting-input" value="25" min="1" max="120">
+                    </div>
+                    <div class="pomo-setting">
+                        <label>Short Break <span class="pomo-setting-unit">min</span></label>
+                        <input type="number" id="pomoShortMin" class="pomo-setting-input" value="5" min="1" max="60">
+                    </div>
+                    <div class="pomo-setting">
+                        <label>Long Break <span class="pomo-setting-unit">min</span></label>
+                        <input type="number" id="pomoLongMin" class="pomo-setting-input" value="15" min="1" max="60">
+                    </div>
                 </div>
-                <div class="pomo-setting">
-                    <label>Short Break <span class="pomo-setting-unit">min</span></label>
-                    <input type="number" id="pomoShortMin" class="pomo-setting-input" value="5" min="1" max="60">
-                </div>
-                <div class="pomo-setting">
-                    <label>Long Break <span class="pomo-setting-unit">min</span></label>
-                    <input type="number" id="pomoLongMin" class="pomo-setting-input" value="15" min="1" max="60">
-                </div>
-            </div>
+            </details>
 
             <!-- Timer ring -->
-            <div class="pomo-ring-wrap">
+            <div class="pomo-ring-wrap" style="margin: 2rem 0;">
                 <svg class="pomo-ring" viewBox="0 0 120 120">
                     <circle class="pomo-ring-bg" cx="60" cy="60" r="54" />
                     <circle class="pomo-ring-fill" id="pomoRingFill" cx="60" cy="60" r="54" stroke-dasharray="339.29"
@@ -900,31 +902,12 @@
             
             <div class="pomo-controls">
                 <button id="btnPomoPrev" class="pomo-control-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
-                <button id="btnPomoStartPause" class="pomo-control-btn main"><i class="fa-solid fa-play"></i></button>
+                <button id="btnPomoStartPause" class="pomo-control-btn main"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
                 <button id="btnPomoSkip" class="pomo-control-btn" title="Skip"><i class="fa-solid fa-forward"></i></button>
-            </div>
-            
-            <!-- Link to Logger -->
-            <div class="pomo-log-link" style="margin-top: 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Finished a session?</p>
-                <button id="btnLogFromPomo" class="btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 1rem;">
-                    <i class="fa-solid fa-clipboard-check"></i> Log this time
-                </button>
-            </div>
-
-            <!-- Controls -->
-            <div class="pomo-controls">
-                <button id="btnPomoPrev" class="pomo-ctrl-btn" title="Restart"><i
-                        class="fa-solid fa-rotate-left"></i></button>
-                <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn">
-                    <i class="fa-solid fa-play" id="pomoPlayIcon"></i>
-                </button>
-                <button id="btnPomoSkip" class="pomo-ctrl-btn" title="Skip"><i
-                        class="fa-solid fa-forward-step"></i></button>
             </div>
 
             <!-- Session dots -->
-            <div class="pomo-sessions">
+            <div class="pomo-sessions" style="margin-top: 2rem;">
                 <div class="pomo-session-label">Sessions completed</div>
                 <div id="pomoSessionDots" class="pomo-session-dots">
                     <span class="pomo-dot" data-idx="0"></span>
@@ -934,10 +917,8 @@
                 </div>
                 <div id="pomoSessionCount" class="pomo-session-count">0 / 4</div>
             </div>
-
-            <p class="pomo-tip">💡 Close this modal — the timer keeps running!</p>
         </div>
-    </div>
+    </main>
 
     <!-- =================== FLOATING MINI TIMER =================== -->
     <div id="pomoMiniTimer" class="pomo-mini-timer" style="display:none;">
