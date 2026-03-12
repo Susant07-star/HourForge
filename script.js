@@ -3069,7 +3069,12 @@ function deleteTimeLog(id) {
     if (!log.createdAt) return;
 
     if (confirm(`Are you sure you want to delete the time log for "${log.task}"?`)) {
-        timeLogs.splice(logIndex, 1);
+        // SOFT DELETE: Mark as deleted so it syncs to cloud
+        log.deleted = true;
+        log.updatedAt = new Date().toISOString();
+        
+        // timeLogs.splice(logIndex, 1); // DO NOT SPLICE!
+        
         saveToLocalStorage();
         renderTimeLogs();
         autoBackupSync();
