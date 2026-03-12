@@ -1883,7 +1883,7 @@ addTimeLogForm.addEventListener('submit', (e) => {
     const dateStr = document.getElementById('timeDateInput').value;
     const notes = document.getElementById('timeNotesInput').value.trim();
 
-    if (!taskName || !startTimeStr || !endTimeStr || !dateStr || !notes) return;
+    if (!taskName || !startTimeStr || !endTimeStr || !dateStr) return;
 
     // Parse start/end times
     const start = new Date(`2000-01-01T${startTimeStr}`);
