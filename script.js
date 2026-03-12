@@ -1260,6 +1260,21 @@ document.getElementById('timeTaskInput').addEventListener('input', (e) => {
         subjectSelect.value = historicalMatch.subject;
         return;
     }
+    
+    // Check if we can infer subject from task name prefixes (e.g., "Math: Homework")
+    const colonSplit = taskName.split(':');
+    if (colonSplit.length > 1) {
+        const potentialSubject = colonSplit[0].trim();
+        // Capitalize first letter
+        const formattedSubject = potentialSubject.charAt(0).toUpperCase() + potentialSubject.slice(1);
+        
+        // Check if this matches a known subject
+        const hasOption = Array.from(subjectSelect.options).some(opt => opt.value.toLowerCase() === formattedSubject.toLowerCase());
+        if (hasOption) {
+            subjectSelect.value = Array.from(subjectSelect.options).find(opt => opt.value.toLowerCase() === formattedSubject.toLowerCase()).value;
+            return;
+        }
+    }
 
     // Fall back to Global Dictionary
     for (const [key, category] of Object.entries(AUTO_SUBJECT_DICTIONARY)) {
@@ -1283,6 +1298,11 @@ function autoFillSmartTimes() {
 
     // Default End Time is ALWAYS exactly Right Now
     endInput.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    // Also update Flatpickr if it exists for end time
+    if (endInput._flatpickr) {
+        endInput._flatpickr.setDate(now, true);
+    }
 
     // Use the currently selected log date (backfill-friendly), falling back to today
     const targetDateStr = (dateInput && dateInput.value) ? dateInput.value : getLocalDateStr();
@@ -1968,9 +1988,6 @@ async function init() {
     if (typeof renderQuickActivityChips === 'function') renderQuickActivityChips();
     if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
 
-    // Check for running stopwatch (persist across refreshes)
-    if (typeof checkStopwatchState === 'function') checkStopwatchState();
-
     // Premium Time/Date Pickers via Flatpickr
     // disableMobile: true FORCES Flatpickr's scroll-wheel UI on ALL devices (mobile AND desktop)
     // This prevents the native browser clock from ever appearing.
@@ -2406,6 +2423,69 @@ document.getElementById('pomoMiniPlay').addEventListener('click', () => {
     POMO.running ? pomoPause() : pomoStart();
 });
 document.getElementById('pomoMiniOpen').addEventListener('click', showPomodoroModal);
+
+// Log from Pomodoro
+document.getElementById('btnLogFromPomo')?.addEventListener('click', () => {
+    // 1. Calculate duration (Full Duration - Remaining)
+    // Only log if we actually did something (e.g. > 1 min)
+    const elapsedSeconds = POMO.duration - POMO.remaining;
+    if (elapsedSeconds < 60) {
+        showToast('Session too short to log (< 1 min).', 'warning');
+        return;
+    }
+
+    const elapsedMinutes = Math.round(elapsedSeconds / 60);
+    
+    // 2. Hide Pomodoro Modal
+    hidePomodoroModal();
+    
+    // 3. Switch to Logger Tab
+    switchTab('hourLogView');
+    
+    // 4. Fill Form
+    const now = new Date();
+    const start = new Date(now.getTime() - (elapsedSeconds * 1000));
+    
+    const formatTime = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    
+    const startStr = formatTime(start);
+    const endStr = formatTime(now);
+    
+    const startInput = document.getElementById('timeStartInput');
+    const endInput = document.getElementById('timeEndInput');
+    const dateInput = document.getElementById('timeDateInput');
+    const taskInput = document.getElementById('timeTaskInput');
+    const notesInput = document.getElementById('timeNotesInput');
+    
+    if (startInput) {
+        if (startInput._flatpickr) startInput._flatpickr.setDate(startStr, true);
+        else startInput.value = startStr;
+    }
+    
+    if (endInput) {
+        if (endInput._flatpickr) endInput._flatpickr.setDate(endStr, true);
+        else endInput.value = endStr;
+    }
+    
+    const dateStr = getLocalDateStr(start);
+    if (dateInput) {
+        if (dateInput._flatpickr) dateInput._flatpickr.setDate(dateStr, true);
+        else dateInput.value = dateStr;
+    }
+    
+    // Pre-fill task name based on mode
+    if (taskInput) {
+        taskInput.value = POMO.mode === 'focus' ? 'Study Session' : 'Break';
+        taskInput.focus();
+        if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
+    }
+    
+    if (notesInput) {
+        notesInput.value = `Logged from Pomodoro Timer (${elapsedMinutes} mins)`;
+    }
+    
+    showToast('Timer data transferred to logger! 📝', 'success');
+});
 
 
 
@@ -3576,141 +3656,5 @@ function getFilteredLogs(period) {
 function formatDateLabel(dateStr) {
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-// ==========================================
-// LIVE STOPWATCH LOGIC
-// ==========================================
-let stopwatchInterval = null;
-let stopwatchStartTime = null;
-let isStopwatchRunning = false;
-
-const stopwatchDisplay = document.getElementById('stopwatchDisplay');
-const stopwatchLabel = document.getElementById('stopwatchLabel');
-const btnStopwatchToggle = document.getElementById('btnStopwatchToggle');
-
-function formatStopwatchTime(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-}
-
-function updateStopwatch() {
-    if (!stopwatchStartTime) return;
-    const now = Date.now();
-    const elapsed = now - stopwatchStartTime;
-    if (stopwatchDisplay) stopwatchDisplay.textContent = formatStopwatchTime(elapsed);
-}
-
-function checkStopwatchState() {
-    const savedStart = localStorage.getItem('stopwatchStartTime');
-    if (savedStart) {
-        stopwatchStartTime = parseInt(savedStart);
-        isStopwatchRunning = true;
-        
-        // Resume UI state immediately
-        if (stopwatchLabel) stopwatchLabel.textContent = "Tracking in progress...";
-        if (btnStopwatchToggle) {
-            btnStopwatchToggle.innerHTML = '<i class="fa-solid fa-stop"></i> Stop & Log';
-            btnStopwatchToggle.style.background = '#ef4444'; // Red for stop
-            btnStopwatchToggle.style.boxShadow = '0 4px 15px rgba(239, 68, 68, 0.4)';
-        }
-        
-        stopwatchInterval = setInterval(updateStopwatch, 1000);
-        updateStopwatch(); // Immediate update
-    }
-}
-
-function toggleStopwatch() {
-    if (isStopwatchRunning) {
-        // STOP ACTION
-        clearInterval(stopwatchInterval);
-        isStopwatchRunning = false;
-        
-        // Remove persistence
-        localStorage.removeItem('stopwatchStartTime');
-        
-        // Update UI
-        if (stopwatchLabel) stopwatchLabel.textContent = "Stopped. Review details below.";
-        if (btnStopwatchToggle) {
-            btnStopwatchToggle.innerHTML = '<i class="fa-solid fa-play"></i> Start Tracking';
-            btnStopwatchToggle.style.background = 'var(--accent-primary)';
-            btnStopwatchToggle.style.boxShadow = '0 4px 15px rgba(99, 102, 241, 0.4)';
-        }
-        
-        // Fill Form
-        const now = new Date();
-        const start = new Date(stopwatchStartTime);
-        
-        const formatTime = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-        
-        const startStr = formatTime(start);
-        const endStr = formatTime(now);
-        
-        const startInput = document.getElementById('timeStartInput');
-        const endInput = document.getElementById('timeEndInput');
-        const dateInput = document.getElementById('timeDateInput');
-        
-        if (startInput) {
-            if (startInput._flatpickr) startInput._flatpickr.setDate(startStr, true);
-            else startInput.value = startStr;
-        }
-        
-        if (endInput) {
-            if (endInput._flatpickr) endInput._flatpickr.setDate(endStr, true);
-            else endInput.value = endStr;
-        }
-        
-        // Ensure date is correct (if stopwatch ran over midnight, use start date)
-        const dateStr = getLocalDateStr(start);
-        if (dateInput) {
-            if (dateInput._flatpickr) dateInput._flatpickr.setDate(dateStr, true);
-            else dateInput.value = dateStr;
-        }
-
-        // Reset internal state
-        stopwatchStartTime = null;
-        if (stopwatchDisplay) stopwatchDisplay.textContent = "00:00:00";
-        
-        // Haptic
-        if (navigator.vibrate) navigator.vibrate([50, 50]);
-        
-        // Focus on task input
-        const taskInput = document.getElementById('timeTaskInput');
-        if (taskInput) {
-            taskInput.focus();
-            // Optional: clear previous task if needed, or keep it? 
-            // Better to keep it blank so user enters what they just did.
-            // But we can trigger intelligent durations to reset
-            if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
-        }
-
-    } else {
-        // START ACTION
-        stopwatchStartTime = Date.now();
-        isStopwatchRunning = true;
-        
-        // Persist
-        localStorage.setItem('stopwatchStartTime', stopwatchStartTime);
-        
-        stopwatchInterval = setInterval(updateStopwatch, 1000);
-        updateStopwatch();
-        
-        // Update UI
-        if (stopwatchLabel) stopwatchLabel.textContent = "Tracking in progress...";
-        if (btnStopwatchToggle) {
-            btnStopwatchToggle.innerHTML = '<i class="fa-solid fa-stop"></i> Stop & Log';
-            btnStopwatchToggle.style.background = '#ef4444'; // Red for stop
-            btnStopwatchToggle.style.boxShadow = '0 4px 15px rgba(239, 68, 68, 0.4)';
-        }
-        
-        if (navigator.vibrate) navigator.vibrate(50);
-    }
-}
-
-if (btnStopwatchToggle) {
-    btnStopwatchToggle.addEventListener('click', toggleStopwatch);
 }
 
