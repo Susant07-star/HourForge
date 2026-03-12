@@ -1800,40 +1800,6 @@ function renderQuickActivityChips() {
         contentSpan.innerHTML = `${icon} ${prefix}${task}`;
         chip.appendChild(contentSpan);
         
-        // Delete button (hidden by default, shown on hover/long-press in CSS ideally, but here just small x)
-        const deleteBtn = document.createElement('span');
-        deleteBtn.className = 'chip-delete-btn';
-        deleteBtn.innerHTML = '<i class="fa-solid fa-times"></i>';
-        deleteBtn.title = "Hide this suggestion";
-        deleteBtn.style.cssText = `
-            margin-left: 8px; 
-            opacity: 0.5; 
-            cursor: pointer; 
-            font-size: 0.7em;
-            padding: 2px 5px;
-            border-radius: 50%;
-        `;
-        // Hover effect for delete
-        deleteBtn.onmouseover = () => deleteBtn.style.opacity = '1';
-        deleteBtn.onmouseout = () => deleteBtn.style.opacity = '0.5';
-        
-        deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Don't trigger the chip selection
-            if (confirm(`Remove "${task}" from suggestions?`)) {
-                // We can't really "delete" it from history without deleting the log, 
-                // but we can add it to a temporary blacklist for this session or mark logs?
-                // For now, let's just visually remove it and maybe set a local ignore list.
-                // A robust way: Add a "hidden" flag to the suggestion logic.
-                // Simpler: Just hide it now.
-                chip.remove();
-                
-                // Add to session ignore list
-                if (!window.suggestionBlacklist) window.suggestionBlacklist = [];
-                window.suggestionBlacklist.push(key);
-            }
-        });
-        chip.appendChild(deleteBtn);
-        
         chip.addEventListener('click', () => {
             if (navigator.vibrate) navigator.vibrate(15);
             const taskInput = document.getElementById('timeTaskInput');
