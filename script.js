@@ -766,6 +766,9 @@ function switchTab(viewId, animate = true) {
     } else {
         window.scrollTo(0, 0);
     }
+    
+    // Save current tab to localStorage
+    localStorage.setItem('activeTab', viewId);
 }
 
 // --- Bottom nav click handler ---
@@ -1978,8 +1981,16 @@ async function init() {
     if (document.getElementById('timeDateInput')) document.getElementById('timeDateInput').value = getLocalDateStr();
     if (document.getElementById('historyDateFilter')) document.getElementById('historyDateFilter').value = getLocalDateStr();
 
-    // Initial render
-    renderDashboard();
+    // Restore last active tab
+    const savedTab = localStorage.getItem('activeTab');
+    if (savedTab && document.getElementById(savedTab)) {
+        switchTab(savedTab, false);
+    } else {
+        // Initial render (default to dashboard)
+        renderDashboard();
+    }
+    
+    // Always render these as they might be needed by other tabs
     renderTableView();
     renderTimeLogs();
     
