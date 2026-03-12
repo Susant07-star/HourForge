@@ -1727,13 +1727,13 @@ main#hourLogView.active {
 
     /* Make frictionless data entry elements smaller on mobile to fit more per row */
     .chip {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.8rem;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.7rem;
     }
 
     .btn-duration {
-        padding: 0.35rem 0.6rem;
-        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
     }
 
     /* Dashboard top widgets: collapse to single column on mobile */
