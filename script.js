@@ -1369,18 +1369,14 @@ function autoFillSmartTimes() {
             
         if (prevLogs.length > 0) {
             // Found a log from yesterday. 
-            // If it ended very late (e.g. 23:59), maybe suggest 00:00?
-            // Or just default to now/1hr ago.
-            // User request: "let's say a man worked form 9:00pm to 12:08am the start time should be 12:08am"
-            // If the split logic worked, we'd have the 00:08 log.
-            // If it didn't, we might need to handle it. 
-            // But let's assume standard behavior for now: default to 1 hour ago from NOW if no logs today.
-             const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000));
-            const defaultStart = `${String(oneHourAgo.getHours()).padStart(2, '0')}:${String(oneHourAgo.getMinutes()).padStart(2, '0')}`;
+            // Use its end time as the start time for today (Continuity)
+            const lastPrevLog = prevLogs[0];
+            const newStart = lastPrevLog.endTime;
+            
             if (startInput._flatpickr) {
-                startInput._flatpickr.setDate(defaultStart, true);
+                startInput._flatpickr.setDate(newStart, true);
             } else {
-                startInput.value = defaultStart;
+                startInput.value = newStart;
             }
         } else {
              // No logs yesterday either. Default.
