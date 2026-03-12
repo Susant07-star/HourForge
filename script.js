@@ -3088,6 +3088,11 @@ function deleteTimeLog(id) {
         saveToLocalStorage();
         renderTimeLogs();
         autoBackupSync();
+        
+        // Refresh smart autofill to update start time if the deleted log was the last one
+        if (typeof autoFillSmartTimes === 'function') autoFillSmartTimes();
+        // Also refresh chips as context might have changed
+        if (typeof renderQuickActivityChips === 'function') renderQuickActivityChips();
     }
 }
 
