@@ -347,13 +347,6 @@
             <!-- Input Section -->
             <section class="add-session-section glass-panel">
                 <h2><i class="fa-solid fa-stopwatch" style="color: var(--color-computer);"></i> Log Activity</h2>
-                <div class="glass-panel" id="stopwatchPanel" style="margin-bottom: 1.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
-                    <div style="font-size: 3rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -1px; margin-bottom: 0.5rem; font-family: 'Outfit', sans-serif;" id="stopwatchDisplay">00:00:00</div>
-                    <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 1rem;" id="stopwatchLabel">Track activity in real-time</div>
-                    <button id="btnStopwatchToggle" class="btn-primary" style="width: auto; padding: 0.8rem 2rem; border-radius: 2rem; background: var(--accent-primary); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); display: inline-flex; align-items: center; gap: 0.5rem;">
-                        <i class="fa-solid fa-play"></i> Start Tracking
-                    </button>
-                </div>
 
                 <form id="addTimeLogForm">
 
@@ -903,6 +896,20 @@
                     <div id="pomoTime">25:00</div>
                     <div id="pomoModeLabel" class="pomo-mode-label">Focus</div>
                 </div>
+            </div>
+            
+            <div class="pomo-controls">
+                <button id="btnPomoPrev" class="pomo-control-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
+                <button id="btnPomoStartPause" class="pomo-control-btn main"><i class="fa-solid fa-play"></i></button>
+                <button id="btnPomoSkip" class="pomo-control-btn" title="Skip"><i class="fa-solid fa-forward"></i></button>
+            </div>
+            
+            <!-- Link to Logger -->
+            <div class="pomo-log-link" style="margin-top: 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Finished a session?</p>
+                <button id="btnLogFromPomo" class="btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 1rem;">
+                    <i class="fa-solid fa-clipboard-check"></i> Log this time
+                </button>
             </div>
 
             <!-- Controls -->
