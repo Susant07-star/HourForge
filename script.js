@@ -1392,9 +1392,21 @@ function autoFillSmartTimes() {
 }
 
 // Event listener for date change to trigger smart autofill and update suggestions
-document.getElementById('timeDateInput')?.addEventListener('change', () => {
+document.getElementById('timeDateInput')?.addEventListener('change', (e) => {
     autoFillSmartTimes();
     renderQuickActivityChips();
+    
+    // Also sync the history view to this date
+    const historyFilter = document.getElementById('historyDateFilter');
+    if (historyFilter) {
+        if (historyFilter._flatpickr) {
+            historyFilter._flatpickr.setDate(e.target.value, true);
+        } else {
+            historyFilter.value = e.target.value;
+            // manually trigger change event if needed, but flatpickr usually handles it
+            historyFilter.dispatchEvent(new Event('change')); 
+        }
+    }
 });
 
 // 2.5 Smart Note Suggestions
