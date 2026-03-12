@@ -297,6 +297,31 @@ body::after {
 
 /* CRITICAL MOBILE FIX: Prevent CSS Grid blowout. 
    Grid items default to min-width: auto and will stretch if children overflow (like scrolling chips). */
+/* View Sections */
+.view-section {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.view-section.active {
+    display: block; /* Grid is default for main-content, but block works for simple containers */
+    opacity: 1;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Ensure Pomodoro View behaves like a full page */
+.pomodoro-view {
+    min-height: 80vh;
+    width: 100%;
+}
+
+/* Keyframe for simple fade */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .main-content > *,
 .view-section > * {
     min-width: 0;
