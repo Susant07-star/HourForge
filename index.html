@@ -396,11 +396,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Short Notes <span style="font-size: 0.8em; opacity: 0.6;">(Describe what you
-                                did)</span></label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <label style="margin-bottom: 0;">Short Notes <span style="font-size: 0.8em; opacity: 0.6;">(Describe what you did)</span></label>
+                            <button type="button" id="btnClearNotes" class="btn-clear-notes" title="Clear Notes" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem; transition: all 0.2s;">
+                                <i class="fa-solid fa-xmark"></i> Clear
+                            </button>
+                        </div>
                         <textarea id="timeNotesInput"
                             placeholder="Describe what you worked on... e.g. Completed 3 problems on integration, Read chapter 5 pages 120-145..."
                             autocomplete="off" required rows="2"></textarea>
+                        <!-- Smart Note Suggestions -->
+                        <div id="smartNoteSuggestions" class="smart-note-suggestions" style="display: none; margin-top: 0.5rem; gap: 0.4rem; flex-wrap: wrap;"></div>
                     </div>
                     <button type="submit" class="btn-primary"
                         style="background: var(--color-computer); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
