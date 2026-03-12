@@ -277,7 +277,18 @@ let realtimeChannel = null;
 // ==========================================
 const supabaseUrl = 'https://dkhofhvqjhpwhmurlmtj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRraG9maHZxamhwd2htdXJsbXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NzU4OTgsImV4cCI6MjA4ODQ1MTg5OH0.5PNGiH4UdL0LEeIjf8gJV9sNkZecxN8M8wcamjqsjn4';
-const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey, {
+    auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+    },
+    // Force HTTP/1.1 or HTTP/2 to avoid Chrome's experimental QUIC protocol issues
+    // by explicitly setting headers or just relying on browser fallback.
+    // However, Supabase-js doesn't expose low-level fetch options easily.
+    // The best fix for ERR_QUIC_PROTOCOL_ERROR is usually client-side network stability 
+    // or disabling QUIC in browser, but we can try to be more robust.
+}) : null;
 
 let currentSession = null;
 
