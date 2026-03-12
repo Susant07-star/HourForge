@@ -1784,6 +1784,7 @@ function renderQuickActivityChips() {
         
         // Main content
         const contentSpan = document.createElement('span');
+        contentSpan.className = 'chip-content';
         contentSpan.innerHTML = `${icon} ${prefix}${task}`;
         chip.appendChild(contentSpan);
         
@@ -1836,7 +1837,7 @@ function renderQuickActivityChips() {
                 subjectSelect.value = '';
                 notesInput.value = '';
                 chip.classList.remove('chip-selected');
-                chip.innerHTML = `${icon} ${prefix}${task}`;
+                chip.querySelector('.chip-content').innerHTML = `${icon} ${prefix}${task}`;
                 // Recalculate intelligent durations (cleared)
                 if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
             } else {
@@ -1847,12 +1848,13 @@ function renderQuickActivityChips() {
                     const isCont = c.style.border.includes('solid'); // crude check for continue chip
                     const ic = isCont ? '<i class="fa-solid fa-forward" style="color: #fbbf24; font-size: 0.8em;"></i>' : '<i class="fa-solid fa-bolt" style="color: var(--text-secondary); font-size: 0.8em;"></i>';
                     const pre = isCont ? 'Continue: ' : '';
-                    c.innerHTML = `${ic} ${pre}${c.dataset.task}`;
+                    const cc = c.querySelector('.chip-content');
+                    if (cc) cc.innerHTML = `${ic} ${pre}${c.dataset.task}`;
                 });
                 
                 // SELECT this one
                 chip.classList.add('chip-selected');
-                chip.innerHTML = `<i class="fa-solid fa-check" style="color: #4ade80; font-size: 0.8em;"></i> ${task}`;
+                chip.querySelector('.chip-content').innerHTML = `<i class="fa-solid fa-check" style="color: #4ade80; font-size: 0.8em;"></i> ${task}`;
                 
                 // Fill form
                 taskInput.value = task;
@@ -2093,17 +2095,11 @@ function renderTimeLogs() {
         if (log.notes) {
             notesHtml = `<div class="tl-notes"><i class="fa-solid fa-quote-left" style="opacity:0.5; margin-right:5px;"></i> ${log.notes}</div>`;
         }
-        let actionBtnsHtml = '';
-        if (log.createdAt) {
-            const diffMins = (Date.now() - new Date(log.createdAt).getTime()) / (1000 * 60);
-            if (diffMins <= 5) {
-                actionBtnsHtml = `
-                    <div class="tl-action-btns" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                        <button class="btn-edit" title="Edit this log" onclick="editTimeLog('${log.id}')" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                        <button class="btn-delete" title="Undo Log (Valid for 5 mins)" onclick="deleteTimeLog('${log.id}')" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fa-solid fa-trash-can"></i> Delete</button>
-                    </div>`;
-            }
-        }
+        let actionBtnsHtml = `
+            <div class="tl-action-btns" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                <button class="btn-edit" title="Edit this log" onclick="editTimeLog('${log.id}')" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                <button class="btn-delete" title="Delete this log" onclick="deleteTimeLog('${log.id}')" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fa-solid fa-trash-can"></i> Delete</button>
+            </div>`;
 
         const subjectBadge = log.subject ? `<span style="display: inline-block; background: rgba(99,102,241,0.15); color: #a5b4fc; padding: 0.15rem 0.5rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 500; margin-left: 0.5rem;">${log.subject}</span>` : '';
 
@@ -3087,18 +3083,11 @@ function deleteTimeLog(id) {
     const log = timeLogs[logIndex];
     if (!log.createdAt) return;
 
-    const diffMins = (Date.now() - new Date(log.createdAt).getTime()) / (1000 * 60);
-
-    if (diffMins <= 5) {
-        if (confirm(`Are you sure you want to delete the time log for "${log.task}"?`)) {
-            timeLogs.splice(logIndex, 1);
-            saveToLocalStorage();
-            renderTimeLogs();
-            autoBackupSync();
-        }
-    } else {
-        alert("Delete window (5 minutes) has expired for this log. To wipe data completely, import an empty backup file.");
-        renderTimeLogs(); // Re-render to clear the button
+    if (confirm(`Are you sure you want to delete the time log for "${log.task}"?`)) {
+        timeLogs.splice(logIndex, 1);
+        saveToLocalStorage();
+        renderTimeLogs();
+        autoBackupSync();
     }
 }
 
