@@ -1836,6 +1836,9 @@ function renderQuickActivityChips() {
                 taskInput.value = '';
                 subjectSelect.value = '';
                 notesInput.value = '';
+                // Trigger visibility check for clear button immediately
+                if (typeof updateClearBtnVisibility === 'function') updateClearBtnVisibility();
+                
                 chip.classList.remove('chip-selected');
                 chip.querySelector('.chip-content').innerHTML = `${icon} ${prefix}${task}`;
                 // Recalculate intelligent durations (cleared)
@@ -1859,7 +1862,11 @@ function renderQuickActivityChips() {
                 // Fill form
                 taskInput.value = task;
                 subjectSelect.value = subject;
-                if (note && note !== 'undefined') notesInput.value = note;
+                if (note && note !== 'undefined') {
+                    notesInput.value = note;
+                    // Trigger visibility check for clear button immediately
+                    if (typeof updateClearBtnVisibility === 'function') updateClearBtnVisibility();
+                }
 
                 // Update End Time to NOW
                 if (endInput) {
