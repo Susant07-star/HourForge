@@ -852,10 +852,10 @@ main#hourLogView.active {
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
-    padding: 0.4rem 0.8rem;
+    padding: 0.3rem 0.6rem;
     border-radius: 0.75rem;
     font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     cursor: pointer;
     transition: all 0.2s;
     flex-shrink: 0;
@@ -1732,8 +1732,8 @@ main#hourLogView.active {
     }
 
     .btn-duration {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.65rem;
     }
 
     /* Dashboard top widgets: collapse to single column on mobile */
