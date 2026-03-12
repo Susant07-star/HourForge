@@ -1100,7 +1100,7 @@ tableView.addEventListener('touchend', e => {
 function calcCurrentStreak() {
     if (!timeLogs || timeLogs.length === 0) return 0;
     // Get unique study days sorted descending
-    const days = [...new Set(timeLogs.map(l => l.date))].sort().reverse();
+    const days = [...new Set(timeLogs.filter(l => !l.deleted).map(l => l.date))].sort().reverse();
     let streak = 0;
     let expected = getLocalDateStr(new Date());
     for (const day of days) {
@@ -1244,7 +1244,7 @@ document.getElementById('timeTaskInput').addEventListener('input', (e) => {
     }
 
     // Check personal history first
-    const historicalMatch = timeLogs.find(log => log.task.toLowerCase() === taskName && log.subject);
+    const historicalMatch = timeLogs.find(log => !log.deleted && log.task.toLowerCase() === taskName && log.subject);
     if (historicalMatch) {
         subjectSelect.value = historicalMatch.subject;
         return;
@@ -1276,18 +1276,30 @@ function autoFillSmartTimes() {
     // Use the currently selected log date (backfill-friendly), falling back to today
     const targetDateStr = (dateInput && dateInput.value) ? dateInput.value : getLocalDateStr();
     const targetLogs = timeLogs
-        .filter(log => log.date === targetDateStr)
+        .filter(log => !log.deleted && log.date === targetDateStr)
         .sort((a, b) => b.endTime.localeCompare(a.endTime));
 
     if (targetLogs.length > 0) {
         // Snap exactly to end of last session for that date
-        startInput.value = targetLogs[0].endTime;
+        if (startInput._flatpickr) {
+            startInput._flatpickr.setDate(targetLogs[0].endTime, true);
+        } else {
+            startInput.value = targetLogs[0].endTime;
+        }
     } else {
         // No logs yet for that date: default to 1 hour ago
         const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000));
-        startInput.value = `${String(oneHourAgo.getHours()).padStart(2, '0')}:${String(oneHourAgo.getMinutes()).padStart(2, '0')}`;
+        const defaultStart = `${String(oneHourAgo.getHours()).padStart(2, '0')}:${String(oneHourAgo.getMinutes()).padStart(2, '0')}`;
+        if (startInput._flatpickr) {
+            startInput._flatpickr.setDate(defaultStart, true);
+        } else {
+            startInput.value = defaultStart;
+        }
     }
 }
+
+// Event listener for date change to trigger smart autofill
+document.getElementById('timeDateInput')?.addEventListener('change', autoFillSmartTimes);
 
 // 3. Quick-Duration Buttons (Ultra-Intelligent Auto-Scaling)
 function renderIntelligentDurations(currentTask = '') {
@@ -1530,6 +1542,7 @@ addTimeLogForm.addEventListener('submit', (e) => {
                 duration: beforeMidnightHours,
                 notes: notes,
                 createdAt: now,
+                updatedAt: now,
                 overnightGroup: overnightGroupId,
                 overnightTotal: totalOvernightHours,
                 overnightOriginalStart: startTimeStr,
@@ -1549,6 +1562,7 @@ addTimeLogForm.addEventListener('submit', (e) => {
                 duration: afterMidnightHours,
                 notes: notes + ' (continued from previous night)',
                 createdAt: now,
+                updatedAt: now,
                 overnightGroup: overnightGroupId,
                 overnightTotal: totalOvernightHours,
                 overnightOriginalStart: startTimeStr,
@@ -1569,7 +1583,8 @@ addTimeLogForm.addEventListener('submit', (e) => {
             date: dateStr,
             duration: parseFloat(durationHours),
             notes: notes,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         });
     }
 
@@ -1592,10 +1607,32 @@ addTimeLogForm.addEventListener('submit', (e) => {
     // Start time should continue from the last end time; end time should refresh to "now".
     const startEl = document.getElementById('timeStartInput');
     const endEl = document.getElementById('timeEndInput');
-    if (startEl && lastEndTimeStr) startEl.value = lastEndTimeStr;
+    
+    // Restore Date Input (handle Flatpickr if present)
+    if (dateEl) {
+        if (dateEl._flatpickr) {
+            dateEl._flatpickr.setDate(lastDateStr || getLocalDateStr(), true);
+        } else {
+            dateEl.value = lastDateStr || getLocalDateStr();
+        }
+    }
+
+    if (startEl && lastEndTimeStr) {
+        if (startEl._flatpickr) {
+            startEl._flatpickr.setDate(lastEndTimeStr, true);
+        } else {
+            startEl.value = lastEndTimeStr;
+        }
+    }
+    
     if (endEl) {
         const now = new Date();
-        endEl.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const nowStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        if (endEl._flatpickr) {
+            endEl._flatpickr.setDate(nowStr, true);
+        } else {
+            endEl.value = nowStr;
+        }
     }
 
     // Then run the smart autofill to normalize based on the selected date/history.
@@ -1628,7 +1665,7 @@ function renderTimeLogs() {
 
     let dailyTotal = 0;
 
-    const filteredLogs = timeLogs.filter(log => log.date === filterDate);
+    const filteredLogs = timeLogs.filter(log => !log.deleted && log.date === filterDate);
 
     if (filteredLogs.length === 0) {
         timeLogFeed.innerHTML = `
@@ -1919,6 +1956,9 @@ async function init() {
     if (typeof autoFillSmartTimes === 'function') autoFillSmartTimes();
     if (typeof renderQuickActivityChips === 'function') renderQuickActivityChips();
     if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
+
+    // Check for running stopwatch (persist across refreshes)
+    if (typeof checkStopwatchState === 'function') checkStopwatchState();
 
     // Premium Time/Date Pickers via Flatpickr
     // disableMobile: true FORCES Flatpickr's scroll-wheel UI on ALL devices (mobile AND desktop)
@@ -2561,6 +2601,7 @@ function handleAddSession(e) {
         topic,
         dateRead, // YYYY-MM-DD
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         revisions: {
             rev2: { done: false, completedAt: null },
             rev4: { done: false, completedAt: null },
@@ -2612,8 +2653,11 @@ function editTimeLog(id) {
     notesTextarea.style.height = 'auto';
     notesTextarea.style.height = notesTextarea.scrollHeight + 'px';
 
-    // Remove the old log entry
-    timeLogs.splice(logIndex, 1);
+    // Remove the old log entry (Soft Delete)
+    log.deleted = true;
+    log.updatedAt = new Date().toISOString();
+    // timeLogs.splice(logIndex, 1); // OLD hard delete
+    
     saveToLocalStorage();
     renderTimeLogs();
     autoBackupSync();
@@ -2679,7 +2723,11 @@ function deleteRevisionCard(event, id) {
     const sessionIndex = studySessions.findIndex(s => s.id === id);
     if (sessionIndex === -1) return;
 
-    studySessions.splice(sessionIndex, 1);
+    // Soft Delete
+    studySessions[sessionIndex].deleted = true;
+    studySessions[sessionIndex].updatedAt = new Date().toISOString();
+    // studySessions.splice(sessionIndex, 1);
+
     saveToLocalStorage();
     renderDashboard();
     renderTableView();
@@ -2726,7 +2774,7 @@ function getRevisionsDueToday() {
         return Math.round(diffTime / (1000 * 60 * 60 * 24));
     };
 
-    studySessions.forEach(session => {
+    studySessions.filter(s => !s.deleted).forEach(session => {
         // Migrate legacy boolean structure if necessary
         const rev2 = typeof session.revisions.rev2 === 'boolean' ? { done: session.revisions.rev2, completedAt: null } : session.revisions.rev2;
         const rev4 = typeof session.revisions.rev4 === 'boolean' ? { done: session.revisions.rev4, completedAt: null } : session.revisions.rev4;
@@ -2966,7 +3014,7 @@ function renderTableView() {
     revisionTableBody.innerHTML = '';
 
     // Filter by the currently selected subject tab in the table view
-    const filteredSessions = studySessions.filter(s => s.subject === currentTableSubject);
+    const filteredSessions = studySessions.filter(s => !s.deleted && s.subject === currentTableSubject);
 
     if (filteredSessions.length === 0) {
         revisionTableBody.innerHTML = `
@@ -3084,8 +3132,10 @@ document.getElementById('importFile').addEventListener('change', importBackup);
 document.getElementById('btnDisconnectBackup').addEventListener('click', disconnectBackup);
 
 function exportBackup() {
-    // 1) Export Core Study Data
-    const studyDataStr = btoa(JSON.stringify({ studySessions, timeLogs }));
+    // 1) Export Core Study Data (only active items)
+    const activeStudySessions = studySessions.filter(s => !s.deleted);
+    const activeTimeLogs = timeLogs.filter(l => !l.deleted);
+    const studyDataStr = btoa(JSON.stringify({ studySessions: activeStudySessions, timeLogs: activeTimeLogs }));
     const studyBlob = new Blob([studyDataStr], { type: 'text/plain' });
     const studyUrl = URL.createObjectURL(studyBlob);
 
@@ -3515,5 +3565,141 @@ function getFilteredLogs(period) {
 function formatDateLabel(dateStr) {
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// ==========================================
+// LIVE STOPWATCH LOGIC
+// ==========================================
+let stopwatchInterval = null;
+let stopwatchStartTime = null;
+let isStopwatchRunning = false;
+
+const stopwatchDisplay = document.getElementById('stopwatchDisplay');
+const stopwatchLabel = document.getElementById('stopwatchLabel');
+const btnStopwatchToggle = document.getElementById('btnStopwatchToggle');
+
+function formatStopwatchTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function updateStopwatch() {
+    if (!stopwatchStartTime) return;
+    const now = Date.now();
+    const elapsed = now - stopwatchStartTime;
+    if (stopwatchDisplay) stopwatchDisplay.textContent = formatStopwatchTime(elapsed);
+}
+
+function checkStopwatchState() {
+    const savedStart = localStorage.getItem('stopwatchStartTime');
+    if (savedStart) {
+        stopwatchStartTime = parseInt(savedStart);
+        isStopwatchRunning = true;
+        
+        // Resume UI state immediately
+        if (stopwatchLabel) stopwatchLabel.textContent = "Tracking in progress...";
+        if (btnStopwatchToggle) {
+            btnStopwatchToggle.innerHTML = '<i class="fa-solid fa-stop"></i> Stop & Log';
+            btnStopwatchToggle.style.background = '#ef4444'; // Red for stop
+            btnStopwatchToggle.style.boxShadow = '0 4px 15px rgba(239, 68, 68, 0.4)';
+        }
+        
+        stopwatchInterval = setInterval(updateStopwatch, 1000);
+        updateStopwatch(); // Immediate update
+    }
+}
+
+function toggleStopwatch() {
+    if (isStopwatchRunning) {
+        // STOP ACTION
+        clearInterval(stopwatchInterval);
+        isStopwatchRunning = false;
+        
+        // Remove persistence
+        localStorage.removeItem('stopwatchStartTime');
+        
+        // Update UI
+        if (stopwatchLabel) stopwatchLabel.textContent = "Stopped. Review details below.";
+        if (btnStopwatchToggle) {
+            btnStopwatchToggle.innerHTML = '<i class="fa-solid fa-play"></i> Start Tracking';
+            btnStopwatchToggle.style.background = 'var(--accent-primary)';
+            btnStopwatchToggle.style.boxShadow = '0 4px 15px rgba(99, 102, 241, 0.4)';
+        }
+        
+        // Fill Form
+        const now = new Date();
+        const start = new Date(stopwatchStartTime);
+        
+        const formatTime = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        
+        const startStr = formatTime(start);
+        const endStr = formatTime(now);
+        
+        const startInput = document.getElementById('timeStartInput');
+        const endInput = document.getElementById('timeEndInput');
+        const dateInput = document.getElementById('timeDateInput');
+        
+        if (startInput) {
+            if (startInput._flatpickr) startInput._flatpickr.setDate(startStr, true);
+            else startInput.value = startStr;
+        }
+        
+        if (endInput) {
+            if (endInput._flatpickr) endInput._flatpickr.setDate(endStr, true);
+            else endInput.value = endStr;
+        }
+        
+        // Ensure date is correct (if stopwatch ran over midnight, use start date)
+        const dateStr = getLocalDateStr(start);
+        if (dateInput) {
+            if (dateInput._flatpickr) dateInput._flatpickr.setDate(dateStr, true);
+            else dateInput.value = dateStr;
+        }
+
+        // Reset internal state
+        stopwatchStartTime = null;
+        if (stopwatchDisplay) stopwatchDisplay.textContent = "00:00:00";
+        
+        // Haptic
+        if (navigator.vibrate) navigator.vibrate([50, 50]);
+        
+        // Focus on task input
+        const taskInput = document.getElementById('timeTaskInput');
+        if (taskInput) {
+            taskInput.focus();
+            // Optional: clear previous task if needed, or keep it? 
+            // Better to keep it blank so user enters what they just did.
+            // But we can trigger intelligent durations to reset
+            if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
+        }
+
+    } else {
+        // START ACTION
+        stopwatchStartTime = Date.now();
+        isStopwatchRunning = true;
+        
+        // Persist
+        localStorage.setItem('stopwatchStartTime', stopwatchStartTime);
+        
+        stopwatchInterval = setInterval(updateStopwatch, 1000);
+        updateStopwatch();
+        
+        // Update UI
+        if (stopwatchLabel) stopwatchLabel.textContent = "Tracking in progress...";
+        if (btnStopwatchToggle) {
+            btnStopwatchToggle.innerHTML = '<i class="fa-solid fa-stop"></i> Stop & Log';
+            btnStopwatchToggle.style.background = '#ef4444'; // Red for stop
+            btnStopwatchToggle.style.boxShadow = '0 4px 15px rgba(239, 68, 68, 0.4)';
+        }
+        
+        if (navigator.vibrate) navigator.vibrate(50);
+    }
+}
+
+if (btnStopwatchToggle) {
+    btnStopwatchToggle.addEventListener('click', toggleStopwatch);
 }
 
