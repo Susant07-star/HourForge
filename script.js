@@ -1361,52 +1361,68 @@ function renderIntelligentDurations(currentTask = '') {
     // Default standard blocks if history is missing/empty
     let targetDurationsMins = [15, 30, 45, 60, 90, 120];
     
+    // If we have history, try to find patterns for THIS specific task
     if (timeLogs && timeLogs.length > 0) {
-        // Filter history by current task (or use all if empty)
-        const relevantLogs = currentTask ? timeLogs.filter(log => log.task.toLowerCase() === currentTask.toLowerCase()) : timeLogs;
+        // Filter history by current task (case-insensitive)
+        const relevantLogs = currentTask 
+            ? timeLogs.filter(log => log.task && log.task.toLowerCase() === currentTask.toLowerCase()) 
+            : [];
         
-        if (relevantLogs.length > 0) {
-            // Count frequency of durations
+        if (relevantLogs.length >= 3) {
+            // We have enough data for this specific task!
             const durationCounts = {};
             relevantLogs.forEach(log => {
                 if (!log.duration) return;
-                const mins = Math.round(log.duration * 60);
-                if (mins > 0 && mins <= 480) { // Keep sensible limits (under 8 hours)
+                // Round to nearest 5 mins to group similar durations (e.g., 43m -> 45m)
+                let mins = Math.round(log.duration * 60);
+                mins = Math.round(mins / 5) * 5; 
+                if (mins > 0 && mins <= 480) { 
                     durationCounts[mins] = (durationCounts[mins] || 0) + 1;
                 }
             });
             
-            // Sort by most frequently logged durations for this specific task
+            // Sort by frequency
             const popularMins = Object.entries(durationCounts)
-                .sort((a,b) => b[1] - a[1])
-                .map(entry => parseInt(entry[0]));
+                .sort((a,b) => b[1] - a[1]) // Sort by count descending
+                .map(entry => parseInt(entry[0]))
+                .slice(0, 4); // Take top 4 most common durations
             
             if (popularMins.length > 0) {
-                // Take top 3, then fill the rest of the array up to 5 buttons with sensible defaults
-                const intelligentSet = new Set(popularMins.slice(0, 3));
-                for (const def of [15, 30, 45, 60, 90, 120]) {
-                    if (intelligentSet.size >= 5) break;
-                    intelligentSet.add(def);
-                }
-                targetDurationsMins = Array.from(intelligentSet).sort((a,b) => a - b);
+                targetDurationsMins = popularMins.sort((a,b) => a - b);
             }
         }
     }
     
-    // Generate Button HTML (replace any static buttons so all have JS handlers)
+    // Generate Button HTML
     container.innerHTML = '';
     
     targetDurationsMins.forEach(mins => {
-        // Format beautifully (e.g., 90m -> 1.5h)
+        // Format beautifully
         let label = `+${mins}m`;
-        if (mins % 60 === 0) label = `+${mins / 60}h`;
-        else if (mins > 60) label = `+${parseFloat((mins / 60).toFixed(1))}h`;
+        if (mins >= 60) {
+            if (mins % 60 === 0) label = `+${mins / 60}h`;
+            else label = `+${parseFloat((mins / 60).toFixed(1))}h`;
+        }
         
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'btn-duration';
+        btn.className = 'btn-duration'; // Ensure CSS styles this class
+        btn.style.cssText = `
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        `;
         btn.dataset.mins = mins;
         btn.textContent = label;
+        
+        // Hover effect
+        btn.onmouseover = () => { btn.style.background = 'rgba(255, 255, 255, 0.1)'; btn.style.color = 'var(--text-primary)'; };
+        btn.onmouseout = () => { btn.style.background = 'rgba(255, 255, 255, 0.05)'; btn.style.color = 'var(--text-secondary)'; };
         
         // Attach logic
         btn.addEventListener('click', (e) => {
@@ -1414,8 +1430,9 @@ function renderIntelligentDurations(currentTask = '') {
             const startInput = document.getElementById('timeStartInput');
             const endInput = document.getElementById('timeEndInput');
             
-            // Check flatpickr instance or native value
-            const startVal = startInput._flatpickr ? startInput.value : startInput.value;
+            // Get start time
+            let startVal = startInput.value;
+            if (startInput._flatpickr) startVal = startInput.value;
             if (!startVal) return;
 
             // Calculate new end time relative to the START time box
@@ -1436,7 +1453,16 @@ function renderIntelligentDurations(currentTask = '') {
             // Brief haptic/visual feedback
             if (navigator.vibrate) navigator.vibrate(30);
             e.target.style.transform = 'scale(1.1)';
-            setTimeout(() => e.target.style.transform = 'scale(1)', 150);
+            e.target.style.background = 'var(--accent-primary)';
+            e.target.style.color = '#fff';
+            e.target.style.borderColor = 'var(--accent-primary)';
+            
+            setTimeout(() => {
+                e.target.style.transform = 'scale(1)';
+                e.target.style.background = 'rgba(255, 255, 255, 0.05)';
+                e.target.style.color = 'var(--text-secondary)';
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            }, 200);
         });
         
         container.appendChild(btn);
@@ -1575,6 +1601,7 @@ function renderQuickActivityChips() {
             const taskInput = document.getElementById('timeTaskInput');
             const subjectSelect = document.getElementById('timeSubjectInput');
             const notesInput = document.getElementById('timeNotesInput');
+            const endInput = document.getElementById('timeEndInput');
             
             const isSelected = chip.classList.contains('chip-selected');
             
@@ -1606,9 +1633,20 @@ function renderQuickActivityChips() {
                 taskInput.value = task;
                 subjectSelect.value = subject;
                 if (note && note !== 'undefined') notesInput.value = note;
+
+                // Update End Time to NOW
+                if (endInput) {
+                    const now = new Date();
+                    const nowStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                    if (endInput._flatpickr) {
+                        endInput._flatpickr.setDate(now, true);
+                    } else {
+                        endInput.value = nowStr;
+                    }
+                }
                 
-                // Trigger smart durations
-                if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
+                // Trigger smart durations for THIS task
+                if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations(task);
             }
         });
         
