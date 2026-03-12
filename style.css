@@ -93,9 +93,12 @@ body::after {
     /* Horizontal/bottom padding for desktop breathing room. */
     /* padding-top is carefully set to just clear the 56px fixed top-bar */
     padding: 0 1.5rem 1.5rem 1.5rem;
-    padding-top: 64px; /* 56px fixed top-bar + 8px gap — NEVER reduce this */
+    /* padding-top: 64px; */ 
     -webkit-overflow-scrolling: touch;
     overflow-x: hidden; /* Prevents app container from scrolling natively */
+    display: flex;
+    flex-direction: column;
+    /* min-height: 100vh; */
 
     /* ── Unified spacing token used by all view section grids ── */
     --card-gap: 1.25rem;
