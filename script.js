@@ -1438,7 +1438,7 @@ function renderIntelligentDurations(currentTask = '') {
     });
 }
 
-// 4. Quick Activity Chips
+// 4. Quick Activity Chips (Intelligent Suggestions)
 function renderQuickActivityChips() {
     const container = document.getElementById('quickActivityChips');
     if (!timeLogs || timeLogs.length === 0) {
@@ -1446,25 +1446,50 @@ function renderQuickActivityChips() {
         return;
     }
 
-    const currentHour = new Date().getHours();
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentDay = now.getDay(); // 0 (Sun) - 6 (Sat)
     
-    // Find top tasks, giving heavy 3x score multiplier to tasks historically done around THIS time of day
     const taskScores = {};
     const latestNotes = {};
     
+    // Sort logs by date descending to find the very last activity for "Continue" feature
+    // (Create a copy to avoid mutating the original timeLogs if it's not already sorted)
+    const sortedLogs = [...timeLogs].sort((a, b) => {
+        const dateA = new Date(a.date + (a.startTime ? 'T' + a.startTime : ''));
+        const dateB = new Date(b.date + (b.startTime ? 'T' + b.startTime : ''));
+        return dateB - dateA;
+    });
+    const lastLog = sortedLogs[0];
+
     timeLogs.forEach(log => {
         if (!log.task) return;
         const key = `${log.task}|${log.subject}`;
         
-        let timeBonus = 1;
+        let score = 1; // Base score per occurrence
+        
+        // 1. Time Context (Same time of day +/- 2 hours)
         if (log.startTime) {
             const logHour = parseInt(log.startTime.split(':')[0]);
-            // Calculate shortest hour distance (handling midnight wrapping)
             const hourDiff = Math.min(Math.abs(currentHour - logHour), Math.abs(currentHour + 24 - logHour), Math.abs(currentHour - 24 - logHour));
-            if (hourDiff <= 2) timeBonus = 3; // 3x weight for contextual time matches!
+            if (hourDiff <= 2) score += 4; // High weight for time relevance
+        }
+
+        // 2. Day Context (Same day of the week)
+        if (log.date) {
+            const logDate = new Date(log.date);
+            if (!isNaN(logDate.getTime())) {
+                if (logDate.getDay() === currentDay) score += 3; // High weight for weekly routine
+
+                // 3. Recency (Boost tasks done recently)
+                const diffTime = Math.abs(now - logDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                if (diffDays <= 7) score += 2; // Last week
+                if (diffDays <= 1) score += 5; // Yesterday/Today (Very strong signal)
+            }
         }
         
-        taskScores[key] = (taskScores[key] || 0) + timeBonus;
+        taskScores[key] = (taskScores[key] || 0) + score;
         
         // Store the most recent authentic note used for this task combination
         if (!latestNotes[key] && log.notes && !log.notes.startsWith('General ')) {
@@ -1472,13 +1497,40 @@ function renderQuickActivityChips() {
         }
     });
 
-    const topTasks = Object.entries(taskScores)
-        .sort((a, b) => b[1] - a[1]) // Sort by score (frequency * time-context)
-        .slice(0, 5)
+    let topTasks = Object.entries(taskScores)
+        .sort((a, b) => b[1] - a[1]) // Sort by total weighted score
+        .slice(0, 6)
         .map(entry => {
             const [task, subject] = entry[0].split('|');
-            return { task, subject, note: latestNotes[entry[0]] || `General ${task}` };
+            return { 
+                task, 
+                subject, 
+                note: latestNotes[entry[0]] || `General ${task}`,
+                isContinue: false
+            };
         });
+
+    // "Continue" Feature: Always ensure the very last task is option #1
+    if (lastLog && lastLog.task) {
+        const existingIdx = topTasks.findIndex(t => t.task === lastLog.task && t.subject === lastLog.subject);
+        
+        const continueItem = {
+            task: lastLog.task,
+            subject: lastLog.subject,
+            note: lastLog.notes || `General ${lastLog.task}`,
+            isContinue: true
+        };
+
+        if (existingIdx !== -1) {
+            // Remove it from its current position so we can prepend it
+            topTasks.splice(existingIdx, 1);
+        }
+        // Add to front
+        topTasks.unshift(continueItem);
+    }
+
+    // Limit to 6 items total
+    topTasks = topTasks.slice(0, 6);
 
     if (topTasks.length === 0) {
         container.style.display = 'none';
@@ -1486,37 +1538,80 @@ function renderQuickActivityChips() {
     }
 
     container.innerHTML = '';
-    topTasks.forEach(({task, subject, note}) => {
+    
+    // Add "Suggestions" label
+    const label = document.createElement('div');
+    label.style.width = '100%';
+    label.style.fontSize = '0.75rem';
+    label.style.color = 'var(--text-secondary)';
+    label.style.marginBottom = '0.5rem';
+    label.textContent = 'SUGGESTED FOR YOU';
+    container.appendChild(label);
+
+    topTasks.forEach(({task, subject, note, isContinue}) => {
         const chip = document.createElement('div');
         chip.className = 'chip';
+        if (isContinue) {
+            chip.style.border = '1px solid rgba(251, 191, 36, 0.4)';
+            chip.style.background = 'rgba(251, 191, 36, 0.1)';
+        }
+        
         chip.dataset.task = task;
         chip.dataset.subject = subject;
         chip.dataset.note = note;
-        chip.innerHTML = `<i class="fa-solid fa-bolt" style="color: #fbbf24; font-size: 0.8em;"></i> ${task}`;
+        
+        const icon = isContinue ? '<i class="fa-solid fa-forward" style="color: #fbbf24; font-size: 0.8em;"></i>' : '<i class="fa-solid fa-bolt" style="color: var(--text-secondary); font-size: 0.8em;"></i>';
+        const prefix = isContinue ? 'Continue: ' : '';
+        
+        chip.innerHTML = `${icon} ${prefix}${task}`;
         
         chip.addEventListener('click', () => {
             if (navigator.vibrate) navigator.vibrate(15);
             const taskInput = document.getElementById('timeTaskInput');
             const subjectSelect = document.getElementById('timeSubjectInput');
             const notesInput = document.getElementById('timeNotesInput');
-            const endInput = document.getElementById('timeEndInput');
             
             const isSelected = chip.classList.contains('chip-selected');
             
             if (isSelected) {
-                // DESELECT: clear the fields this chip filled and reset the chip UI
+                // DESELECT: clear the fields this chip filled
                 taskInput.value = '';
                 subjectSelect.value = '';
                 notesInput.value = '';
                 chip.classList.remove('chip-selected');
-                chip.innerHTML = `<i class="fa-solid fa-bolt" style="color: #fbbf24; font-size: 0.8em;"></i> ${task}`;
+                chip.innerHTML = `${icon} ${prefix}${task}`;
+                // Recalculate intelligent durations (cleared)
                 if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
             } else {
                 // DESELECT any other chip first
                 container.querySelectorAll('.chip-selected').forEach(c => {
                     c.classList.remove('chip-selected');
-                    c.innerHTML = `<i class="fa-solid fa-bolt" style="color: #fbbf24; font-size: 0.8em;"></i> ${c.dataset.task}`;
+                    // Reset text
+                    const isCont = c.style.border.includes('solid'); // crude check for continue chip
+                    const ic = isCont ? '<i class="fa-solid fa-forward" style="color: #fbbf24; font-size: 0.8em;"></i>' : '<i class="fa-solid fa-bolt" style="color: var(--text-secondary); font-size: 0.8em;"></i>';
+                    const pre = isCont ? 'Continue: ' : '';
+                    c.innerHTML = `${ic} ${pre}${c.dataset.task}`;
                 });
+                
+                // SELECT this one
+                chip.classList.add('chip-selected');
+                chip.innerHTML = `<i class="fa-solid fa-check" style="color: #4ade80; font-size: 0.8em;"></i> ${task}`;
+                
+                // Fill form
+                taskInput.value = task;
+                subjectSelect.value = subject;
+                if (note && note !== 'undefined') notesInput.value = note;
+                
+                // Trigger smart durations
+                if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
+            }
+        });
+        
+        container.appendChild(chip);
+    });
+    
+    container.style.display = 'flex';
+}
                 
                 // SELECT this chip
                 taskInput.value = task;
