@@ -718,7 +718,7 @@ async function migrateDatabaseIfNeeded() {
 // ==========================================
 
 // Ordered list of swipeable tab IDs (matches bottom nav order, excluding pomodoro)
-const SWIPE_TABS = ['dashboardView', 'tableView', 'hourLogView', 'insightsView'];
+const SWIPE_TABS = ['dashboardView', 'tableView', 'hourLogView', 'insightsView', 'pomodoroView'];
 
 // Keep old selectors alive for any existing code that references them
 const navBtns = document.querySelectorAll('.nav-btn');
@@ -775,12 +775,8 @@ function switchTab(viewId, animate = true) {
 document.querySelectorAll('.bottom-nav-item').forEach(btn => {
     btn.addEventListener('click', () => {
         const view = btn.dataset.view;
-        if (view === 'pomodoroView') {
-            const pomoBtn = document.getElementById('btnPomodoroIcon');
-            if (pomoBtn) pomoBtn.click();
-        } else {
-            switchTab(view);
-        }
+        // Pomo is now a normal tab
+        switchTab(view);
     });
 });
 
@@ -1396,15 +1392,24 @@ function renderIntelligentDurations(currentTask = '') {
             const startInput = document.getElementById('timeStartInput');
             const endInput = document.getElementById('timeEndInput');
             
-            if (!startInput.value) return;
+            // Check flatpickr instance or native value
+            const startVal = startInput._flatpickr ? startInput.value : startInput.value;
+            if (!startVal) return;
 
             // Calculate new end time relative to the START time box
-            const startParts = startInput.value.split(':');
+            const startParts = startVal.split(':');
             const startDate = new Date();
             startDate.setHours(parseInt(startParts[0]), parseInt(startParts[1]), 0, 0);
             
             const newEndDate = new Date(startDate.getTime() + (minsToAdd * 60000));
-            endInput.value = `${String(newEndDate.getHours()).padStart(2, '0')}:${String(newEndDate.getMinutes()).padStart(2, '0')}`;
+            const newEndStr = `${String(newEndDate.getHours()).padStart(2, '0')}:${String(newEndDate.getMinutes()).padStart(2, '0')}`;
+            
+            // Update input (handling Flatpickr if present)
+            if (endInput._flatpickr) {
+                endInput._flatpickr.setDate(newEndStr, true);
+            } else {
+                endInput.value = newEndStr;
+            }
             
             // Brief haptic/visual feedback
             if (navigator.vibrate) navigator.vibrate(30);
@@ -2008,8 +2013,9 @@ async function init() {
             noCalendar: true,
             dateFormat: 'H:i',       // Internal storage stays HH:mm for JS compatibility
             altInput: true,          // Show a friendly display value to the user
-            altFormat: 'h:i K',      // What the USER sees: "1:30 PM"
+            altFormat: 'h:i K',      // What the USER sees: "1:30 PM" (No seconds!)
             time_24hr: false,
+            enableSeconds: false,    // Explicitly disable seconds
             minuteIncrement: 5,
             disableMobile: false,    // Let mobile OS use its own native scroll-wheel picker
             onChange: function(selectedDates, dateStr, instance) {
@@ -2372,28 +2378,14 @@ function pomoSetMode(mode) {
     if (wasRunning) pomoStart();
 }
 
-function showPomodoroModal() {
-    const m = document.getElementById('pomodoroModal');
-    m.style.display = 'flex';
-    setTimeout(() => m.classList.add('active'), 10);
-    pomoUpdateUI();
-}
-function hidePomodoroModal() {
-    const m = document.getElementById('pomodoroModal');
-    m.classList.remove('active');
-    setTimeout(() => { m.style.display = 'none'; }, 300);
-    if (!POMO.running) document.title = 'HourForge';
-    // Mini-timer shows automatically via pomoUpdateUI if mid-session
-    pomoUpdateUI();
-}
-
-document.getElementById('btnPomodoroIcon').addEventListener('click', showPomodoroModal);
-document.getElementById('btnClosePomodoro').addEventListener('click', hidePomodoroModal);
+// Deprecated Modal Logic Removed
+// document.getElementById('btnPomodoroIcon').addEventListener('click', showPomodoroModal);
+// document.getElementById('btnClosePomodoro').addEventListener('click', hidePomodoroModal);
 
 // Clicking outside modal: if timer is running, just close to mini-timer. If not, close.
-document.getElementById('pomodoroModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('pomodoroModal')) hidePomodoroModal();
-});
+// document.getElementById('pomodoroModal').addEventListener('click', (e) => {
+//     if (e.target === document.getElementById('pomodoroModal')) hidePomodoroModal();
+// });
 
 document.getElementById('btnPomoStartPause').addEventListener('click', () => {
     POMO.running ? pomoPause() : pomoStart();
@@ -2433,70 +2425,10 @@ document.querySelectorAll('.pomo-mode-btn').forEach(btn => {
 document.getElementById('pomoMiniPlay').addEventListener('click', () => {
     POMO.running ? pomoPause() : pomoStart();
 });
-document.getElementById('pomoMiniOpen').addEventListener('click', showPomodoroModal);
+document.getElementById('pomoMiniOpen').addEventListener('click', () => switchTab('pomodoroView'));
 
-// Log from Pomodoro
-document.getElementById('btnLogFromPomo')?.addEventListener('click', () => {
-    // 1. Calculate duration (Full Duration - Remaining)
-    // Only log if we actually did something (e.g. > 1 min)
-    const elapsedSeconds = POMO.duration - POMO.remaining;
-    if (elapsedSeconds < 60) {
-        showToast('Session too short to log (< 1 min).', 'warning');
-        return;
-    }
-
-    const elapsedMinutes = Math.round(elapsedSeconds / 60);
-    
-    // 2. Hide Pomodoro Modal
-    hidePomodoroModal();
-    
-    // 3. Switch to Logger Tab
-    switchTab('hourLogView');
-    
-    // 4. Fill Form
-    const now = new Date();
-    const start = new Date(now.getTime() - (elapsedSeconds * 1000));
-    
-    const formatTime = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-    
-    const startStr = formatTime(start);
-    const endStr = formatTime(now);
-    
-    const startInput = document.getElementById('timeStartInput');
-    const endInput = document.getElementById('timeEndInput');
-    const dateInput = document.getElementById('timeDateInput');
-    const taskInput = document.getElementById('timeTaskInput');
-    const notesInput = document.getElementById('timeNotesInput');
-    
-    if (startInput) {
-        if (startInput._flatpickr) startInput._flatpickr.setDate(startStr, true);
-        else startInput.value = startStr;
-    }
-    
-    if (endInput) {
-        if (endInput._flatpickr) endInput._flatpickr.setDate(endStr, true);
-        else endInput.value = endStr;
-    }
-    
-    const dateStr = getLocalDateStr(start);
-    if (dateInput) {
-        if (dateInput._flatpickr) dateInput._flatpickr.setDate(dateStr, true);
-        else dateInput.value = dateStr;
-    }
-    
-    // Pre-fill task name based on mode
-    if (taskInput) {
-        taskInput.value = POMO.mode === 'focus' ? 'Study Session' : 'Break';
-        taskInput.focus();
-        if (typeof renderIntelligentDurations === 'function') renderIntelligentDurations();
-    }
-    
-    if (notesInput) {
-        notesInput.value = `Logged from Pomodoro Timer (${elapsedMinutes} mins)`;
-    }
-    
-    showToast('Timer data transferred to logger! 📝', 'success');
-});
+// Log from Pomodoro logic removed as requested (user wants something better)
+// document.getElementById('btnLogFromPomo')?.addEventListener('click', () => { ... });
 
 
 
