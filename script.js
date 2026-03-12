@@ -296,6 +296,20 @@ let currentSession = null;
 // SUPABASE: AUTH & CLOUD SYNC UI HANDLERS
 // ==========================================
 
+// Helper: Restore last active tab and render it immediately
+function restoreSavedTab() {
+    const savedTab = localStorage.getItem('activeTab');
+    if (savedTab && document.getElementById(savedTab)) {
+        switchTab(savedTab, false);
+        // Force immediate render of the restored view using local data
+        if (savedTab === 'hourLogView' && typeof renderTimeLogs === 'function') renderTimeLogs();
+        else if (savedTab === 'tableView' && typeof renderTableView === 'function') renderTableView();
+        else if (savedTab === 'dashboardView' && typeof renderDashboard === 'function') renderDashboard();
+    } else {
+        if (typeof renderDashboard === 'function') renderDashboard();
+    }
+}
+
 // Helper: dismisses the auth loader and shows either the gate or the app
 function resolveAuthUI(hasSession) {
     const loader = document.getElementById('authLoader');
@@ -320,6 +334,7 @@ const authFallbackTimer = setTimeout(() => {
         if (hasLocalHint) {
             if (gate) gate.style.display = 'none';
             if (app) app.style.display = 'block';
+            restoreSavedTab();
             init();
             isAppInitialized = true;
         } else {
@@ -379,6 +394,7 @@ if (supabaseClient) {
     const app = document.getElementById('mainAppContainer');
     if (gate) gate.style.display = 'none';
     if (app) app.style.display = 'block';
+    restoreSavedTab();
     setTimeout(() => {
         if (!isAppInitialized) { init(); isAppInitialized = true; }
     }, 100);
@@ -639,6 +655,7 @@ function updateAuthUI() {
     if (currentSession) {
         // User is logged in -> Hide Gate, Show App
         loginGate.style.display = 'none';
+        restoreSavedTab();
         mainAppContainer.style.display = 'block';
     } else {
         // User is logged out -> Show Gate, Hide App
@@ -1986,14 +2003,14 @@ async function init() {
     if (document.getElementById('timeDateInput')) document.getElementById('timeDateInput').value = getLocalDateStr();
     if (document.getElementById('historyDateFilter')) document.getElementById('historyDateFilter').value = getLocalDateStr();
 
-    // Restore last active tab
-    const savedTab = localStorage.getItem('activeTab');
-    if (savedTab && document.getElementById(savedTab)) {
-        switchTab(savedTab, false);
-    } else {
-        // Initial render (default to dashboard)
-        renderDashboard();
-    }
+    // Restore last active tab - HANDLED IN restoreSavedTab() BEFORE INIT
+    // const savedTab = localStorage.getItem('activeTab');
+    // if (savedTab && document.getElementById(savedTab)) {
+    //     switchTab(savedTab, false);
+    // } else {
+    //     // Initial render (default to dashboard)
+    //     renderDashboard();
+    // }
     
     // Always render these as they might be needed by other tabs
     renderTableView();
