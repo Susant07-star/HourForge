@@ -26,7 +26,14 @@ const CHART_COLORS = {
     red: { bg: 'rgba(239, 68, 68, 0.2)', border: '#ef4444' },
 };
 
-SUBJECT_CHART_COLORS = buildSubjectColors().chartColors;
+// Ensure SUBJECT_CHART_COLORS is populated even if buildSubjectColors isn't globally available yet
+// (This handles the race condition where charts.js loads before script.js defines the function)
+if (typeof buildSubjectColors === 'function') {
+    SUBJECT_CHART_COLORS = buildSubjectColors().chartColors;
+} else if (typeof SUBJECT_CHART_COLORS === 'undefined') {
+    // Fallback if script.js hasn't run yet - will be overwritten by script.js later
+    SUBJECT_CHART_COLORS = {}; 
+}
 
 // Chart.js global defaults for dark theme
 Chart.defaults.color = 'rgba(255,255,255,0.6)';
