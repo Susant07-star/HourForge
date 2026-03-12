@@ -347,6 +347,14 @@
             <!-- Input Section -->
             <section class="add-session-section glass-panel">
                 <h2><i class="fa-solid fa-stopwatch" style="color: var(--color-computer);"></i> Log Activity</h2>
+                <div class="glass-panel" id="stopwatchPanel" style="margin-bottom: 1.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div style="font-size: 3rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -1px; margin-bottom: 0.5rem; font-family: 'Outfit', sans-serif;" id="stopwatchDisplay">00:00:00</div>
+                    <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 1rem;" id="stopwatchLabel">Track activity in real-time</div>
+                    <button id="btnStopwatchToggle" class="btn-primary" style="width: auto; padding: 0.8rem 2rem; border-radius: 2rem; background: var(--accent-primary); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-play"></i> Start Tracking
+                    </button>
+                </div>
+
                 <form id="addTimeLogForm">
 
                     <div class="form-group">
