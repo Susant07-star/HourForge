@@ -1512,6 +1512,7 @@ if (clearNotesBtn) {
     clearNotesBtn.addEventListener('click', () => {
         if (noteInput) {
             noteInput.value = '';
+            noteInput.style.height = 'auto'; // Reset height
             noteInput.focus();
             updateClearBtnVisibility();
         }
