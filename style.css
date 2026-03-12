@@ -3708,7 +3708,7 @@ main#hourLogView.active {
 .app-container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    /* min-height: 100vh; */
 }
 
 .main-content.view-section,
@@ -3789,4 +3789,4 @@ main#hourLogView.active {
         -webkit-backdrop-filter: blur(12px) !important;
         background: rgba(15, 12, 41, 0.95) !important;
     }
-}
+}
