@@ -1849,6 +1849,8 @@ function renderQuickActivityChips() {
                 // Update End Time to NOW
                 if (endInput) {
                     const now = new Date();
+                    // Force seconds to 00
+                    now.setSeconds(0, 0);
                     const nowStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
                     if (endInput._flatpickr) {
                         endInput._flatpickr.setDate(now, true);
@@ -2356,7 +2358,7 @@ async function init() {
             time_24hr: false,
             enableSeconds: false,    // Explicitly disable seconds
             minuteIncrement: 1,      // Allow single minute adjustments (user feedback: 12:08 not 12:05)
-            disableMobile: false,    // Let mobile OS use its own native scroll-wheel picker
+            disableMobile: true,     // FORCE Flatpickr on mobile to prevent native clock (which might show seconds)
             onChange: function(selectedDates, dateStr, instance) {
                 instance.element.value = dateStr;
                 instance.element.dispatchEvent(new Event('input', { bubbles: true }));
