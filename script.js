@@ -1350,8 +1350,113 @@ function autoFillSmartTimes() {
     }
 }
 
-// Event listener for date change to trigger smart autofill
-document.getElementById('timeDateInput')?.addEventListener('change', autoFillSmartTimes);
+// Event listener for date change to trigger smart autofill and update suggestions
+document.getElementById('timeDateInput')?.addEventListener('change', () => {
+    autoFillSmartTimes();
+    renderQuickActivityChips();
+});
+
+// 2.5 Smart Note Suggestions
+function renderNoteSuggestions(currentTask = '') {
+    const container = document.getElementById('smartNoteSuggestions');
+    if (!container) return;
+    
+    // Clear if no task
+    if (!currentTask) {
+        container.style.display = 'none';
+        return;
+    }
+
+    const suggestions = new Set();
+    
+    // 1. Generic Templates
+    suggestions.add("Continued from previous session");
+    suggestions.add("Completed chapter/section");
+    suggestions.add("Review and practice problems");
+    
+    // 2. Context-Aware History
+    if (timeLogs && timeLogs.length > 0) {
+        // Find previous logs for this exact task
+        const relevantLogs = timeLogs
+            .filter(log => log.task && log.task.toLowerCase() === currentTask.toLowerCase() && log.notes)
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 3); // Look at last 3 entries
+            
+        relevantLogs.forEach(log => {
+            // If the note contains "Chapter X" or numbers, try to increment
+            const numberMatch = log.notes.match(/(\d+)/);
+            if (numberMatch) {
+                const nextNum = parseInt(numberMatch[0]) + 1;
+                const nextNote = log.notes.replace(numberMatch[0], nextNum);
+                suggestions.add(nextNote);
+            }
+            
+            // "Continued from [Date]"
+            if (log.date) {
+                suggestions.add(`Continued from ${log.date}`);
+            }
+        });
+    }
+
+    // Render Chips
+    container.innerHTML = '';
+    if (suggestions.size === 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    const label = document.createElement('span');
+    label.style.fontSize = '0.7rem';
+    label.style.color = 'var(--text-secondary)';
+    label.style.width = '100%';
+    label.textContent = 'Quick Notes:';
+    container.appendChild(label);
+
+    suggestions.forEach(text => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'note-chip'; // New class for CSS
+        chip.style.cssText = `
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        `;
+        chip.textContent = text;
+        
+        chip.addEventListener('click', () => {
+            const noteInput = document.getElementById('timeNotesInput');
+            // Append or replace? Let's replace if empty, append if not
+            if (noteInput.value.trim()) {
+                noteInput.value += ` | ${text}`;
+            } else {
+                noteInput.value = text;
+            }
+            noteInput.focus();
+        });
+        
+        container.appendChild(chip);
+    });
+    container.style.display = 'flex';
+}
+
+// Clear Note Button Logic
+document.getElementById('btnClearNotes')?.addEventListener('click', () => {
+    const noteInput = document.getElementById('timeNotesInput');
+    if (noteInput) {
+        noteInput.value = '';
+        noteInput.focus();
+    }
+});
+
+// Trigger note suggestions when task changes
+document.getElementById('timeTaskInput')?.addEventListener('input', (e) => {
+    renderNoteSuggestions(e.target.value.trim());
+});
 
 // 3. Quick-Duration Buttons (Ultra-Intelligent Auto-Scaling)
 function renderIntelligentDurations(currentTask = '') {
@@ -1477,9 +1582,18 @@ function renderQuickActivityChips() {
         return;
     }
 
+    // Determine context based on SELECTED date in form, not just "now"
+    const dateInput = document.getElementById('timeDateInput');
+    const selectedDateStr = (dateInput && dateInput.value) ? dateInput.value : getLocalDateStr();
+    const selectedDate = new Date(selectedDateStr);
+    
+    // If selected date is invalid or "today", use current time for context
+    // If "yesterday" or other, we can still use time-of-day but maybe weight it differently
+    const isToday = selectedDateStr === getLocalDateStr();
+    
     const now = new Date();
-    const currentHour = now.getHours();
-    const currentDay = now.getDay(); // 0 (Sun) - 6 (Sat)
+    const currentHour = now.getHours(); // Still use actual current hour for time-of-day context
+    const currentDay = selectedDate.getDay(); // Use the day of the SELECTED date (e.g. Monday)
     
     const taskScores = {};
     const latestNotes = {};
@@ -1500,7 +1614,9 @@ function renderQuickActivityChips() {
         let score = 1; // Base score per occurrence
         
         // 1. Time Context (Same time of day +/- 2 hours)
-        if (log.startTime) {
+        // Only apply strong time context if we are logging for TODAY. 
+        // If logging for past/future, time-of-day matters less than day-of-week.
+        if (isToday && log.startTime) {
             const logHour = parseInt(log.startTime.split(':')[0]);
             const hourDiff = Math.min(Math.abs(currentHour - logHour), Math.abs(currentHour + 24 - logHour), Math.abs(currentHour - 24 - logHour));
             if (hourDiff <= 2) score += 4; // High weight for time relevance
@@ -1510,11 +1626,13 @@ function renderQuickActivityChips() {
         if (log.date) {
             const logDate = new Date(log.date);
             if (!isNaN(logDate.getTime())) {
-                if (logDate.getDay() === currentDay) score += 3; // High weight for weekly routine
+                if (logDate.getDay() === currentDay) score += 3; // High weight for weekly routine (e.g. Physics on Mondays)
 
-                // 3. Recency (Boost tasks done recently)
-                const diffTime = Math.abs(now - logDate);
+                // 3. Recency (Boost tasks done recently relative to the selected date)
+                // Calculate diff between log date and selected date
+                const diffTime = Math.abs(selectedDate - logDate);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                
                 if (diffDays <= 7) score += 2; // Last week
                 if (diffDays <= 1) score += 5; // Yesterday/Today (Very strong signal)
             }
