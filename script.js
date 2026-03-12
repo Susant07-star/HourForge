@@ -1647,11 +1647,7 @@ function renderIntelligentDurations(currentTask = '') {
 // 4. Quick Activity Chips (Intelligent Suggestions)
 function renderQuickActivityChips() {
     const container = document.getElementById('quickActivityChips');
-    if (!timeLogs || timeLogs.length === 0) {
-        container.style.display = 'none';
-        return;
-    }
-
+    
     // Determine context based on SELECTED date in form
     const dateInput = document.getElementById('timeDateInput');
     const selectedDateStr = (dateInput && dateInput.value) ? dateInput.value : getLocalDateStr();
@@ -1663,97 +1659,118 @@ function renderQuickActivityChips() {
     
     const now = new Date();
     const currentHour = now.getHours(); 
-    // If not today, we don't really have a "current hour" for context, unless we assume similar time?
-    // Actually, for past dates, user is likely logging "what I did", so suggestions should match that day's routine.
     const currentDay = selectedDate.getDay(); 
     
-    const taskScores = {};
-    const latestNotes = {};
-    
-    // Sort logs by date descending to find the very last activity for "Continue" feature
-    // (Create a copy to avoid mutating the original timeLogs if it's not already sorted)
-    const sortedLogs = [...timeLogs].sort((a, b) => {
-        const dateA = new Date(a.date + (a.startTime ? 'T' + a.startTime : ''));
-        const dateB = new Date(b.date + (b.startTime ? 'T' + b.startTime : ''));
-        return dateB - dateA;
-    });
-    const lastLog = sortedLogs[0];
+    let topTasks = [];
 
-    timeLogs.forEach(log => {
-        if (!log.task) return;
-        const key = `${log.task}|${log.subject}`;
-        
-        // Filter out blacklisted suggestions
-        if (window.suggestionBlacklist && window.suggestionBlacklist.includes(key)) return;
-        
-        let score = 1; // Base score per occurrence
-        
-        // 1. Time Context (Same time of day +/- 2 hours)
-        // Only apply strong time context if we are logging for TODAY. 
-        if (isToday && log.startTime) {
-            const logHour = parseInt(log.startTime.split(':')[0]);
-            const hourDiff = Math.min(Math.abs(currentHour - logHour), Math.abs(currentHour + 24 - logHour), Math.abs(currentHour - 24 - logHour));
-            if (hourDiff <= 2) score += 4; // High weight for time relevance
-        }
+    // NEW USER EXPERIENCE: If no logs exist, show generic starter suggestions
+    if (!timeLogs || timeLogs.length === 0) {
+        // Get user's subjects (if any) or default ones
+        const subjects = getSubjects() || [];
+        const starterTasks = [
+            { task: "Reading Textbook", subject: subjects[0] || "General" },
+            { task: "Solving Problems", subject: subjects[1] || "Maths" },
+            { task: "Watching Lectures", subject: subjects[0] || "Physics" },
+            { task: "Revision", subject: "General" },
+            { task: "Sleep", subject: "Sleep" }
+        ];
 
-        // 2. Day Context (Same day of the week)
-        if (log.date) {
-            const logDate = new Date(log.date);
-            if (!isNaN(logDate.getTime())) {
-                if (logDate.getDay() === currentDay) score += 3; // High weight for weekly routine (e.g. Physics on Mondays)
+        topTasks = starterTasks.map(t => ({
+            task: t.task,
+            subject: t.subject,
+            note: "",
+            isContinue: false
+        }));
+    } else {
+        // EXISTING LOGIC for returning users...
+        const taskScores = {};
+        const latestNotes = {};
+        
+        // Sort logs by date descending to find the very last activity for "Continue" feature
+        // (Create a copy to avoid mutating the original timeLogs if it's not already sorted)
+        const sortedLogs = [...timeLogs].sort((a, b) => {
+            const dateA = new Date(a.date + (a.startTime ? 'T' + a.startTime : ''));
+            const dateB = new Date(b.date + (b.startTime ? 'T' + b.startTime : ''));
+            return dateB - dateA;
+        });
+        const lastLog = sortedLogs[0];
 
-                // 3. Recency (Boost tasks done recently relative to the selected date)
-                // Calculate diff between log date and selected date
-                const diffTime = Math.abs(selectedDate - logDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                
-                if (diffDays <= 7) score += 2; // Last week
-                if (diffDays <= 1) score += 5; // Yesterday/Today (Very strong signal)
+        timeLogs.forEach(log => {
+            if (!log.task) return;
+            const key = `${log.task}|${log.subject}`;
+            
+            // Filter out blacklisted suggestions
+            if (window.suggestionBlacklist && window.suggestionBlacklist.includes(key)) return;
+            
+            let score = 1; // Base score per occurrence
+            
+            // 1. Time Context (Same time of day +/- 2 hours)
+            // Only apply strong time context if we are logging for TODAY. 
+            if (isToday && log.startTime) {
+                const logHour = parseInt(log.startTime.split(':')[0]);
+                const hourDiff = Math.min(Math.abs(currentHour - logHour), Math.abs(currentHour + 24 - logHour), Math.abs(currentHour - 24 - logHour));
+                if (hourDiff <= 2) score += 4; // High weight for time relevance
             }
-        }
-        
-        taskScores[key] = (taskScores[key] || 0) + score;
-        
-        // Store the most recent authentic note used for this task combination
-        if (!latestNotes[key] && log.notes && !log.notes.startsWith('General ')) {
-            latestNotes[key] = log.notes;
-        }
-    });
 
-    let topTasks = Object.entries(taskScores)
-        .sort((a, b) => b[1] - a[1]) // Sort by total weighted score
-        .slice(0, 6)
-        .map(entry => {
-            const [task, subject] = entry[0].split('|');
-            return { 
-                task, 
-                subject, 
-                note: latestNotes[entry[0]] || `General ${task}`,
-                isContinue: false
-            };
+            // 2. Day Context (Same day of the week)
+            if (log.date) {
+                const logDate = new Date(log.date);
+                if (!isNaN(logDate.getTime())) {
+                    if (logDate.getDay() === currentDay) score += 3; // High weight for weekly routine (e.g. Physics on Mondays)
+
+                    // 3. Recency (Boost tasks done recently relative to the selected date)
+                    // Calculate diff between log date and selected date
+                    const diffTime = Math.abs(selectedDate - logDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    
+                    if (diffDays <= 7) score += 2; // Last week
+                    if (diffDays <= 1) score += 5; // Yesterday/Today (Very strong signal)
+                }
+            }
+            
+            taskScores[key] = (taskScores[key] || 0) + score;
+            
+            // Store the most recent authentic note used for this task combination
+            if (!latestNotes[key] && log.notes && !log.notes.startsWith('General ')) {
+                latestNotes[key] = log.notes;
+            }
         });
 
-    // "Continue" Feature: Always ensure the very last task is option #1
-    if (lastLog && lastLog.task) {
-        const existingIdx = topTasks.findIndex(t => t.task === lastLog.task && t.subject === lastLog.subject);
-        
-        const continueItem = {
-            task: lastLog.task,
-            subject: lastLog.subject,
-            note: lastLog.notes || `General ${lastLog.task}`,
-            isContinue: true
-        };
+        topTasks = Object.entries(taskScores)
+            .sort((a, b) => b[1] - a[1]) // Sort by total weighted score
+            .slice(0, 6)
+            .map(entry => {
+                const [task, subject] = entry[0].split('|');
+                return { 
+                    task, 
+                    subject, 
+                    note: latestNotes[entry[0]] || `General ${task}`,
+                    isContinue: false
+                };
+            });
 
-        if (existingIdx !== -1) {
-            // Remove it from its current position so we can prepend it
-            topTasks.splice(existingIdx, 1);
+        // "Continue" Feature: Always ensure the very last task is option #1
+        if (lastLog && lastLog.task) {
+            const existingIdx = topTasks.findIndex(t => t.task === lastLog.task && t.subject === lastLog.subject);
+            
+            const continueItem = {
+                task: lastLog.task,
+                subject: lastLog.subject,
+                note: lastLog.notes || `General ${lastLog.task}`,
+                isContinue: true
+            };
+
+            if (existingIdx !== -1) {
+                // Remove it from its current position so we can prepend it
+                topTasks.splice(existingIdx, 1);
+            }
+            // Add to front
+            topTasks.unshift(continueItem);
         }
-        // Add to front
-        topTasks.unshift(continueItem);
-    }
 
-    // Limit to 6 items total
-    topTasks = topTasks.slice(0, 6);
+        // Limit to 6 items total
+        topTasks = topTasks.slice(0, 6);
+    }
 
     if (topTasks.length === 0) {
         container.style.display = 'none';
