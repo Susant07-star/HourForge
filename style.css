@@ -93,7 +93,7 @@ body::after {
     /* Horizontal/bottom padding for desktop breathing room. */
     /* padding-top is carefully set to just clear the 56px fixed top-bar */
     padding: 0 1.5rem 1.5rem 1.5rem;
-    /* padding-top: 64px; */ 
+    padding-top: 64px; 
     -webkit-overflow-scrolling: touch;
     overflow-x: hidden; /* Prevents app container from scrolling natively */
     display: flex;

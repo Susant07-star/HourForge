@@ -1437,6 +1437,7 @@ function renderNoteSuggestions(currentTask = '') {
                 noteInput.value = text;
             }
             noteInput.focus();
+            updateClearBtnVisibility(); // Ensure button appears when chip adds text
         });
         
         container.appendChild(chip);
@@ -1445,13 +1446,28 @@ function renderNoteSuggestions(currentTask = '') {
 }
 
 // Clear Note Button Logic
-document.getElementById('btnClearNotes')?.addEventListener('click', () => {
-    const noteInput = document.getElementById('timeNotesInput');
-    if (noteInput) {
-        noteInput.value = '';
-        noteInput.focus();
+const clearNotesBtn = document.getElementById('btnClearNotes');
+const noteInput = document.getElementById('timeNotesInput');
+
+function updateClearBtnVisibility() {
+    if (clearNotesBtn && noteInput) {
+        clearNotesBtn.style.display = noteInput.value.trim().length > 0 ? 'inline-block' : 'none';
     }
-});
+}
+
+if (clearNotesBtn) {
+    clearNotesBtn.addEventListener('click', () => {
+        if (noteInput) {
+            noteInput.value = '';
+            noteInput.focus();
+            updateClearBtnVisibility();
+        }
+    });
+}
+
+if (noteInput) {
+    noteInput.addEventListener('input', updateClearBtnVisibility);
+}
 
 // Trigger note suggestions when task changes
 document.getElementById('timeTaskInput')?.addEventListener('input', (e) => {
