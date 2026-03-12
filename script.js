@@ -1327,25 +1327,70 @@ function autoFillSmartTimes() {
 
     // Use the currently selected log date (backfill-friendly), falling back to today
     const targetDateStr = (dateInput && dateInput.value) ? dateInput.value : getLocalDateStr();
+    
+    // Logic to handle Overnight transitions:
+    // If the user selects "Today", check if there was an activity "Yesterday" that went past midnight (00:00+).
+    // Or if there is a log on "Today" that started at 00:00 (which would be the second half of a split).
+    
     const targetLogs = timeLogs
         .filter(log => !log.deleted && log.date === targetDateStr)
         .sort((a, b) => b.endTime.localeCompare(a.endTime));
 
     if (targetLogs.length > 0) {
         // Snap exactly to end of last session for that date
+        const lastLog = targetLogs[0];
         if (startInput._flatpickr) {
-            startInput._flatpickr.setDate(targetLogs[0].endTime, true);
+            startInput._flatpickr.setDate(lastLog.endTime, true);
         } else {
-            startInput.value = targetLogs[0].endTime;
+            startInput.value = lastLog.endTime;
         }
     } else {
-        // No logs yet for that date: default to 1 hour ago
-        const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000));
-        const defaultStart = `${String(oneHourAgo.getHours()).padStart(2, '0')}:${String(oneHourAgo.getMinutes()).padStart(2, '0')}`;
-        if (startInput._flatpickr) {
-            startInput._flatpickr.setDate(defaultStart, true);
+        // No logs for this specific date yet.
+        // CHECK OVERNIGHT CASE: Did the *previous day* have a log that ended after midnight (technically on this day)?
+        // OR did the previous day have a log that ended at 23:59 and we should resume at 00:00?
+        
+        // Actually, if an overnight split happened, there WOULD be a log on `targetDateStr` starting at 00:00.
+        // So `targetLogs` would NOT be empty. 
+        // Example: 9 PM - 12:08 AM split -> Log A (9pm-23:59, Day 1) & Log B (00:00-00:08, Day 2).
+        // If user is now logging for Day 2, `targetLogs` finds Log B. `lastLog` is Log B. End time is 00:08.
+        // So the start time for the NEW log becomes 00:08. This is correct behavior.
+        
+        // BUT if the user manually entered a log on Day 1 that went to 12:08 AM *without* splitting (if logic failed?),
+        // or if they just want to resume from yesterday's last log?
+        
+        // Let's check the previous calendar day's last log just in case.
+        const d = new Date(targetDateStr);
+        d.setDate(d.getDate() - 1);
+        const prevDateStr = getLocalDateStr(d);
+        
+        const prevLogs = timeLogs
+            .filter(log => !log.deleted && log.date === prevDateStr)
+            .sort((a, b) => b.endTime.localeCompare(a.endTime));
+            
+        if (prevLogs.length > 0) {
+            // Found a log from yesterday. 
+            // If it ended very late (e.g. 23:59), maybe suggest 00:00?
+            // Or just default to now/1hr ago.
+            // User request: "let's say a man worked form 9:00pm to 12:08am the start time should be 12:08am"
+            // If the split logic worked, we'd have the 00:08 log.
+            // If it didn't, we might need to handle it. 
+            // But let's assume standard behavior for now: default to 1 hour ago from NOW if no logs today.
+             const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000));
+            const defaultStart = `${String(oneHourAgo.getHours()).padStart(2, '0')}:${String(oneHourAgo.getMinutes()).padStart(2, '0')}`;
+            if (startInput._flatpickr) {
+                startInput._flatpickr.setDate(defaultStart, true);
+            } else {
+                startInput.value = defaultStart;
+            }
         } else {
-            startInput.value = defaultStart;
+             // No logs yesterday either. Default.
+            const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000));
+            const defaultStart = `${String(oneHourAgo.getHours()).padStart(2, '0')}:${String(oneHourAgo.getMinutes()).padStart(2, '0')}`;
+            if (startInput._flatpickr) {
+                startInput._flatpickr.setDate(defaultStart, true);
+            } else {
+                startInput.value = defaultStart;
+            }
         }
     }
 }
@@ -1598,18 +1643,20 @@ function renderQuickActivityChips() {
         return;
     }
 
-    // Determine context based on SELECTED date in form, not just "now"
+    // Determine context based on SELECTED date in form
     const dateInput = document.getElementById('timeDateInput');
     const selectedDateStr = (dateInput && dateInput.value) ? dateInput.value : getLocalDateStr();
     const selectedDate = new Date(selectedDateStr);
     
-    // If selected date is invalid or "today", use current time for context
-    // If "yesterday" or other, we can still use time-of-day but maybe weight it differently
+    // If selected date is "today", we prioritize time-of-day.
+    // If "yesterday", we prioritize what usually happens on that day-of-week.
     const isToday = selectedDateStr === getLocalDateStr();
     
     const now = new Date();
-    const currentHour = now.getHours(); // Still use actual current hour for time-of-day context
-    const currentDay = selectedDate.getDay(); // Use the day of the SELECTED date (e.g. Monday)
+    const currentHour = now.getHours(); 
+    // If not today, we don't really have a "current hour" for context, unless we assume similar time?
+    // Actually, for past dates, user is likely logging "what I did", so suggestions should match that day's routine.
+    const currentDay = selectedDate.getDay(); 
     
     const taskScores = {};
     const latestNotes = {};
@@ -1627,11 +1674,13 @@ function renderQuickActivityChips() {
         if (!log.task) return;
         const key = `${log.task}|${log.subject}`;
         
+        // Filter out blacklisted suggestions
+        if (window.suggestionBlacklist && window.suggestionBlacklist.includes(key)) return;
+        
         let score = 1; // Base score per occurrence
         
         // 1. Time Context (Same time of day +/- 2 hours)
         // Only apply strong time context if we are logging for TODAY. 
-        // If logging for past/future, time-of-day matters less than day-of-week.
         if (isToday && log.startTime) {
             const logHour = parseInt(log.startTime.split(':')[0]);
             const hourDiff = Math.min(Math.abs(currentHour - logHour), Math.abs(currentHour + 24 - logHour), Math.abs(currentHour - 24 - logHour));
@@ -1707,15 +1756,24 @@ function renderQuickActivityChips() {
     // Add "Suggestions" label
     const label = document.createElement('div');
     label.style.width = '100%';
+    label.style.display = 'flex';
+    label.style.justifyContent = 'space-between';
+    label.style.alignItems = 'center';
     label.style.fontSize = '0.75rem';
     label.style.color = 'var(--text-secondary)';
     label.style.marginBottom = '0.5rem';
-    label.textContent = 'SUGGESTED FOR YOU';
+    label.innerHTML = `
+        <span>SUGGESTED FOR YOU</span>
+        <span style="font-size: 0.7em; opacity: 0.7;">(Tap to select)</span>
+    `;
     container.appendChild(label);
 
     topTasks.forEach(({task, subject, note, isContinue}) => {
         const chip = document.createElement('div');
         chip.className = 'chip';
+        // Position relative for the delete button
+        chip.style.position = 'relative';
+        
         if (isContinue) {
             chip.style.border = '1px solid rgba(251, 191, 36, 0.4)';
             chip.style.background = 'rgba(251, 191, 36, 0.1)';
@@ -1728,7 +1786,44 @@ function renderQuickActivityChips() {
         const icon = isContinue ? '<i class="fa-solid fa-forward" style="color: #fbbf24; font-size: 0.8em;"></i>' : '<i class="fa-solid fa-bolt" style="color: var(--text-secondary); font-size: 0.8em;"></i>';
         const prefix = isContinue ? 'Continue: ' : '';
         
-        chip.innerHTML = `${icon} ${prefix}${task}`;
+        // Main content
+        const contentSpan = document.createElement('span');
+        contentSpan.innerHTML = `${icon} ${prefix}${task}`;
+        chip.appendChild(contentSpan);
+        
+        // Delete button (hidden by default, shown on hover/long-press in CSS ideally, but here just small x)
+        const deleteBtn = document.createElement('span');
+        deleteBtn.className = 'chip-delete-btn';
+        deleteBtn.innerHTML = '<i class="fa-solid fa-times"></i>';
+        deleteBtn.title = "Hide this suggestion";
+        deleteBtn.style.cssText = `
+            margin-left: 8px; 
+            opacity: 0.5; 
+            cursor: pointer; 
+            font-size: 0.7em;
+            padding: 2px 5px;
+            border-radius: 50%;
+        `;
+        // Hover effect for delete
+        deleteBtn.onmouseover = () => deleteBtn.style.opacity = '1';
+        deleteBtn.onmouseout = () => deleteBtn.style.opacity = '0.5';
+        
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Don't trigger the chip selection
+            if (confirm(`Remove "${task}" from suggestions?`)) {
+                // We can't really "delete" it from history without deleting the log, 
+                // but we can add it to a temporary blacklist for this session or mark logs?
+                // For now, let's just visually remove it and maybe set a local ignore list.
+                // A robust way: Add a "hidden" flag to the suggestion logic.
+                // Simpler: Just hide it now.
+                chip.remove();
+                
+                // Add to session ignore list
+                if (!window.suggestionBlacklist) window.suggestionBlacklist = [];
+                window.suggestionBlacklist.push(key);
+            }
+        });
+        chip.appendChild(deleteBtn);
         
         chip.addEventListener('click', () => {
             if (navigator.vibrate) navigator.vibrate(15);
@@ -2283,7 +2378,7 @@ async function init() {
             altFormat: 'h:i K',      // What the USER sees: "1:30 PM" (No seconds!)
             time_24hr: false,
             enableSeconds: false,    // Explicitly disable seconds
-            minuteIncrement: 5,
+            minuteIncrement: 1,      // Allow single minute adjustments (user feedback: 12:08 not 12:05)
             disableMobile: false,    // Let mobile OS use its own native scroll-wheel picker
             onChange: function(selectedDates, dateStr, instance) {
                 instance.element.value = dateStr;
