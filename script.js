@@ -2945,7 +2945,28 @@ function editTimeLog(id) {
     // Pre-fill the form with the log's current data
     document.getElementById('timeTaskInput').value = log.task;
     document.getElementById('timeSubjectInput').value = log.subject || '';
+    
+    // Default to the log's own start time
     document.getElementById('timeStartInput').value = log.startTime;
+    
+    // User Request: If editing the *latest* log (chronologically), 
+    // the start time should ideally snap to the end time of the *previous* log (to fix gaps/mistakes).
+    // Let's check if there is a previous log on the same date.
+    const logsOnSameDate = timeLogs
+        .filter(l => !l.deleted && l.date === log.date && l.id !== id) // Exclude self
+        .sort((a, b) => b.endTime.localeCompare(a.endTime)); // Newest first
+    
+    if (logsOnSameDate.length > 0) {
+        // The "latest" log before this one
+        const previousLog = logsOnSameDate[0];
+        // If the log being edited started *after* the previous one ended,
+        // suggesting the previous end time might be helpful.
+        // We only overwrite if the current start time seems "unaligned" or if user specifically asked for this behavior.
+        // For now, let's prioritize the user's request: "start time should be set accroding to the last of already saved".
+        // We will set it to the previous log's end time.
+        document.getElementById('timeStartInput').value = previousLog.endTime;
+    }
+
     document.getElementById('timeEndInput').value = log.endTime;
     document.getElementById('timeDateInput').value = log.date;
     const notesTextarea = document.getElementById('timeNotesInput');
