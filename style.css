@@ -3790,3 +3790,95 @@ main#hourLogView.active {
         background: rgba(15, 12, 41, 0.95) !important;
     }
 }
+
+/* POMODORO FULLSCREEN STYLES */
+#pomodoroView.fullscreen-active {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    background: #000 !important;
+    z-index: 99999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+#pomodoroView.fullscreen-active .pomodoro-panel {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    width: 100%;
+    max-width: 1000px;
+}
+
+#pomodoroView.fullscreen-active .modal-header,
+#pomodoroView.fullscreen-active .pomo-settings-details,
+#pomodoroView.fullscreen-active .pomo-sessions {
+    display: none !important;
+}
+
+#pomodoroView.fullscreen-active .pomo-ring-wrap {
+    transform: scale(1.5);
+    margin: 3rem 0;
+}
+
+#pomodoroView.fullscreen-active .pomo-mode-bar {
+    opacity: 0.5;
+}
+
+#pomodoroView.fullscreen-active .pomo-controls {
+    transform: scale(1.2);
+    margin-top: 2rem;
+}
+
+/* Fullscreen Pomodoro View */
+#pomodoroView:fullscreen {
+    background: #0f172a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#pomodoroView:fullscreen .pomodoro-panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    width: 100vw;
+    height: 100vh;
+}
+#pomodoroView:fullscreen .pomo-ring-wrap {
+    transform: scale(1.5);
+    margin-top: 3rem;
+}
+#pomodoroView:fullscreen #bottomNav,
+#pomodoroView:fullscreen .top-bar {
+    display: none !important;
+}
+
+#pomodoroView:-webkit-full-screen {
+    background: #0f172a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#pomodoroView:-webkit-full-screen .pomodoro-panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    width: 100vw;
+    height: 100vh;
+}
+#pomodoroView:-webkit-full-screen .pomo-ring-wrap {
+    transform: scale(1.5);
+    margin-top: 3rem;
+}
+#pomodoroView:-webkit-full-screen #bottomNav,
+#pomodoroView:-webkit-full-screen .top-bar {
+    display: none !important;
+}

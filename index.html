@@ -869,26 +869,25 @@
 
             <!-- Mode selector -->
             <div class="pomo-mode-bar">
-                <button class="pomo-mode-btn active" data-mode="focus" data-duration="1500">Focus</button>
-                <button class="pomo-mode-btn" data-mode="short" data-duration="300">Short Break</button>
-                <button class="pomo-mode-btn" data-mode="long" data-duration="900">Long Break</button>
+                <button class="pomo-mode-btn active" data-mode="focus" data-duration="3000">Focus</button>
+                <button class="pomo-mode-btn" data-mode="short" data-duration="600">Break</button>
             </div>
 
             <!-- Custom time settings (Collapsible) -->
             <details class="pomo-settings-details" style="width: 100%; max-width: 400px; margin-top: 1rem; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 0.5rem 1rem;">
                 <summary style="cursor: pointer; color: var(--text-secondary); font-weight: 500; outline: none; padding: 0.5rem 0;">⚙️ Timer Settings</summary>
-                <div class="pomo-settings-row" style="margin-top: 1rem;">
-                    <div class="pomo-setting">
+                <div class="pomo-settings-row" style="margin-top: 1rem; display: flex; justify-content: space-between;">
+                    <div class="pomo-setting" style="text-align: center;">
                         <label>Focus <span class="pomo-setting-unit">min</span></label>
-                        <input type="number" id="pomoFocusMin" class="pomo-setting-input" value="25" min="1" max="120">
+                        <input type="number" id="pomoFocusMin" class="pomo-setting-input" value="50" min="1" max="120" style="width: 60px;">
                     </div>
-                    <div class="pomo-setting">
-                        <label>Short Break <span class="pomo-setting-unit">min</span></label>
-                        <input type="number" id="pomoShortMin" class="pomo-setting-input" value="5" min="1" max="60">
+                    <div class="pomo-setting" style="text-align: center;">
+                        <label>Break <span class="pomo-setting-unit">min</span></label>
+                        <input type="number" id="pomoShortMin" class="pomo-setting-input" value="10" min="1" max="60" style="width: 60px;">
                     </div>
-                    <div class="pomo-setting">
-                        <label>Long Break <span class="pomo-setting-unit">min</span></label>
-                        <input type="number" id="pomoLongMin" class="pomo-setting-input" value="15" min="1" max="60">
+                    <div class="pomo-setting" style="text-align: center;">
+                        <label>Duration <span class="pomo-setting-unit">hrs</span></label>
+                        <input type="number" id="pomoTotalHours" class="pomo-setting-input" value="4" min="1" max="10" style="width: 60px;">
                     </div>
                 </div>
             </details>
@@ -910,19 +909,15 @@
                 <button id="btnPomoPrev" class="pomo-control-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
                 <button id="btnPomoStartPause" class="pomo-control-btn main"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
                 <button id="btnPomoSkip" class="pomo-control-btn" title="Skip"><i class="fa-solid fa-forward"></i></button>
+                <button id="btnPomoFullscreen" class="pomo-control-btn" title="Full Screen" style="margin-left: 1rem;"><i class="fa-solid fa-expand"></i></button>
             </div>
 
             <!-- Session dots -->
             <div class="pomo-sessions" style="margin-top: 2rem;">
-                <div class="pomo-session-label">Sessions completed</div>
-                <div id="pomoSessionDots" class="pomo-session-dots">
-                    <span class="pomo-dot" data-idx="0"></span>
-                    <span class="pomo-dot" data-idx="1"></span>
-                    <span class="pomo-dot" data-idx="2"></span>
-                    <span class="pomo-dot" data-idx="3"></span>
-                </div>
-                <div id="pomoSessionCount" class="pomo-session-count">0 / 4</div>
+                <div class="pomo-session-label">Current Cycle</div>
+                <div id="pomoSessionCount" class="pomo-session-count" style="font-size: 1.2rem; margin-top: 0.5rem; color: var(--accent-primary);">1 of 4</div>
             </div>
+
         </div>
     </main>
 

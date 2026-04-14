@@ -3984,3 +3984,230 @@ function formatDateLabel(dateStr) {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+
+// ==========================================
+// POMODORO TIMER LOGIC
+// ==========================================
+let pomoInterval = null;
+let pomoTimeLeft = 50 * 60; // default 50 mins
+let pomoMode = 'focus'; // 'focus' or 'short'
+let isPomoRunning = false;
+let pomoCurrentCycle = 1;
+
+const pomoTimeDisplay = document.getElementById('pomoTime');
+const pomoRingFill = document.getElementById('pomoRingFill');
+const pomoSessionCount = document.getElementById('pomoSessionCount');
+const btnPomoStartPause = document.getElementById('btnPomoStartPause');
+const pomoPlayIcon = document.getElementById('pomoPlayIcon');
+const btnPomoPrev = document.getElementById('btnPomoPrev');
+const btnPomoSkip = document.getElementById('btnPomoSkip');
+const btnPomoFullscreen = document.getElementById('btnPomoFullscreen');
+
+const pomoFocusMin = document.getElementById('pomoFocusMin');
+const pomoShortMin = document.getElementById('pomoShortMin');
+const pomoTotalHours = document.getElementById('pomoTotalHours');
+
+// Audio Context
+let audioCtx = null;
+
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+function playTick() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.05);
+    
+    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.05);
+}
+
+function playRing() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.type = 'bell';
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    
+    gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 2.0);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 2.0);
+}
+
+function formatPomoTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+function getTotalCycles() {
+    let focusMin = parseInt(pomoFocusMin.value) || 50;
+    let shortMin = parseInt(pomoShortMin.value) || 10;
+    let totalHr = parseFloat(pomoTotalHours.value) || 4;
+    return Math.max(1, Math.round((totalHr * 60) / (focusMin + shortMin)));
+}
+
+function updatePomoDisplay() {
+    pomoTimeDisplay.textContent = formatPomoTime(pomoTimeLeft);
+    
+    let totalTime = pomoMode === 'focus' ? parseInt(pomoFocusMin.value) * 60 : parseInt(pomoShortMin.value) * 60;
+    let percentage = (pomoTimeLeft / totalTime);
+    let offset = 339.29 - (339.29 * percentage);
+    pomoRingFill.style.strokeDashoffset = offset;
+    
+    if (pomoMode === 'short') {
+        pomoRingFill.style.stroke = '#34d399';
+    } else {
+        pomoRingFill.style.stroke = '#ef4444';
+    }
+    
+    // Update Cycle Count
+    if (pomoSessionCount) {
+        let total = getTotalCycles();
+        pomoSessionCount.textContent = `${Math.min(pomoCurrentCycle, total)} of ${total}`;
+    }
+}
+
+function setPomoMode(mode, autoStart = false) {
+    pomoMode = mode;
+    document.querySelectorAll('.pomo-mode-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.pomo-mode-btn[data-mode="${mode}"]`).classList.add('active');
+    
+    document.getElementById('pomoModeLabel').textContent = mode === 'focus' ? 'Focus' : 'Break';
+    
+    if (mode === 'focus') {
+        pomoTimeLeft = parseInt(pomoFocusMin.value) * 60;
+    } else {
+        pomoTimeLeft = parseInt(pomoShortMin.value) * 60;
+    }
+    updatePomoDisplay();
+    startPomoTimer(autoStart); 
+}
+
+function startPomoTimer(startPlaying = true) {
+    clearInterval(pomoInterval);
+    if (!startPlaying) {
+        isPomoRunning = false;
+        pomoPlayIcon.className = 'fa-solid fa-play';
+        return;
+    }
+    
+    initAudio();
+    isPomoRunning = true;
+    pomoPlayIcon.className = 'fa-solid fa-pause';
+    
+    pomoInterval = setInterval(() => {
+        pomoTimeLeft--;
+        
+        if (pomoTimeLeft <= 10 && pomoTimeLeft > 0) {
+            playTick();
+        }
+        
+        if (pomoTimeLeft <= 0) {
+            clearInterval(pomoInterval);
+            playRing();
+            isPomoRunning = false;
+            pomoPlayIcon.className = 'fa-solid fa-play';
+            
+            // Auto transition
+            if (pomoMode === 'focus') {
+                setPomoMode('short', true);
+            } else {
+                pomoCurrentCycle++;
+                if (pomoCurrentCycle > getTotalCycles()) {
+                    // Reached end of total duration
+                    setPomoMode('focus', false);
+                    pomoCurrentCycle = 1;
+                    updatePomoDisplay();
+                } else {
+                    setPomoMode('focus', true);
+                }
+            }
+        }
+        
+        updatePomoDisplay();
+    }, 1000);
+}
+
+document.querySelectorAll('.pomo-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        setPomoMode(btn.dataset.mode, false);
+    });
+});
+
+[pomoFocusMin, pomoShortMin, pomoTotalHours].forEach(input => {
+    if(input) {
+        input.addEventListener('change', () => {
+            pomoCurrentCycle = 1;
+            setPomoMode('focus', false);
+        });
+    }
+});
+
+if (btnPomoStartPause) {
+    btnPomoStartPause.addEventListener('click', () => {
+        if (isPomoRunning) {
+            startPomoTimer(false); // Pause
+        } else {
+            startPomoTimer(true); // Play
+        }
+    });
+}
+
+if (btnPomoPrev) {
+    btnPomoPrev.addEventListener('click', () => {
+        setPomoMode(pomoMode, false); // Reset current mode
+    });
+}
+
+if (btnPomoSkip) {
+    btnPomoSkip.addEventListener('click', () => {
+        if (pomoMode === 'focus') {
+            setPomoMode('short', isPomoRunning);
+        } else {
+            pomoCurrentCycle++;
+            if (pomoCurrentCycle > getTotalCycles()) {
+                pomoCurrentCycle = 1;
+                setPomoMode('focus', false);
+            } else {
+                setPomoMode('focus', isPomoRunning);
+            }
+        }
+    });
+}
+
+if (btnPomoFullscreen) {
+    btnPomoFullscreen.addEventListener('click', () => {
+        const view = document.getElementById('pomodoroView');
+        if (!document.fullscreenElement) {
+            view.requestFullscreen().then(() => {
+                // Lock landscape on mobile
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(e => console.log('Orientation lock not supported'));
+                }
+            }).catch(e => console.log(e));
+        } else {
+            document.exitFullscreen();
+        }
+    });
+}
+
+// Initial display
+updatePomoDisplay();
