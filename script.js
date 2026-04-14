@@ -4191,8 +4191,13 @@ if (btnPomoSkip) {
 let fsIdleTimer;
 const pomodoroView = document.getElementById('pomodoroView');
 
+// Helper: returns true if we're in either native fullscreen OR CSS mobile fullscreen
+function isInFullscreen() {
+    return !!document.fullscreenElement || (pomodoroView && pomodoroView.classList.contains('is-pomo-fs'));
+}
+
 function showFsControls() {
-    pomodoroView.classList.remove('fullscreen-idle');
+    if (pomodoroView) pomodoroView.classList.remove('fullscreen-idle');
     if (pomoFullscreenControls) {
         pomoFullscreenControls.classList.remove('fs-hidden');
         pomoFullscreenControls.classList.add('fs-visible');
@@ -4200,7 +4205,7 @@ function showFsControls() {
 }
 
 function hideFsControls() {
-    pomodoroView.classList.add('fullscreen-idle');
+    if (pomodoroView) pomodoroView.classList.add('fullscreen-idle');
     if (pomoFullscreenControls) {
         pomoFullscreenControls.classList.remove('fs-visible');
         pomoFullscreenControls.classList.add('fs-hidden');
@@ -4208,26 +4213,29 @@ function hideFsControls() {
 }
 
 function resetFsIdle() {
-    if (!document.fullscreenElement) return;
+    if (!isInFullscreen()) return;
     showFsControls();
     clearTimeout(fsIdleTimer);
     fsIdleTimer = setTimeout(hideFsControls, 3000);
 }
 
 if (pomodoroView) {
-    ['mousemove', 'touchmove'].forEach(e =>
-        pomodoroView.addEventListener(e, resetFsIdle)
+    // Mouse and touch movement — show controls, start auto-hide timer
+    ['mousemove', 'touchmove'].forEach(evt =>
+        pomodoroView.addEventListener(evt, resetFsIdle, { passive: true })
     );
-    
-    pomodoroView.addEventListener('click', (e) => {
-        if (!document.fullscreenElement) return;
-        
-        // Don't toggle if clicking on a button inside the controls
-        if (e.target.closest('.pomo-ctrl-btn')) {
+
+    // Click/tap handler — works on both desktop and mobile
+    function handleFsTap(e) {
+        if (!isInFullscreen()) return;
+
+        // If tapping a control button, just reset the idle timer
+        if (e.target.closest('.pomo-ctrl-btn') || e.target.closest('#pomoFullscreenControls')) {
             resetFsIdle();
             return;
         }
 
+        // Toggle visibility on any other tap
         const isVisible = pomoFullscreenControls && pomoFullscreenControls.classList.contains('fs-visible');
         if (isVisible) {
             clearTimeout(fsIdleTimer);
@@ -4235,26 +4243,42 @@ if (pomodoroView) {
         } else {
             resetFsIdle();
         }
-    });
+    }
+
+    pomodoroView.addEventListener('click', handleFsTap);
+    // MOBILE FIX: also listen to touchend for devices where 'click' fires too late
+    pomodoroView.addEventListener('touchend', (e) => {
+        // prevent the duplicate click event on mobile
+        e.preventDefault();
+        handleFsTap(e);
+    }, { passive: false });
 }
 
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
-        pomodoroView.classList.remove('fullscreen-idle');
+        if (pomodoroView) pomodoroView.classList.remove('fullscreen-idle');
         clearTimeout(fsIdleTimer);
     } else {
         resetFsIdle();
     }
 });
 
+
 if (btnPomoFullscreen) {
     btnPomoFullscreen.addEventListener('click', () => {
+        // Try native fullscreen (desktop) first
         if (!document.fullscreenElement) {
             pomodoroView.requestFullscreen().then(() => {
                 if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('landscape').catch(() => {});
+                    screen.orientation.lock('portrait').catch(() => {});
                 }
-            }).catch(e => console.log(e));
+                resetFsIdle();
+            }).catch(() => {
+                // MOBILE FALLBACK: If native fullscreen isn't supported, use CSS class
+                pomodoroView.classList.add('is-pomo-fs');
+                document.body.classList.add('pomo-fs-active');
+                resetFsIdle();
+            });
         } else {
             document.exitFullscreen();
         }
@@ -4265,6 +4289,11 @@ if (btnFsExit) {
     btnFsExit.addEventListener('click', () => {
         if (document.fullscreenElement) {
             document.exitFullscreen();
+        } else {
+            // Mobile: remove CSS fallback fullscreen
+            pomodoroView.classList.remove('is-pomo-fs', 'fullscreen-idle');
+            document.body.classList.remove('pomo-fs-active');
+            clearTimeout(fsIdleTimer);
         }
     });
 }
