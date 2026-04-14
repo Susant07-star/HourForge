@@ -3830,21 +3830,16 @@ const pomoFullscreenControls = document.getElementById('pomoFullscreenControls')
 const btnFsExit = document.getElementById('btnFsExit');
 
 
-// ===================== WAKE LOCK =====================
-// ===================== WAKE LOCK =====================
-let noSleepVideo = null;
+// ===================== WAKE LOCK & BACKGROUND MEDIA =====================
+let bgSessionAudio = null;
 
-function initNoSleepVideo() {
-    if (noSleepVideo) return;
-    noSleepVideo = document.createElement('video');
-    noSleepVideo.setAttribute('playsinline', '');
-    noSleepVideo.setAttribute('muted', '');
-    noSleepVideo.setAttribute('loop', '');
-    noSleepVideo.style.display = 'none';
-    noSleepVideo.muted = true; // explicitly ensure it's muted
-    // Tiny empty base64 webm video
-    noSleepVideo.src = 'data:video/webm;base64,GkXfo0AgQoaBAUL3gQFC8oEEQvOBCEKCQAR3ZWJtQoeBAkKFgQIYU4BnQAABZpqAwwBA94EBqAOFPwh1fEibnImX7oOPEIOrEAAAAC8AAAEAAAAAAAAAAABBQx2B//AAB1h7hOACgQAAdY+4TgAoEAACgQAAtUAAAH2Lg4BqAAAAALsEAAgBgQIBgQEA';
-    document.body.appendChild(noSleepVideo);
+function initBgAudio() {
+    if (bgSessionAudio) return;
+    bgSessionAudio = new Audio();
+    bgSessionAudio.loop = true;
+    bgSessionAudio.muted = false; // MUST be false to register with OS MediaSession
+    // 1-second completely silent WAV file
+    bgSessionAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 }
 
 async function requestWakeLock() {
@@ -3856,12 +3851,12 @@ async function requestWakeLock() {
         }
     }
     
-    // iOS Safari fallback
-    initNoSleepVideo();
+    // Fallback & OS MediaSession Hijack
+    initBgAudio();
     try {
-        await noSleepVideo.play();
+        await bgSessionAudio.play();
     } catch(e) {
-        console.log('Video wake lock failed:', e);
+        console.log('Audio background failed:', e);
     }
 }
 
@@ -3870,8 +3865,8 @@ async function releaseWakeLock() {
         try { await wakeLock.release(); } catch(e) {}
         wakeLock = null;
     }
-    if (noSleepVideo) {
-        noSleepVideo.pause();
+    if (bgSessionAudio) {
+        bgSessionAudio.pause();
     }
 }
 
