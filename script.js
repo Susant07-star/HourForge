@@ -4189,6 +4189,7 @@ if (btnPomoSkip) {
 
 // ===================== FULLSCREEN + IDLE FADE =====================
 let fsIdleTimer;
+let _lastTouchTime = 0; // tracks last touch so mousemove guard can filter mobile synthetic events
 const pomodoroView = document.getElementById('pomodoroView');
 
 // Helper: returns true if we're in either native fullscreen OR CSS mobile fullscreen
@@ -4221,9 +4222,13 @@ function resetFsIdle() {
 
 if (pomodoroView) {
     // Desktop only: mouse movement shows controls and resets auto-hide
-    pomodoroView.addEventListener('mousemove', resetFsIdle);
-    // NOTE: touchmove intentionally removed — on mobile any slight finger wiggle
-    // after a tap was triggering resetFsIdle() and immediately re-showing controls
+    // GUARD: Mobile Chrome synthesizes a fake 'mousemove' after every touch tap
+    // which would immediately re-show controls we just hid. Ignore it.
+    pomodoroView.addEventListener('mousemove', (e) => {
+        // If a touchstart fired in the last 800ms, this is a synthetic event — skip it
+        if (Date.now() - _lastTouchTime < 800) return;
+        resetFsIdle();
+    });
 
     // Timestamp guard to prevent the same tap firing BOTH touchstart AND click
     let _lastTouchHandled = 0;
@@ -4252,7 +4257,8 @@ if (pomodoroView) {
     // Mobile: touchstart fires first — mark the time and handle it
     pomodoroView.addEventListener('touchstart', (e) => {
         if (e.touches.length !== 1) return; // ignore multi-finger
-        _lastTouchHandled = Date.now();
+        _lastTouchTime = Date.now();     // for mousemove synthetic event guard
+        _lastTouchHandled = Date.now(); // for click dedup guard
         handleFsTap(e);
     }, { passive: true });
 
