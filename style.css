@@ -4006,3 +4006,63 @@ main#hourLogView.active {
 #pomodoroView:-webkit-full-screen .header-icon-group {
     display: none !important;
 }
+
+/* ===================== MOBILE CSS FULLSCREEN FALLBACK ===================== */
+/* Used when native Fullscreen API is unavailable (iOS Safari, Android Chrome PWA) */
+body.pomo-fs-active {
+    overflow: hidden;
+}
+
+#pomodoroView.is-pomo-fs {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;  /* dynamic viewport height — avoids browser chrome */
+    z-index: 9999 !important;
+    border-radius: 0 !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Hide top nav, bottom nav, and inline settings in mobile fullscreen */
+body.pomo-fs-active #bottomNav,
+body.pomo-fs-active .top-bar,
+#pomodoroView.is-pomo-fs .pomo-mode-bar,
+#pomodoroView.is-pomo-fs .pomo-sessions,
+#pomodoroView.is-pomo-fs .pomo-settings-details,
+#pomodoroView.is-pomo-fs .btn-fullscreen-inline,
+#pomodoroView.is-pomo-fs .pomo-controls,
+#pomodoroView.is-pomo-fs .modal-header {
+    display: none !important;
+}
+
+/* Show the floating controls overlay */
+#pomodoroView.is-pomo-fs #pomoFullscreenControls {
+    display: flex !important;
+}
+
+/* Make the ring bigger in mobile fullscreen */
+#pomodoroView.is-pomo-fs .pomo-ring-wrap {
+    width: 280px;
+    height: 280px;
+    margin: 2rem 0;
+}
+
+#pomodoroView.is-pomo-fs .pomo-ring {
+    width: 280px;
+    height: 280px;
+}
+
+#pomodoroView.is-pomo-fs #pomoTime {
+    font-size: 4.5rem;
+}
+
+/* Idle fade in mobile fullscreen too */
+#pomodoroView.is-pomo-fs.fullscreen-idle .pomo-mode-label {
+    opacity: 0.3;
+    transition: opacity 0.5s ease;
+}
