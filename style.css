@@ -2857,7 +2857,8 @@ main#hourLogView.active {
     stroke-linecap: round;
     stroke-dasharray: 339.29;
     stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1s linear, stroke 0.4s ease;
+    transition: none;
+    /* JS adds .pomo-animate class to enable smooth drain */
 }
 
 .pomo-timer-display {
@@ -3838,113 +3839,144 @@ main#hourLogView.active {
     margin-top: 2rem;
 }
 
-/* Fullscreen Pomodoro View */
-#pomodoroView:fullscreen {
-    background: #0f172a;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-#pomodoroView:fullscreen .pomodoro-panel {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    width: 100vw;
-    height: 100vh;
-}
-#pomodoroView:fullscreen .pomo-ring-wrap {
-    width: 320px;
-    height: 320px;
-    margin: 2rem 0;
-    transform: none;
-}
-#pomodoroView:fullscreen .pomo-ring {
-    width: 320px;
-    height: 320px;
-}
-#pomodoroView:fullscreen #pomoTime {
-    font-size: 5rem;
-}
-#pomodoroView:fullscreen .pomo-mode-label {
-    font-size: 1.2rem;
-}
-#pomodoroView:fullscreen #bottomNav,
-#pomodoroView:fullscreen .top-bar,
-#pomodoroView:fullscreen .modal-header,
-#pomodoroView:fullscreen .pomo-settings-details {
-    display: none !important;
+/* ==========================================
+   FULLSCREEN POMODORO — YouTube-style
+   ========================================== */
+
+/* Smooth ring animation only when running (added via JS) */
+.pomo-ring-fill.pomo-animate {
+    transition: stroke-dashoffset 1s linear, stroke 0.3s ease !important;
 }
 
+/* Fullscreen wrapper: dark canvas, flex-centered */
+#pomodoroView:fullscreen,
 #pomodoroView:-webkit-full-screen {
-    background: #0f172a;
-    display: flex;
+    background: #090c14;
+    display: flex !important;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
-#pomodoroView:-webkit-full-screen .pomodoro-panel {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    width: 100vw;
-    height: 100vh;
-}
-#pomodoroView:-webkit-full-screen .pomo-ring-wrap {
-    width: 320px;
-    height: 320px;
-    margin: 2rem 0;
-    transform: none;
-}
-#pomodoroView:-webkit-full-screen .pomo-ring {
-    width: 320px;
-    height: 320px;
-}
-#pomodoroView:-webkit-full-screen #pomoTime {
-    font-size: 5rem;
-}
-#pomodoroView:-webkit-full-screen .pomo-mode-label {
-    font-size: 1.2rem;
-}
-#pomodoroView:-webkit-full-screen #bottomNav,
+
+/* Hide everything except the ring, time, and floating controls */
+#pomodoroView:fullscreen .top-bar,
+#pomodoroView:fullscreen #bottomNav,
+#pomodoroView:fullscreen .pomo-mode-bar,
+#pomodoroView:fullscreen .pomo-settings-details,
+#pomodoroView:fullscreen .modal-header,
 #pomodoroView:-webkit-full-screen .top-bar,
-#pomodoroView:-webkit-full-screen .modal-header,
-#pomodoroView:-webkit-full-screen .pomo-settings-details {
+#pomodoroView:-webkit-full-screen #bottomNav,
+#pomodoroView:-webkit-full-screen .pomo-mode-bar,
+#pomodoroView:-webkit-full-screen .pomo-settings-details,
+#pomodoroView:-webkit-full-screen .modal-header {
     display: none !important;
 }
 
-
-#pomodoroView.fullscreen-idle .pomo-mode-bar,
-#pomodoroView.fullscreen-idle .pomo-controls,
-#pomodoroView.fullscreen-idle .pomo-sessions,
-#pomodoroView.fullscreen-idle .pomo-settings-details,
-#pomodoroView.fullscreen-idle .modal-header {
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transition: opacity 0.5s ease;
+/* Strip the panel card styling */
+#pomodoroView:fullscreen .pomodoro-panel,
+#pomodoroView:-webkit-full-screen .pomodoro-panel {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 100vh !important;
+    position: relative !important;
 }
 
-#pomodoroView .pomo-mode-bar,
-#pomodoroView .pomo-controls,
-#pomodoroView .pomo-sessions,
-#pomodoroView .pomo-settings-details,
-#pomodoroView .modal-header {
-    transition: opacity 0.3s ease;
-    opacity: 1;
+/* Large centered ring */
+#pomodoroView:fullscreen .pomo-ring-wrap,
+#pomodoroView:-webkit-full-screen .pomo-ring-wrap {
+    width: 280px !important;
+    height: 280px !important;
+    margin: 0 auto !important;
+    transform: none !important;
+    position: relative !important;
 }
 
-.btn-fullscreen-toggle {
-    position: absolute;
-    right: 1.5rem;
-    top: 1.5rem;
-    z-index: 1000;
+#pomodoroView:fullscreen .pomo-ring,
+#pomodoroView:-webkit-full-screen .pomo-ring {
+    width: 280px !important;
+    height: 280px !important;
 }
-/* Ensure sessions and details show in fullscreen but fade out idle */
-#pomodoroView:fullscreen .pomo-settings-details, 
-#pomodoroView:fullscreen .modal-header,
-#pomodoroView:fullscreen .pomo-sessions {
-    display: flex !important; 
+
+#pomodoroView:fullscreen #pomoTime,
+#pomodoroView:-webkit-full-screen #pomoTime {
+    font-size: 5.5rem !important;
 }
-#pomodoroView:-webkit-full-screen .pomo-settings-details, 
-#pomodoroView:-webkit-full-screen .modal-header,
+
+#pomodoroView:fullscreen .pomo-mode-label,
+#pomodoroView:-webkit-full-screen .pomo-mode-label {
+    font-size: 1rem !important;
+    letter-spacing: 3px !important;
+}
+
+/* Session cycle below the ring */
+#pomodoroView:fullscreen .pomo-sessions,
 #pomodoroView:-webkit-full-screen .pomo-sessions {
     display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    margin-top: 1.5rem !important;
 }
+
+/* ---- Floating controls overlay (YouTube style) ---- */
+#pomoFullscreenControls {
+    position: fixed;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    display: none; /* only shown in fullscreen */
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 3rem;
+    padding: 0.9rem 2.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+#pomoFullscreenControls.fs-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+#pomoFullscreenControls.fs-hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
+}
+
+/* Hide normal controls in fullscreen */
+#pomodoroView:fullscreen .pomo-controls,
+#pomodoroView:-webkit-full-screen .pomo-controls {
+    display: none !important;
+}
+
+/* Show floating controls div only in fullscreen */
+:fullscreen #pomoFullscreenControls,
+:-webkit-full-screen #pomoFullscreenControls {
+    display: flex !important;
+}
+
+/* Idle fade: hide floating controls after 3s inactivity */
+#pomodoroView.fullscreen-idle #pomoFullscreenControls {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(-50%) translateY(20px) !important;
+}
+
