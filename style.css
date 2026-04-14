@@ -3890,11 +3890,13 @@ main#hourLogView.active {
     background: radial-gradient(circle at center, rgba(52, 211, 153, 0.15) 0%, #0f172a 70%);
 }
 #pomodoroView:fullscreen .pomodoro-panel {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    width: 100vw;
-    height: 100vh;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 #pomodoroView:fullscreen .pomo-ring-wrap {
     width: 320px;
@@ -3930,11 +3932,13 @@ main#hourLogView.active {
     cursor: pointer;
 }
 #pomodoroView:-webkit-full-screen .pomodoro-panel {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    width: 100vw;
-    height: 100vh;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 #pomodoroView:-webkit-full-screen .pomo-ring-wrap {
     width: 320px;
