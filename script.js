@@ -4026,6 +4026,7 @@ const pomoFsPlayIcon = document.getElementById('pomoFsPlayIcon');
 const btnFsSkip = document.getElementById('btnFsSkip');
 const fsCycleText = document.getElementById('fsCycleText');
 const pomoFullscreenControls = document.getElementById('pomoFullscreenControls');
+const btnFsExit = document.getElementById('btnFsExit');
 
 
 // ===================== WAKE LOCK =====================
@@ -4390,6 +4391,14 @@ if (btnPomoFullscreen) {
                 }
             }).catch(e => console.log(e));
         } else {
+            document.exitFullscreen();
+        }
+    });
+}
+
+if (btnFsExit) {
+    btnFsExit.addEventListener('click', () => {
+        if (document.fullscreenElement) {
             document.exitFullscreen();
         }
     });

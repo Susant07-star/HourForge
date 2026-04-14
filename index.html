@@ -862,10 +862,10 @@
 
     <!-- =================== POMODORO MODAL (Converted to Tab) =================== -->
     <main id="pomodoroView" class="view-section pomodoro-view">
-        <div class="glass-panel pomodoro-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
-            <div class="modal-header" style="width: 100%; justify-content: center; margin-bottom: 2rem;">
-                <h2><i class="fa-solid fa-hourglass-half" style="color:#ef4444;"></i> Pomodoro Timer</h2>
-                <button id="btnPomoFullscreen" class="btn-fullscreen-toggle modal-close-btn" title="Full Screen"><i class="fa-solid fa-expand"></i></button>
+        <div class="glass-panel pomodoro-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; position: relative; padding-top: 1.5rem;">
+            <button id="btnPomoFullscreen" class="btn-fullscreen-toggle" title="Full Screen" style="position: absolute; top: 1.5rem; right: 1.5rem;"><i class="fa-solid fa-expand"></i></button>
+            <div class="modal-header" style="width: 100%; justify-content: center; margin-bottom: 1rem; border-bottom: none; padding-bottom: 0;">
+                <h2 style="margin: 0;"><i class="fa-solid fa-hourglass-half" style="color:#ef4444;"></i> Pomodoro Timer</h2>
             </div>
 
             <!-- Mode selector -->
@@ -915,18 +915,19 @@
             </div>
 
             <!-- Session dots -->
-            <div class="pomo-sessions" style="margin-top: 2rem;">
+            <div class="pomo-sessions" style="margin-top: 1rem;">
                 <div class="pomo-session-label">Current Cycle</div>
-                <div id="pomoSessionCount" class="pomo-session-count" style="font-size: 1.2rem; margin-top: 0.5rem; color: var(--accent-primary);">1 of 4</div>
+                <div id="pomoSessionCount" class="pomo-session-count" style="font-size: 1.2rem; margin-top: 0.3rem; color: var(--accent-primary);">1 of 4</div>
             </div>
 
 
             <!-- ========= FULLSCREEN FLOATING CONTROLS ========= -->
             <div id="pomoFullscreenControls" class="fs-visible">
+                <div class="fs-cycle-text" id="fsCycleText" style="margin-left: 0; margin-right: 1.5rem;">1 of 4</div>
                 <button id="btnFsPrev" class="pomo-ctrl-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
                 <button id="btnFsPlayPause" class="pomo-ctrl-btn pomo-main-btn"><i class="fa-solid fa-play" id="pomoFsPlayIcon"></i></button>
                 <button id="btnFsSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward"></i></button>
-                <div class="fs-cycle-text" id="fsCycleText">1 of 4</div>
+                <button id="btnFsExit" class="pomo-ctrl-btn" title="Exit Full Screen" style="margin-left: 1.5rem;"><i class="fa-solid fa-compress"></i></button>
             </div>
         </div>
     </main>
