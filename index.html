@@ -865,12 +865,14 @@
         <div class="glass-panel pomodoro-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
             <div class="modal-header" style="width: 100%; justify-content: center; margin-bottom: 2rem;">
                 <h2><i class="fa-solid fa-hourglass-half" style="color:#ef4444;"></i> Pomodoro Timer</h2>
+                <button id="btnPomoFullscreen" class="btn-fullscreen-toggle modal-close-btn" title="Full Screen"><i class="fa-solid fa-expand"></i></button>
             </div>
 
             <!-- Mode selector -->
             <div class="pomo-mode-bar">
                 <button class="pomo-mode-btn active" data-mode="focus" data-duration="3000">Focus</button>
                 <button class="pomo-mode-btn" data-mode="short" data-duration="600">Break</button>
+                <button class="pomo-mode-btn" id="btnToggleRing" title="Toggle Ring Style"><i class="fa-solid fa-bullseye"></i></button>
             </div>
 
             <!-- Custom time settings (Collapsible) -->
@@ -909,7 +911,7 @@
                 <button id="btnPomoPrev" class="pomo-ctrl-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
                 <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
                 <button id="btnPomoSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward"></i></button>
-                <button id="btnPomoFullscreen" class="pomo-ctrl-btn" title="Full Screen" style="margin-left: 1rem;"><i class="fa-solid fa-expand"></i></button>
+                
             </div>
 
             <!-- Session dots -->
