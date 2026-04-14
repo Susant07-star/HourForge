@@ -3835,11 +3835,8 @@ let bgSessionAudio = null;
 
 function initBgAudio() {
     if (bgSessionAudio) return;
-    bgSessionAudio = new Audio();
-    bgSessionAudio.loop = true;
-    bgSessionAudio.muted = false; // MUST be false to register with OS MediaSession
-    // 2-second completely silent WAV file loaded from silent_audio.js
-    bgSessionAudio.src = SILENT_AUDIO_WAV;
+    bgSessionAudio = document.getElementById('bgSessionAudio');
+    if (bgSessionAudio) bgSessionAudio.muted = false; // MUST be false to register with OS MediaSession
 
     // ACTION HANDLERS ARE REQUIRED FOR THE NOTIFICATION TO APPEAR ON ANDROID/IOS!
     if ('mediaSession' in navigator) {
