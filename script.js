@@ -4225,17 +4225,17 @@ if (pomodoroView) {
         pomodoroView.addEventListener(evt, resetFsIdle, { passive: true })
     );
 
-    // Click/tap handler — works on both desktop and mobile
+    // Core toggle logic — shared between click (desktop) and touchstart (mobile)
     function handleFsTap(e) {
         if (!isInFullscreen()) return;
 
-        // If tapping a control button, just reset the idle timer
-        if (e.target.closest('.pomo-ctrl-btn') || e.target.closest('#pomoFullscreenControls')) {
+        // If tapping ON a control button or the controls panel, just reset the idle timer
+        if (e.target.closest('.pomo-ctrl-btn') || e.target.closest('#pomoFullscreenControls') || e.target.closest('button')) {
             resetFsIdle();
             return;
         }
 
-        // Toggle visibility on any other tap
+        // Toggle: tap on blank area hides/shows controls
         const isVisible = pomoFullscreenControls && pomoFullscreenControls.classList.contains('fs-visible');
         if (isVisible) {
             clearTimeout(fsIdleTimer);
@@ -4245,7 +4245,16 @@ if (pomodoroView) {
         }
     }
 
+    // Desktop: use click
     pomodoroView.addEventListener('click', handleFsTap);
+
+    // Mobile: use touchstart — fires instantly on ANY element, unlike 'click' which
+    // mobile browsers suppress on non-interactive background divs
+    pomodoroView.addEventListener('touchstart', (e) => {
+        // Only handle single-finger taps, not pinch/swipe
+        if (e.touches.length !== 1) return;
+        handleFsTap(e);
+    }, { passive: true });
 }
 
 document.addEventListener('fullscreenchange', () => {
@@ -4264,7 +4273,7 @@ if (btnPomoFullscreen) {
         if (!document.fullscreenElement) {
             pomodoroView.requestFullscreen().then(() => {
                 if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('portrait').catch(() => {});
+                    screen.orientation.lock('natural').catch(() => {});
                 }
                 resetFsIdle();
             }).catch(() => {
