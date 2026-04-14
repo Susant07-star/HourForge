@@ -3736,6 +3736,27 @@ main#hourLogView.active {
         padding-left: 0.5rem;
         padding-right: 0.5rem;
     }
+    
+    .pomodoro-panel {
+        margin-bottom: 5rem !important;
+    }
+    
+    #pomoFullscreenControls {
+        gap: 0.5rem !important;
+        padding: 0.6rem 1rem !important;
+        width: 95%;
+        max-width: 380px;
+        justify-content: space-between;
+    }
+    
+    .fs-cycle-text {
+        margin-right: 0 !important;
+        font-size: 0.95rem;
+    }
+    
+    #btnFsExit {
+        margin-left: 0 !important;
+    }
     .view-section > h2:first-child,
     .view-section > h1:first-child {
         margin-top: 0;
