@@ -4220,10 +4220,10 @@ function resetFsIdle() {
 }
 
 if (pomodoroView) {
-    // Mouse and touch movement — show controls, start auto-hide timer
-    ['mousemove', 'touchmove'].forEach(evt =>
-        pomodoroView.addEventListener(evt, resetFsIdle, { passive: true })
-    );
+    // Desktop only: mouse movement shows controls and resets auto-hide
+    pomodoroView.addEventListener('mousemove', resetFsIdle);
+    // NOTE: touchmove intentionally removed — on mobile any slight finger wiggle
+    // after a tap was triggering resetFsIdle() and immediately re-showing controls
 
     // Timestamp guard to prevent the same tap firing BOTH touchstart AND click
     let _lastTouchHandled = 0;
