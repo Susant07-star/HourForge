@@ -3910,3 +3910,41 @@ main#hourLogView.active {
 #pomodoroView:-webkit-full-screen .pomo-settings-details {
     display: none !important;
 }
+
+
+#pomodoroView.fullscreen-idle .pomo-mode-bar,
+#pomodoroView.fullscreen-idle .pomo-controls,
+#pomodoroView.fullscreen-idle .pomo-sessions,
+#pomodoroView.fullscreen-idle .pomo-settings-details,
+#pomodoroView.fullscreen-idle .modal-header {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.5s ease;
+}
+
+#pomodoroView .pomo-mode-bar,
+#pomodoroView .pomo-controls,
+#pomodoroView .pomo-sessions,
+#pomodoroView .pomo-settings-details,
+#pomodoroView .modal-header {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+
+.btn-fullscreen-toggle {
+    position: absolute;
+    right: 1.5rem;
+    top: 1.5rem;
+    z-index: 1000;
+}
+/* Ensure sessions and details show in fullscreen but fade out idle */
+#pomodoroView:fullscreen .pomo-settings-details, 
+#pomodoroView:fullscreen .modal-header,
+#pomodoroView:fullscreen .pomo-sessions {
+    display: flex !important; 
+}
+#pomodoroView:-webkit-full-screen .pomo-settings-details, 
+#pomodoroView:-webkit-full-screen .modal-header,
+#pomodoroView:-webkit-full-screen .pomo-sessions {
+    display: flex !important;
+}

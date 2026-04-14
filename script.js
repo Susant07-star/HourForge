@@ -3993,6 +3993,7 @@ let pomoTimeLeft = 50 * 60; // default 50 mins
 let pomoMode = 'focus'; // 'focus' or 'short'
 let isPomoRunning = false;
 let pomoCurrentCycle = 1;
+let isRingVisible = true;
 
 const pomoTimeDisplay = document.getElementById('pomoTime');
 const pomoRingFill = document.getElementById('pomoRingFill');
@@ -4002,6 +4003,13 @@ const pomoPlayIcon = document.getElementById('pomoPlayIcon');
 const btnPomoPrev = document.getElementById('btnPomoPrev');
 const btnPomoSkip = document.getElementById('btnPomoSkip');
 const btnPomoFullscreen = document.getElementById('btnPomoFullscreen');
+const btnToggleRing = document.getElementById('btnToggleRing');
+
+const pomoMiniTime = document.getElementById('pomoMiniTime');
+const pomoMiniLabel = document.getElementById('pomoMiniLabel');
+const pomoMiniPlay = document.getElementById('pomoMiniPlay');
+const pomoMiniPlayIcon = document.getElementById('pomoMiniPlayIcon');
+const pomoMiniTimer = document.getElementById('pomoMiniTimer');
 
 const pomoFocusMin = document.getElementById('pomoFocusMin');
 const pomoShortMin = document.getElementById('pomoShortMin');
@@ -4042,7 +4050,6 @@ function playTickCore(timeOffset) {
 
 function playTick() {
     if (!audioCtx) return;
-    // Tick 2 times per second
     playTickCore(0);
     playTickCore(0.5);
 }
@@ -4050,9 +4057,7 @@ function playTick() {
 function playRing() {
     if (!audioCtx) return;
     const time = audioCtx.currentTime;
-    
     function ringPattern(startTime, baseFreq) {
-        // "tinii nii nii" pattern
         for(let i=0; i<8; i++) {
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
@@ -4070,8 +4075,6 @@ function playRing() {
             osc.stop(startTime + (i * 0.15) + 0.15);
         }
     }
-    
-    // Play multiple times over a few seconds for longer alert
     ringPattern(time, 800);
     ringPattern(time + 1.5, 800);
     ringPattern(time + 3.0, 800);
@@ -4087,12 +4090,17 @@ function getTotalCycles() {
     let focusMin = parseInt(pomoFocusMin.value) || 50;
     let shortMin = parseInt(pomoShortMin.value) || 10;
     let totalHr = parseFloat(pomoTotalHours.value) || 4;
-    // Use floor to ensure we don't artificially bump cycle count to 5 for 4 hrs etc.
     return Math.max(1, Math.floor((totalHr * 60) / (focusMin + shortMin)));
 }
 
 function updatePomoDisplay() {
-    pomoTimeDisplay.textContent = formatPomoTime(pomoTimeLeft);
+    let formattedTime = formatPomoTime(pomoTimeLeft);
+    pomoTimeDisplay.textContent = formattedTime;
+    
+    if(pomoMiniTime) {
+        pomoMiniTime.textContent = formattedTime;
+        pomoMiniLabel.textContent = pomoMode === 'focus' ? 'Focus' : 'Break';
+    }
     
     let totalTime = pomoMode === 'focus' ? parseInt(pomoFocusMin.value) * 60 : parseInt(pomoShortMin.value) * 60;
     let percentage = (pomoTimeLeft / totalTime);
@@ -4101,11 +4109,12 @@ function updatePomoDisplay() {
     
     if (pomoMode === 'short') {
         pomoRingFill.style.stroke = '#34d399';
+        if(pomoMiniTimer) pomoMiniTimer.setAttribute('data-mode', 'short');
     } else {
         pomoRingFill.style.stroke = '#ef4444';
+        if(pomoMiniTimer) pomoMiniTimer.setAttribute('data-mode', 'focus');
     }
     
-    // Update Cycle Count
     if (pomoSessionCount) {
         let total = getTotalCycles();
         pomoSessionCount.textContent = `${Math.min(pomoCurrentCycle, total)} of ${total}`;
@@ -4115,7 +4124,8 @@ function updatePomoDisplay() {
 function setPomoMode(mode, autoStart = false) {
     pomoMode = mode;
     document.querySelectorAll('.pomo-mode-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.pomo-mode-btn[data-mode="${mode}"]`).classList.add('active');
+    let matchedBtn = document.querySelector(`.pomo-mode-btn[data-mode="${mode}"]`);
+    if(matchedBtn) matchedBtn.classList.add('active');
     
     document.getElementById('pomoModeLabel').textContent = mode === 'focus' ? 'Focus' : 'Break';
     
@@ -4133,12 +4143,14 @@ function startPomoTimer(startPlaying = true) {
     if (!startPlaying) {
         isPomoRunning = false;
         pomoPlayIcon.className = 'fa-solid fa-play';
+        if(pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
         return;
     }
     
     initAudio();
     isPomoRunning = true;
     pomoPlayIcon.className = 'fa-solid fa-pause';
+    if(pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-pause';
     
     pomoInterval = setInterval(() => {
         pomoTimeLeft--;
@@ -4152,14 +4164,13 @@ function startPomoTimer(startPlaying = true) {
             playRing();
             isPomoRunning = false;
             pomoPlayIcon.className = 'fa-solid fa-play';
+            if(pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
             
-            // Auto transition
             if (pomoMode === 'focus') {
                 setPomoMode('short', true);
             } else {
                 pomoCurrentCycle++;
                 if (pomoCurrentCycle > getTotalCycles()) {
-                    // Reached end of total duration
                     setPomoMode('focus', false);
                     pomoCurrentCycle = 1;
                     updatePomoDisplay();
@@ -4173,11 +4184,24 @@ function startPomoTimer(startPlaying = true) {
     }, 1000);
 }
 
-document.querySelectorAll('.pomo-mode-btn').forEach(btn => {
+document.querySelectorAll('.pomo-mode-btn[data-mode]').forEach(btn => {
     btn.addEventListener('click', () => {
         setPomoMode(btn.dataset.mode, false);
     });
 });
+
+if(btnToggleRing) {
+    btnToggleRing.addEventListener('click', () => {
+        isRingVisible = !isRingVisible;
+        document.querySelector('.pomo-ring').style.display = isRingVisible ? 'block' : 'none';
+        btnToggleRing.innerHTML = isRingVisible ? '<i class="fa-solid fa-bullseye"></i>' : '<i class="fa-solid fa-circle"></i>';
+        if(isRingVisible) {
+            btnToggleRing.classList.add('active');
+        } else {
+            btnToggleRing.classList.remove('active');
+        }
+    });
+}
 
 [pomoFocusMin, pomoShortMin, pomoTotalHours].forEach(input => {
     if(input) {
@@ -4188,19 +4212,20 @@ document.querySelectorAll('.pomo-mode-btn').forEach(btn => {
     }
 });
 
-if (btnPomoStartPause) {
-    btnPomoStartPause.addEventListener('click', () => {
-        if (isPomoRunning) {
-            startPomoTimer(false); // Pause
-        } else {
-            startPomoTimer(true); // Play
-        }
-    });
+function toggleTimerGlobal() {
+    if (isPomoRunning) {
+        startPomoTimer(false); // Pause
+    } else {
+        startPomoTimer(true); // Play
+    }
 }
+
+if (btnPomoStartPause) btnPomoStartPause.addEventListener('click', toggleTimerGlobal);
+if (pomoMiniPlay) pomoMiniPlay.addEventListener('click', toggleTimerGlobal);
 
 if (btnPomoPrev) {
     btnPomoPrev.addEventListener('click', () => {
-        setPomoMode(pomoMode, false); // Reset current mode
+        setPomoMode(pomoMode, false);
     });
 }
 
@@ -4220,12 +4245,38 @@ if (btnPomoSkip) {
     });
 }
 
+// Full screen Idle specific logic
+let fsIdleTimer;
+const pomodoroView = document.getElementById('pomodoroView');
+
+function resetFsIdle() {
+    if(!document.fullscreenElement) return;
+    pomodoroView.classList.remove('fullscreen-idle');
+    clearTimeout(fsIdleTimer);
+    fsIdleTimer = setTimeout(() => {
+        pomodoroView.classList.add('fullscreen-idle');
+    }, 3000);
+}
+
+if(pomodoroView) {
+    pomodoroView.addEventListener('mousemove', resetFsIdle);
+    pomodoroView.addEventListener('touchstart', resetFsIdle);
+    pomodoroView.addEventListener('click', resetFsIdle);
+}
+
+document.addEventListener('fullscreenchange', () => {
+    if(!document.fullscreenElement) {
+        pomodoroView.classList.remove('fullscreen-idle');
+        clearTimeout(fsIdleTimer);
+    } else {
+        resetFsIdle();
+    }
+});
+
 if (btnPomoFullscreen) {
     btnPomoFullscreen.addEventListener('click', () => {
-        const view = document.getElementById('pomodoroView');
         if (!document.fullscreenElement) {
-            view.requestFullscreen().then(() => {
-                // Lock landscape on mobile
+            pomodoroView.requestFullscreen().then(() => {
                 if (screen.orientation && screen.orientation.lock) {
                     screen.orientation.lock('landscape').catch(e => console.log('Orientation lock not supported'));
                 }
