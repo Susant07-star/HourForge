@@ -863,7 +863,6 @@
     <!-- =================== POMODORO MODAL (Converted to Tab) =================== -->
     <main id="pomodoroView" class="view-section pomodoro-view">
         <div class="glass-panel pomodoro-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; position: relative; padding-top: 1.5rem;">
-            <button id="btnPomoFullscreen" class="btn-fullscreen-toggle" title="Full Screen" style="position: absolute; top: 1.5rem; right: 1.5rem;"><i class="fa-solid fa-expand"></i></button>
             <div class="modal-header" style="width: 100%; justify-content: center; margin-bottom: 1rem; border-bottom: none; padding-bottom: 0;">
                 <h2 style="margin: 0;"><i class="fa-solid fa-hourglass-half" style="color:#ef4444;"></i> Pomodoro Timer</h2>
             </div>
@@ -893,6 +892,10 @@
                     </div>
                 </div>
             </details>
+
+            <button id="btnPomoFullscreen" class="btn-fullscreen-inline" title="Full Screen" style="margin-top: 1.5rem; background: rgba(255,255,255,0.1); border:none; padding: 0.6rem 1.2rem; border-radius: 2rem; color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+                <i class="fa-solid fa-expand"></i> Enter Full Screen
+            </button>
 
             <!-- Timer ring -->
             <div class="pomo-ring-wrap" style="margin: 1.5rem 0;">
