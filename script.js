@@ -2591,206 +2591,6 @@ document.getElementById('btnProfileIcon')?.addEventListener('click', openProfile
 // ==========================================
 // Info Modal button was removed from the header.
 
-// ==========================================
-// POMODORO TIMER
-// ==========================================
-const POMO = {
-    interval: null,
-    mode: 'focus',      // focus | short | long
-    duration: 1500,     // seconds
-    remaining: 1500,
-    running: false,
-    sessions: 0,
-};
-
-const POMO_CIRCUMFERENCE = 339.29;
-
-const POMO_COLORS = { focus: '#ef4444', short: '#34d399', long: '#6366f1' };
-const POMO_LABELS = { focus: 'Focus', short: 'Short Break', long: 'Long Break' };
-
-// Get user-configured durations (in seconds)
-function pomoGetDuration(mode) {
-    const focusVal = parseInt(document.getElementById('pomoFocusMin')?.value || 25);
-    const shortVal = parseInt(document.getElementById('pomoShortMin')?.value || 5);
-    const longVal = parseInt(document.getElementById('pomoLongMin')?.value || 15);
-    return { focus: focusVal * 60, short: shortVal * 60, long: longVal * 60 }[mode];
-}
-
-function pomoUpdateUI() {
-    const m = Math.floor(POMO.remaining / 60);
-    const s = POMO.remaining % 60;
-    const timeStr = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-
-    // Main modal
-    document.getElementById('pomoTime').textContent = timeStr;
-    document.getElementById('pomoModeLabel').textContent = POMO_LABELS[POMO.mode];
-    document.getElementById('pomoPlayIcon').className = POMO.running ? 'fa-solid fa-pause' : 'fa-solid fa-play';
-
-    // Ring
-    const progress = POMO.remaining / POMO.duration;
-    const ringFill = document.getElementById('pomoRingFill');
-    ringFill.style.strokeDashoffset = POMO_CIRCUMFERENCE * (1 - progress);
-    ringFill.style.stroke = POMO_COLORS[POMO.mode];
-
-    // Session dots
-    document.querySelectorAll('.pomo-dot').forEach((dot, i) => {
-        dot.classList.toggle('filled', i < POMO.sessions);
-    });
-    document.getElementById('pomoSessionCount').textContent = `${POMO.sessions} / 4`;
-
-    // Mini-timer widget
-    const mini = document.getElementById('pomoMiniTimer');
-    if (POMO.running) {
-        mini.style.display = 'flex';
-        mini.dataset.mode = POMO.mode;
-        document.getElementById('pomoMiniTime').textContent = timeStr;
-        document.getElementById('pomoMiniLabel').textContent = POMO_LABELS[POMO.mode];
-        document.getElementById('pomoMiniPlayIcon').className = 'fa-solid fa-pause';
-    } else {
-        // Show widget if time is not full (mid-session paused)
-        const isMidSession = POMO.remaining < POMO.duration && POMO.remaining > 0;
-        mini.style.display = isMidSession ? 'flex' : 'none';
-        if (isMidSession) {
-            mini.dataset.mode = POMO.mode;
-            document.getElementById('pomoMiniTime').textContent = timeStr;
-            document.getElementById('pomoMiniLabel').textContent = POMO_LABELS[POMO.mode];
-            document.getElementById('pomoMiniPlayIcon').className = 'fa-solid fa-play';
-        }
-    }
-
-    // Page title
-    document.title = POMO.running ? `⏱ ${timeStr} — HourForge` : 'HourForge';
-}
-
-function pomoBeeep() {
-    try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        [0, 0.3, 0.6].forEach(delay => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.frequency.value = POMO.mode === 'focus' ? 880 : 523;
-            gain.gain.setValueAtTime(0.4, ctx.currentTime + delay);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.4);
-            osc.start(ctx.currentTime + delay);
-            osc.stop(ctx.currentTime + delay + 0.5);
-        });
-    } catch (e) { }
-}
-
-function pomoStart() {
-    if (POMO.remaining <= 0) { // reset before starting if finished
-        POMO.remaining = POMO.duration;
-    }
-    POMO.running = true;
-    POMO.interval = setInterval(() => {
-        POMO.remaining--;
-        pomoUpdateUI();
-        if (POMO.remaining <= 0) {
-            clearInterval(POMO.interval);
-            POMO.running = false;
-            pomoBeeep();
-            if (POMO.mode === 'focus') {
-                POMO.sessions = Math.min(POMO.sessions + 1, 4);
-                showToast(POMO.sessions === 4
-                    ? '🎉 4 sessions done! Take a well-earned break!'
-                    : '✅ Focus session done! Take a break.', 'success');
-            } else {
-                showToast('⏰ Break over! Ready to focus again?', 'success');
-            }
-            pomoUpdateUI();
-        }
-    }, 1000);
-    pomoUpdateUI();
-}
-
-function pomoPause() {
-    clearInterval(POMO.interval);
-    POMO.running = false;
-    pomoUpdateUI();
-}
-
-function pomoReset() {
-    clearInterval(POMO.interval);
-    POMO.running = false;
-    POMO.remaining = POMO.duration;
-    document.getElementById('pomoMiniTimer').style.display = 'none';
-    pomoUpdateUI();
-}
-
-function pomoSetMode(mode) {
-    // If already on this mode and running, do nothing (don't interrupt)
-    if (POMO.mode === mode && POMO.running) return;
-
-    const wasRunning = POMO.running;
-    clearInterval(POMO.interval);
-    POMO.running = false;
-    POMO.mode = mode;
-    POMO.duration = pomoGetDuration(mode);
-    POMO.remaining = POMO.duration;
-    if (mode === 'focus' && POMO.sessions >= 4) POMO.sessions = 0;
-    document.querySelectorAll('.pomo-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-    document.getElementById('pomoMiniTimer').style.display = 'none';
-    pomoUpdateUI();
-
-    // Auto-restart with new mode if we were already running
-    if (wasRunning) pomoStart();
-}
-
-// Deprecated Modal Logic Removed
-// document.getElementById('btnPomodoroIcon').addEventListener('click', showPomodoroModal);
-// document.getElementById('btnClosePomodoro').addEventListener('click', hidePomodoroModal);
-
-// Clicking outside modal: if timer is running, just close to mini-timer. If not, close.
-// document.getElementById('pomodoroModal').addEventListener('click', (e) => {
-//     if (e.target === document.getElementById('pomodoroModal')) hidePomodoroModal();
-// });
-
-document.getElementById('btnPomoStartPause').addEventListener('click', () => {
-    POMO.running ? pomoPause() : pomoStart();
-});
-document.getElementById('btnPomoPrev').addEventListener('click', pomoReset);
-document.getElementById('btnPomoSkip').addEventListener('click', () => {
-    clearInterval(POMO.interval);
-    POMO.running = false;
-    POMO.remaining = 0;
-    if (POMO.mode === 'focus') POMO.sessions = Math.min(POMO.sessions + 1, 4);
-    pomoUpdateUI();
-    showToast('Skipped to next!', 'success');
-});
-
-document.querySelectorAll('.pomo-mode-btn').forEach(btn => {
-    btn.addEventListener('click', () => pomoSetMode(btn.dataset.mode));
-});
-
-// Custom time inputs: update duration when not running
-['pomoFocusMin', 'pomoShortMin', 'pomoLongMin'].forEach(id => {
-    document.getElementById(id)?.addEventListener('change', () => {
-        if (!POMO.running) {
-            POMO.duration = pomoGetDuration(POMO.mode);
-            POMO.remaining = POMO.duration;
-            // Also update dataset on mode buttons
-            const modeMap = { focus: 'pomoFocusMin', short: 'pomoShortMin', long: 'pomoLongMin' };
-            document.querySelectorAll('.pomo-mode-btn').forEach(btn => {
-                const dur = parseInt(document.getElementById(modeMap[btn.dataset.mode])?.value || 0);
-                btn.dataset.duration = dur * 60;
-            });
-            pomoUpdateUI();
-        }
-    });
-});
-
-// Mini-timer buttons
-document.getElementById('pomoMiniPlay').addEventListener('click', () => {
-    POMO.running ? pomoPause() : pomoStart();
-});
-document.getElementById('pomoMiniOpen').addEventListener('click', () => switchTab('pomodoroView'));
-
-// Log from Pomodoro logic removed as requested (user wants something better)
-// document.getElementById('btnLogFromPomo')?.addEventListener('click', () => { ... });
-
-
-
 // Close button (drawer)
 document.getElementById('btnCloseProfile')?.addEventListener('click', closeProfileDrawer);
 
@@ -4091,22 +3891,20 @@ function initAudio() {
     if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
-// Gentle soft "tick" — low volume, soft sine
+// Crisp digital tick warning
 function playTickCore(timeOffset) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, audioCtx.currentTime + timeOffset);
-    osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + timeOffset + 0.07);
-
-    gain.gain.setValueAtTime(0.25, audioCtx.currentTime + timeOffset);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + timeOffset + 0.12);
-
+    
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime + timeOffset);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime + timeOffset);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + timeOffset + 0.1);
+    
     osc.start(audioCtx.currentTime + timeOffset);
-    osc.stop(audioCtx.currentTime + timeOffset + 0.12);
+    osc.stop(audioCtx.currentTime + timeOffset + 0.15);
 }
 
 function playTick() {
@@ -4115,28 +3913,24 @@ function playTick() {
     playTickCore(0.5);
 }
 
-// Gentle bell ring — like a soft singing bowl / meditation bell
+// Crisp digital alarm ring
 function playRing() {
     if (!audioCtx) return;
     const time = audioCtx.currentTime;
-    const durations = [0, 0.5, 1.0, 1.6, 2.1]; // play 5 soft bell hits
-
-    durations.forEach((offset, idx) => {
+    
+    [0, 0.2, 0.4, 0.8, 1.0, 1.2].forEach(offset => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-
-        osc.type = 'sine';
-        // Slowly rising pitch across hits for a warm ascending tone
-        osc.frequency.setValueAtTime(528 + idx * 40, time + offset);
-
-        gain.gain.setValueAtTime(0, time + offset);
-        gain.gain.linearRampToValueAtTime(0.5, time + offset + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + offset + 0.9);
-
+        
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(800, time + offset);
+        gain.gain.setValueAtTime(0.15, time + offset);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + offset + 0.15);
+        
         osc.start(time + offset);
-        osc.stop(time + offset + 0.95);
+        osc.stop(time + offset + 0.2);
     });
 }
 

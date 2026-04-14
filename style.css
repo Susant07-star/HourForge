@@ -3849,6 +3849,7 @@ main#hourLogView.active {
 
 #pomodoroView {
     transition: background 0.8s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 #pomodoroView.mode-short {
     background: radial-gradient(circle at top, rgba(52, 211, 153, 0.08) 0%, transparent 70%);
