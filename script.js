@@ -4050,14 +4050,20 @@ function startPomoTimer(startPlaying = true) {
     
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
 
+    // TIMESTAMP TIMER FIX: Calculate exact OS timestamp for when the timer should end.
+    // This solves the bug where mobile browsers suspend `setInterval` in the background.
+    const expectedEndTime = Date.now() + (pomoTimeLeft * 1000);
+
     pomoInterval = setInterval(() => {
-        pomoTimeLeft--;
+        // Recalculate remaining seconds based on the pure clock, ignoring suspended intervals
+        pomoTimeLeft = Math.ceil((expectedEndTime - Date.now()) / 1000);
 
         if (pomoTimeLeft <= 10 && pomoTimeLeft > 0) {
             playTick();
         }
 
         if (pomoTimeLeft <= 0) {
+            pomoTimeLeft = 0; // Prevent negative flash on screen
             clearInterval(pomoInterval);
             playRing(); // Plays the digital alarm sound
             isPomoRunning = false;
