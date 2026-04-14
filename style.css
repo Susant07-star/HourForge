@@ -3844,6 +3844,20 @@ main#hourLogView.active {
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
+}
+
+#pomodoroView {
+    transition: background 0.8s ease;
+}
+#pomodoroView.mode-short {
+    background: radial-gradient(circle at top, rgba(52, 211, 153, 0.08) 0%, transparent 70%);
+}
+#pomodoroView:fullscreen.mode-focus, #pomodoroView:-webkit-full-screen.mode-focus {
+    background: radial-gradient(circle at center, rgba(239, 68, 68, 0.1) 0%, #0f172a 70%);
+}
+#pomodoroView:fullscreen.mode-short, #pomodoroView:-webkit-full-screen.mode-short {
+    background: radial-gradient(circle at center, rgba(52, 211, 153, 0.15) 0%, #0f172a 70%);
 }
 #pomodoroView:fullscreen .pomodoro-panel {
     background: transparent;
@@ -3882,6 +3896,7 @@ main#hourLogView.active {
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 #pomodoroView:-webkit-full-screen .pomodoro-panel {
     background: transparent;
