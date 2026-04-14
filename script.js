@@ -4225,12 +4225,15 @@ if (pomodoroView) {
         pomodoroView.addEventListener(evt, resetFsIdle, { passive: true })
     );
 
-    // Core toggle logic — shared between click (desktop) and touchstart (mobile)
+    // Timestamp guard to prevent the same tap firing BOTH touchstart AND click
+    let _lastTouchHandled = 0;
+
+    // Core toggle logic
     function handleFsTap(e) {
         if (!isInFullscreen()) return;
 
-        // If tapping ON a control button or the controls panel, just reset the idle timer
-        if (e.target.closest('.pomo-ctrl-btn') || e.target.closest('#pomoFullscreenControls') || e.target.closest('button')) {
+        // If tapping ON a button or the controls panel, just reset the idle timer
+        if (e.target.closest('button') || e.target.closest('#pomoFullscreenControls')) {
             resetFsIdle();
             return;
         }
@@ -4245,16 +4248,18 @@ if (pomodoroView) {
         }
     }
 
-    // Desktop: use click
-    pomodoroView.addEventListener('click', handleFsTap);
-
-    // Mobile: use touchstart — fires instantly on ANY element, unlike 'click' which
-    // mobile browsers suppress on non-interactive background divs
+    // Mobile: touchstart fires first — mark the time and handle it
     pomodoroView.addEventListener('touchstart', (e) => {
-        // Only handle single-finger taps, not pinch/swipe
-        if (e.touches.length !== 1) return;
+        if (e.touches.length !== 1) return; // ignore multi-finger
+        _lastTouchHandled = Date.now();
         handleFsTap(e);
     }, { passive: true });
+
+    // Desktop: click — but skip if touchstart just handled this same tap
+    pomodoroView.addEventListener('click', (e) => {
+        if (Date.now() - _lastTouchHandled < 500) return; // already handled by touchstart
+        handleFsTap(e);
+    });
 }
 
 document.addEventListener('fullscreenchange', () => {
@@ -4272,9 +4277,7 @@ if (btnPomoFullscreen) {
         // Try native fullscreen (desktop) first
         if (!document.fullscreenElement) {
             pomodoroView.requestFullscreen().then(() => {
-                if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('natural').catch(() => {});
-                }
+                // DO NOT lock orientation — let the device auto-rotate freely
                 resetFsIdle();
             }).catch(() => {
                 // MOBILE FALLBACK: If native fullscreen isn't supported, use CSS class
