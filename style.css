@@ -46,46 +46,15 @@ body {
 
 /* Base Styles & Typography */
 
-/* Background Animated Gradient Orbs */
-body::before,
-body::after {
-    content: '';
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(100px);
-    z-index: -1;
-    opacity: 0.5;
-    animation: drift 20s infinite alternate;
-    will-change: transform;
-    pointer-events: none;
+/* Static Background Gradient — replaces animated orbs for performance */
+body {
+    background:
+        radial-gradient(ellipse at 10% 15%, rgba(99, 102, 241, 0.18) 0%, transparent 50%),
+        radial-gradient(ellipse at 88% 85%, rgba(236, 72, 153, 0.10) 0%, transparent 50%),
+        #0a0820;
+    background-attachment: fixed;
 }
 
-body::before {
-    width: 400px;
-    height: 400px;
-    background: rgba(99, 102, 241, 0.3);
-    top: -100px;
-    left: -100px;
-}
-
-body::after {
-    width: 300px;
-    height: 300px;
-    background: rgba(236, 72, 153, 0.2);
-    bottom: -50px;
-    right: -50px;
-    animation-delay: -10s;
-}
-
-@keyframes drift {
-    0% {
-        transform: translate(0, 0);
-    }
-
-    100% {
-        transform: translate(50px, 50px);
-    }
-}
 
 .app-container {
     max-width: 1200px;
@@ -336,16 +305,14 @@ body::after {
     }
 }
 
-/* Glassmorphism Panels */
+/* Solid Panels — no backdrop-filter for GPU performance */
 .glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border);
+    background: rgba(22, 18, 54, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 1.5rem;
     padding: 2rem;
-    box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.4);
-    transform: translateZ(0); /* Hardware acceleration hint */
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    contain: layout style;
 }
 
 .glass-panel h2 {
@@ -2094,8 +2061,7 @@ main#hourLogView.active {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    -webkit-
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -2448,8 +2414,7 @@ main#hourLogView.active {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    -webkit-
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -2523,8 +2488,7 @@ main#hourLogView.active {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    -webkit-
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
@@ -2542,8 +2506,7 @@ main#hourLogView.active {
     left: 0;
     right: 0;
     background: var(--glass-bg);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    -webkit-
     border-top: 1px solid var(--glass-border);
     border-radius: 24px 24px 0 0;
     z-index: 1001;
@@ -3050,8 +3013,6 @@ main#hourLogView.active {
     align-items: center;
     gap: 0.6rem;
     background: rgba(15, 23, 42, 0.92);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-left: 3px solid #ef4444;
     border-radius: 1rem;
@@ -3165,8 +3126,7 @@ main#hourLogView.active {
     width: 100%;
     text-align: center;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    -webkit-
 }
 
 .login-gate-logo {
@@ -3301,8 +3261,7 @@ main#hourLogView.active {
     justify-content: space-between;
     padding: 0 0.75rem;
     background: rgba(15, 12, 41, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    -webkit-
     border-bottom: 1px solid rgba(255,255,255,0.07);
 }
 
@@ -3423,7 +3382,6 @@ main#hourLogView.active {
     inset: 0;
     z-index: 299;
     background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(2px);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -3640,8 +3598,7 @@ main#hourLogView.active {
     align-items: stretch;
     justify-content: space-around;
     background: rgba(10, 8, 32, 0.96);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    -webkit-
     border-top: 1px solid rgba(255,255,255,0.08);
     box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
     pointer-events: auto;
@@ -4012,8 +3969,7 @@ main#hourLogView.active {
     justify-content: center;
     gap: 1.5rem;
     background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    -webkit-
     border-radius: 3rem;
     padding: 1rem 2rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
