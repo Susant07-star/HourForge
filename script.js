@@ -4029,6 +4029,22 @@ const pomoFullscreenControls = document.getElementById('pomoFullscreenControls')
 
 
 // ===================== WAKE LOCK =====================
+// ===================== WAKE LOCK =====================
+let noSleepVideo = null;
+
+function initNoSleepVideo() {
+    if (noSleepVideo) return;
+    noSleepVideo = document.createElement('video');
+    noSleepVideo.setAttribute('playsinline', '');
+    noSleepVideo.setAttribute('muted', '');
+    noSleepVideo.setAttribute('loop', '');
+    noSleepVideo.style.display = 'none';
+    noSleepVideo.muted = true; // explicitly ensure it's muted
+    // Tiny empty base64 webm video
+    noSleepVideo.src = 'data:video/webm;base64,GkXfo0AgQoaBAUL3gQFC8oEEQvOBCEKCQAR3ZWJtQoeBAkKFgQIYU4BnQAABZpqAwwBA94EBqAOFPwh1fEibnImX7oOPEIOrEAAAAC8AAAEAAAAAAAAAAABBQx2B//AAB1h7hOACgQAAdY+4TgAoEAACgQAAtUAAAH2Lg4BqAAAAALsEAAgBgQIBgQEA';
+    document.body.appendChild(noSleepVideo);
+}
+
 async function requestWakeLock() {
     if ('wakeLock' in navigator) {
         try {
@@ -4037,12 +4053,23 @@ async function requestWakeLock() {
             console.log('Wake lock failed:', e);
         }
     }
+    
+    // iOS Safari fallback
+    initNoSleepVideo();
+    try {
+        await noSleepVideo.play();
+    } catch(e) {
+        console.log('Video wake lock failed:', e);
+    }
 }
 
 async function releaseWakeLock() {
     if (wakeLock) {
         try { await wakeLock.release(); } catch(e) {}
         wakeLock = null;
+    }
+    if (noSleepVideo) {
+        noSleepVideo.pause();
     }
 }
 
@@ -4298,27 +4325,51 @@ if (btnPomoSkip) {
 let fsIdleTimer;
 const pomodoroView = document.getElementById('pomodoroView');
 
-function resetFsIdle() {
-    if (!document.fullscreenElement) return;
+function showFsControls() {
     pomodoroView.classList.remove('fullscreen-idle');
     if (pomoFullscreenControls) {
         pomoFullscreenControls.classList.remove('fs-hidden');
         pomoFullscreenControls.classList.add('fs-visible');
     }
+}
+
+function hideFsControls() {
+    pomodoroView.classList.add('fullscreen-idle');
+    if (pomoFullscreenControls) {
+        pomoFullscreenControls.classList.remove('fs-visible');
+        pomoFullscreenControls.classList.add('fs-hidden');
+    }
+}
+
+function resetFsIdle() {
+    if (!document.fullscreenElement) return;
+    showFsControls();
     clearTimeout(fsIdleTimer);
-    fsIdleTimer = setTimeout(() => {
-        pomodoroView.classList.add('fullscreen-idle');
-        if (pomoFullscreenControls) {
-            pomoFullscreenControls.classList.remove('fs-visible');
-            pomoFullscreenControls.classList.add('fs-hidden');
-        }
-    }, 3000);
+    fsIdleTimer = setTimeout(hideFsControls, 3000);
 }
 
 if (pomodoroView) {
-    ['mousemove', 'touchstart', 'click'].forEach(e =>
+    ['mousemove', 'touchmove'].forEach(e =>
         pomodoroView.addEventListener(e, resetFsIdle)
     );
+    
+    pomodoroView.addEventListener('click', (e) => {
+        if (!document.fullscreenElement) return;
+        
+        // Don't toggle if clicking on a button inside the controls
+        if (e.target.closest('.pomo-ctrl-btn')) {
+            resetFsIdle();
+            return;
+        }
+
+        const isVisible = pomoFullscreenControls && pomoFullscreenControls.classList.contains('fs-visible');
+        if (isVisible) {
+            clearTimeout(fsIdleTimer);
+            hideFsControls();
+        } else {
+            resetFsIdle();
+        }
+    });
 }
 
 document.addEventListener('fullscreenchange', () => {
