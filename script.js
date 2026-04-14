@@ -4020,6 +4020,14 @@ const pomoFocusMin = document.getElementById('pomoFocusMin');
 const pomoShortMin = document.getElementById('pomoShortMin');
 const pomoTotalHours = document.getElementById('pomoTotalHours');
 
+const btnFsPrev = document.getElementById('btnFsPrev');
+const btnFsPlayPause = document.getElementById('btnFsPlayPause');
+const pomoFsPlayIcon = document.getElementById('pomoFsPlayIcon');
+const btnFsSkip = document.getElementById('btnFsSkip');
+const fsCycleText = document.getElementById('fsCycleText');
+const pomoFullscreenControls = document.getElementById('pomoFullscreenControls');
+
+
 // ===================== WAKE LOCK =====================
 async function requestWakeLock() {
     if ('wakeLock' in navigator) {
@@ -4137,6 +4145,9 @@ function updatePomoDisplay() {
     if (pomoSessionCount) {
         const total = getTotalCycles();
         pomoSessionCount.textContent = `${Math.min(pomoCurrentCycle, total)} of ${total}`;
+        if (fsCycleText) {
+            fsCycleText.textContent = `${Math.min(pomoCurrentCycle, total)} of ${total}`;
+        }
     }
 }
 
@@ -4164,6 +4175,7 @@ function startPomoTimer(startPlaying = true) {
         isPomoRunning = false;
         if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-play';
         if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
+            if (pomoFsPlayIcon) pomoFsPlayIcon.className = 'fa-solid fa-play';
         releaseWakeLock();
         return;
     }
@@ -4172,6 +4184,7 @@ function startPomoTimer(startPlaying = true) {
     isPomoRunning = true;
     if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-pause';
     if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-pause';
+            if (pomoFsPlayIcon) pomoFsPlayIcon.className = 'fa-solid fa-pause';
     requestWakeLock();
 
     pomoInterval = setInterval(() => {
@@ -4187,6 +4200,7 @@ function startPomoTimer(startPlaying = true) {
             isPomoRunning = false;
             if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-play';
             if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
+            if (pomoFsPlayIcon) pomoFsPlayIcon.className = 'fa-solid fa-play';
 
             if (pomoMode === 'focus') {
                 setPomoMode('short', true);
@@ -4230,6 +4244,25 @@ function toggleTimerGlobal() {
 }
 
 if (btnPomoStartPause) btnPomoStartPause.addEventListener('click', toggleTimerGlobal);
+
+if (btnFsPlayPause) btnFsPlayPause.addEventListener('click', toggleTimerGlobal);
+if (btnFsPrev) btnFsPrev.addEventListener('click', () => setPomoMode(pomoMode, false));
+if (btnFsSkip) {
+    btnFsSkip.addEventListener('click', () => {
+        if (pomoMode === 'focus') {
+            setPomoMode('short', isPomoRunning);
+        } else {
+            pomoCurrentCycle++;
+            if (pomoCurrentCycle > getTotalCycles()) {
+                pomoCurrentCycle = 1;
+                setPomoMode('focus', false);
+            } else {
+                setPomoMode('focus', isPomoRunning);
+            }
+        }
+    });
+}
+
 if (pomoMiniPlay) pomoMiniPlay.addEventListener('click', toggleTimerGlobal);
 
 if (btnPomoPrev) {
@@ -4268,9 +4301,17 @@ const pomodoroView = document.getElementById('pomodoroView');
 function resetFsIdle() {
     if (!document.fullscreenElement) return;
     pomodoroView.classList.remove('fullscreen-idle');
+    if (pomoFullscreenControls) {
+        pomoFullscreenControls.classList.remove('fs-hidden');
+        pomoFullscreenControls.classList.add('fs-visible');
+    }
     clearTimeout(fsIdleTimer);
     fsIdleTimer = setTimeout(() => {
         pomodoroView.classList.add('fullscreen-idle');
+        if (pomoFullscreenControls) {
+            pomoFullscreenControls.classList.remove('fs-visible');
+            pomoFullscreenControls.classList.add('fs-hidden');
+        }
     }, 3000);
 }
 
