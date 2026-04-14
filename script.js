@@ -4232,13 +4232,14 @@ if (pomodoroView) {
     function handleFsTap(e) {
         if (!isInFullscreen()) return;
 
-        // If tapping ON a button or the controls panel, just reset the idle timer
-        if (e.target.closest('button') || e.target.closest('#pomoFullscreenControls')) {
+        // ONLY skip if the user tapped an actual interactive button
+        // (Don't skip for the controls panel container — that would block hiding)
+        if (e.target.closest('button')) {
             resetFsIdle();
             return;
         }
 
-        // Toggle: tap on blank area hides/shows controls
+        // Toggle: any tap on non-button area hides/shows controls
         const isVisible = pomoFullscreenControls && pomoFullscreenControls.classList.contains('fs-visible');
         if (isVisible) {
             clearTimeout(fsIdleTimer);
