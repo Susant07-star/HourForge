@@ -4189,6 +4189,12 @@ function setPomoMode(mode, autoStart = false) {
     const label = document.getElementById('pomoModeLabel');
     if (label) label.textContent = mode === 'focus' ? 'Focus' : 'Break';
 
+    const view = document.getElementById('pomodoroView');
+    if (view) {
+        view.classList.remove('mode-focus', 'mode-short');
+        view.classList.add(`mode-${mode}`);
+    }
+
     pomoTimeLeft = mode === 'focus'
         ? parseInt(pomoFocusMin.value) * 60
         : parseInt(pomoShortMin.value) * 60;
