@@ -3980,6 +3980,17 @@ function updatePomoDisplay() {
                 { src: './icon-512.png', sizes: '512x512', type: 'image/png' }
             ]
         });
+
+        // Set native OS scrubbing bar
+        if ('setPositionState' in navigator.mediaSession) {
+            try {
+                navigator.mediaSession.setPositionState({
+                    duration: totalTime > 0 ? totalTime : 1,
+                    playbackRate: isPomoRunning ? 1 : 0,
+                    position: Math.max(0, totalTime - pomoTimeLeft)
+                });
+            } catch(e) {}
+        }
     }
     // --------------------------------------------------------
 
