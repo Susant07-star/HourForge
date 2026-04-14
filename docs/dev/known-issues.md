@@ -25,4 +25,20 @@
 - **Planned Fix**: Break down the CSS into "Modules" (e.g., `components.css`, `layouts.css`, `animations.css`).
 
 ---
+
+## ✅ Resolved Issues (Archived)
+
+### ~~Ghost "25-Minute" Timer~~ — Fixed in v2.2
+- **Was**: The legacy `POMO` object (from the old popup modal era) was still running alongside the new timer engine, creating two simultaneous countdowns.
+- **Fix**: Deleted the entire legacy block (~200 lines) from `script.js`. There is now exactly one Pomodoro engine.
+
+### ~~Fullscreen Tap Not Registering (iOS/Android)~~ — Fixed in v2.2
+- **Was**: Tapping the fullscreen background on mobile did not toggle the floating controls. Only swipe/drag gestures worked.
+- **Fix**: Added `cursor: pointer` to `#pomodoroView:fullscreen` and `-webkit-tap-highlight-color: transparent`. Mobile browsers now fire click events on the fullscreen background reliably.
+
+### ~~Tab Swipe in Fullscreen~~ — Fixed in v2.2
+- **Was**: Swiping left/right during fullscreen mode silently changed the active tab. When the user exited fullscreen, they found themselves on a different tab.
+- **Fix**: Added `if (document.fullscreenElement) return;` at the top of the `touchstart` handler in the swipe IIFE.
+
+---
 *Technical debt is documented to ensure future refactors tackle the most critical stability risks first.*
