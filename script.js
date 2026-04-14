@@ -3958,6 +3958,30 @@ function updatePomoDisplay() {
     const totalTime = pomoMode === 'focus'
         ? parseInt(pomoFocusMin.value) * 60
         : parseInt(pomoShortMin.value) * 60;
+        
+    // --- BACKGROUND VISIBILITY (Tab Title & Lock Screen) ---
+    const modeTitle = pomoMode === 'focus' ? 'Focus' : 'Break';
+    
+    // Only show timer in tab title if it's currently running or paused halfway
+    if (isPomoRunning || pomoTimeLeft < totalTime) {
+        document.title = `(${formattedTime}) ${modeTitle} - HourForge`;
+    } else {
+        document.title = "HourForge";
+    }
+
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: `${modeTitle}: ${formattedTime} left`,
+            artist: 'HourForge Timer',
+            album: `Cycle ${pomoCurrentCycle || 1} of ${getTotalCycles()}`,
+            artwork: [
+                { src: './icon-192.png', sizes: '192x192', type: 'image/png' },
+                { src: './icon-512.png', sizes: '512x512', type: 'image/png' }
+            ]
+        });
+    }
+    // --------------------------------------------------------
+
     const percentage = pomoTimeLeft / totalTime;
     const offset = 339.29 - (339.29 * percentage);
     if (pomoRingFill) {
@@ -4006,7 +4030,14 @@ function startPomoTimer(startPlaying = true) {
         if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
             if (pomoFsPlayIcon) pomoFsPlayIcon.className = 'fa-solid fa-play';
         releaseWakeLock();
+        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+        updatePomoDisplay(); // Ensures title updates properly when paused
         return;
+    }
+
+    // Request Notification permission so we can alert them when finished
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
     }
 
     initAudio();
@@ -4015,6 +4046,8 @@ function startPomoTimer(startPlaying = true) {
     if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-pause';
             if (pomoFsPlayIcon) pomoFsPlayIcon.className = 'fa-solid fa-pause';
     requestWakeLock();
+    
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
 
     pomoInterval = setInterval(() => {
         pomoTimeLeft--;
@@ -4025,8 +4058,20 @@ function startPomoTimer(startPlaying = true) {
 
         if (pomoTimeLeft <= 0) {
             clearInterval(pomoInterval);
-            playRing();
+            playRing(); // Plays the digital alarm sound
             isPomoRunning = false;
+            
+            // OS-Level Push Notification when timer is up
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                    new Notification(pomoMode === 'focus' ? 'Focus Session Complete!' : 'Break Time Over!', {
+                        body: pomoMode === 'focus' ? "Great job. It's time to take a break." : "Time to get back to work.",
+                        icon: './icon-192.png',
+                        vibrate: [200, 100, 200]
+                    });
+                } catch(e) { console.log('Notification failed', e); }
+            }
+
             if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-play';
             if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
             if (pomoFsPlayIcon) pomoFsPlayIcon.className = 'fa-solid fa-play';
@@ -4040,6 +4085,7 @@ function startPomoTimer(startPlaying = true) {
                     pomoCurrentCycle = 1;
                     updatePomoDisplay();
                     releaseWakeLock();
+                    document.title = "Timer Finished! - HourForge";
                 } else {
                     setPomoMode('focus', true);
                 }
