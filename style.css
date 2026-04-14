@@ -3871,7 +3871,9 @@ main#hourLogView.active {
 #pomodoroView:fullscreen #bottomNav,
 #pomodoroView:fullscreen .top-bar,
 #pomodoroView:fullscreen .modal-header,
-#pomodoroView:fullscreen .pomo-settings-details {
+#pomodoroView:fullscreen .pomo-settings-details,
+#pomodoroView:fullscreen .pomo-mode-bar,
+#pomodoroView:fullscreen .pomo-sessions {
     display: none !important;
 }
 
@@ -3907,7 +3909,9 @@ main#hourLogView.active {
 #pomodoroView:-webkit-full-screen #bottomNav,
 #pomodoroView:-webkit-full-screen .top-bar,
 #pomodoroView:-webkit-full-screen .modal-header,
-#pomodoroView:-webkit-full-screen .pomo-settings-details {
+#pomodoroView:-webkit-full-screen .pomo-settings-details,
+#pomodoroView:-webkit-full-screen .pomo-mode-bar,
+#pomodoroView:-webkit-full-screen .pomo-sessions {
     display: none !important;
 }
 
@@ -3937,17 +3941,7 @@ main#hourLogView.active {
     top: 1.5rem;
     z-index: 1000;
 }
-/* Ensure sessions and details show in fullscreen but fade out idle */
-#pomodoroView:fullscreen .pomo-settings-details, 
-#pomodoroView:fullscreen .modal-header,
-#pomodoroView:fullscreen .pomo-sessions {
-    display: flex !important; 
-}
-#pomodoroView:-webkit-full-screen .pomo-settings-details, 
-#pomodoroView:-webkit-full-screen .modal-header,
-#pomodoroView:-webkit-full-screen .pomo-sessions {
-    display: flex !important;
-}
+/* Old overrides removed to properly hide setting bars in fullscreen */
 
 /* Show floating controls div only in fullscreen */
 :fullscreen #pomoFullscreenControls,
