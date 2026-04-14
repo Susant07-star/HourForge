@@ -3849,20 +3849,23 @@ function initBgAudio() {
 }
 
 async function requestWakeLock() {
+    // 1. MUST BE CALLED SYNCHRONOUSLY FIRST
+    // Browsers block audio.play() if there's any await before it in a click handler
+    initBgAudio();
+    try {
+        const playPromise = bgSessionAudio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(e => console.log('Audio background failed:', e));
+        }
+    } catch(e) {}
+
+    // 2. NOW we can do async wake lock
     if ('wakeLock' in navigator) {
         try {
             wakeLock = await navigator.wakeLock.request('screen');
         } catch (e) {
             console.log('Wake lock failed:', e);
         }
-    }
-    
-    // Fallback & OS MediaSession Hijack
-    initBgAudio();
-    try {
-        await bgSessionAudio.play();
-    } catch(e) {
-        console.log('Audio background failed:', e);
     }
 }
 
