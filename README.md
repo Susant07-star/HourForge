@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
 [![Made with](https://img.shields.io/badge/Made_with-HTML_|_CSS_|_JS-f59e0b?style=for-the-badge)](#)
 [![AI Powered](https://img.shields.io/badge/AI-Groq_API-ec4899?style=for-the-badge)](#)
-[![Version](https://img.shields.io/badge/Version-2.0-a855f7?style=for-the-badge)](#)
+[![Version](https://img.shields.io/badge/Version-2.1-a855f7?style=for-the-badge)](#)
 
 A personal academic productivity web app that helps students study smarter — combining **spaced repetition**, **time logging**, and **AI-powered coaching** in one beautiful, offline-capable interface.
 
@@ -24,7 +24,8 @@ A personal academic productivity web app that helps students study smarter — c
 | ⏱️ **Time Tracker** | Log every study session with subject, start/end time, and notes |
 | 🤖 **AI Insights** | Daily, weekly, and monthly mentor-level feedback via Groq AI |
 | 📊 **Progress Charts** | Visual breakdown of study hours, subject distribution, peak hours & revision rate |
-| 🍅 **Pomodoro Timer** | Built-in focus timer with customizable focus, short break, and long break modes |
+| ⏱️ **Pomodoro Timer** | 50/10 focus-break cycles with ring progress, fullscreen mode, gentle audio alerts, cycle tracking, and screen Wake Lock |
+| 🌙 **Screen Always-On** | Uses the Screen Wake Lock API to keep your display on while the Pomodoro timer is running |
 | 🎯 **Exam Countdown** | Set up to 2 upcoming exam dates and see a live countdown on the dashboard |
 | 🔥 **Study Streaks** | Daily streak tracking to keep you consistent and accountable |
 | 👤 **Student Profiles** | Configure your grade, faculty, and subjects — app auto-fills relevant subjects |
@@ -137,6 +138,9 @@ HourForge/
 
 - [x] PWA support (installable as an app on Android/iOS)
 - [x] Cloud sync (Google Auth + Supabase)
+- [x] Pomodoro Timer with 50/10 rule, fullscreen mode & cycle tracking
+- [x] Screen Wake Lock (display stays on during focus sessions)
+- [x] PWA App Shortcuts (jump to Timer or Log from home screen icon)
 - [ ] Multiple profile support (for families or shared devices)
 - [ ] Weekly planner / goal-setting module
 - [ ] More AI models support (Gemini, OpenAI)

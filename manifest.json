@@ -5,7 +5,25 @@
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#1e1b4b",
-  "description": "Master Your Memory with the 2-4-7 Spaced Repetition Method",
+  "description": "Study smarter with the 50/10 Pomodoro method, spaced repetition, AI insights, and time tracking — all offline-capable.",
+  "orientation": "any",
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Start Pomodoro",
+      "short_name": "Timer",
+      "description": "Jump directly to the Pomodoro timer",
+      "url": "./index.html#pomodoroView",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Log Study Session",
+      "short_name": "Log",
+      "description": "Quick-add a study session",
+      "url": "./index.html#hourLogView",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    }
+  ],
   "icons": [
     {
       "src": "./icon-192.png",
