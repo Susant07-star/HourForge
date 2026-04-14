@@ -339,8 +339,8 @@ body::after {
 /* Glassmorphism Panels */
 .glass-panel {
     background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--glass-border);
     border-radius: 1.5rem;
     padding: 2rem;
@@ -3772,9 +3772,9 @@ main#hourLogView.active {
     .glass-panel,
     .dashboard-stat-card,
     .bottom-sheet {
-        backdrop-filter: blur(6px) !important;
-        -webkit-backdrop-filter: blur(6px) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        box-shadow: none !important;
         background: rgba(18, 16, 44, 0.85) !important; /* more opaque fallback */
     }
 
@@ -3851,6 +3851,14 @@ main#hourLogView.active {
     transition: background 0.8s ease;
     -webkit-tap-highlight-color: transparent;
 }
+#pomodoroView.mode-focus .pomodoro-panel {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.15);
+}
+#pomodoroView.mode-short .pomodoro-panel {
+    background: rgba(52, 211, 153, 0.08);
+    border-color: rgba(52, 211, 153, 0.15);
+}
 #pomodoroView.mode-short {
     background: radial-gradient(circle at top, rgba(52, 211, 153, 0.08) 0%, transparent 70%);
 }
@@ -3888,7 +3896,8 @@ main#hourLogView.active {
 #pomodoroView:fullscreen .modal-header,
 #pomodoroView:fullscreen .pomo-settings-details,
 #pomodoroView:fullscreen .pomo-mode-bar,
-#pomodoroView:fullscreen .pomo-sessions {
+#pomodoroView:fullscreen .pomo-sessions,
+#pomodoroView:fullscreen .btn-fullscreen-inline {
     display: none !important;
 }
 
@@ -3927,7 +3936,8 @@ main#hourLogView.active {
 #pomodoroView:-webkit-full-screen .modal-header,
 #pomodoroView:-webkit-full-screen .pomo-settings-details,
 #pomodoroView:-webkit-full-screen .pomo-mode-bar,
-#pomodoroView:-webkit-full-screen .pomo-sessions {
+#pomodoroView:-webkit-full-screen .pomo-sessions,
+#pomodoroView:-webkit-full-screen .btn-fullscreen-inline {
     display: none !important;
 }
 

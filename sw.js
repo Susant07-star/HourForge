@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hourforge-v25';
+const CACHE_NAME = 'hourforge-v26';
 const ASSETS = [
     './',
     './index.html',
