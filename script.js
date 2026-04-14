@@ -4246,12 +4246,6 @@ if (pomodoroView) {
     }
 
     pomodoroView.addEventListener('click', handleFsTap);
-    // MOBILE FIX: also listen to touchend for devices where 'click' fires too late
-    pomodoroView.addEventListener('touchend', (e) => {
-        // prevent the duplicate click event on mobile
-        e.preventDefault();
-        handleFsTap(e);
-    }, { passive: false });
 }
 
 document.addEventListener('fullscreenchange', () => {
