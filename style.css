@@ -3853,11 +3853,25 @@ main#hourLogView.active {
     height: 100vh;
 }
 #pomodoroView:fullscreen .pomo-ring-wrap {
-    transform: scale(1.5);
-    margin-top: 3rem;
+    width: 320px;
+    height: 320px;
+    margin: 2rem 0;
+    transform: none;
+}
+#pomodoroView:fullscreen .pomo-ring {
+    width: 320px;
+    height: 320px;
+}
+#pomodoroView:fullscreen #pomoTime {
+    font-size: 5rem;
+}
+#pomodoroView:fullscreen .pomo-mode-label {
+    font-size: 1.2rem;
 }
 #pomodoroView:fullscreen #bottomNav,
-#pomodoroView:fullscreen .top-bar {
+#pomodoroView:fullscreen .top-bar,
+#pomodoroView:fullscreen .modal-header,
+#pomodoroView:fullscreen .pomo-settings-details {
     display: none !important;
 }
 
@@ -3875,10 +3889,24 @@ main#hourLogView.active {
     height: 100vh;
 }
 #pomodoroView:-webkit-full-screen .pomo-ring-wrap {
-    transform: scale(1.5);
-    margin-top: 3rem;
+    width: 320px;
+    height: 320px;
+    margin: 2rem 0;
+    transform: none;
+}
+#pomodoroView:-webkit-full-screen .pomo-ring {
+    width: 320px;
+    height: 320px;
+}
+#pomodoroView:-webkit-full-screen #pomoTime {
+    font-size: 5rem;
+}
+#pomodoroView:-webkit-full-screen .pomo-mode-label {
+    font-size: 1.2rem;
 }
 #pomodoroView:-webkit-full-screen #bottomNav,
-#pomodoroView:-webkit-full-screen .top-bar {
+#pomodoroView:-webkit-full-screen .top-bar,
+#pomodoroView:-webkit-full-screen .modal-header,
+#pomodoroView:-webkit-full-screen .pomo-settings-details {
     display: none !important;
 }

@@ -4016,39 +4016,65 @@ function initAudio() {
     }
 }
 
-function playTick() {
-    if (!audioCtx) return;
+function playTickCore(timeOffset) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.connect(gain);
+    const filter = audioCtx.createBiquadFilter();
+    
+    osc.connect(filter);
+    filter.connect(gain);
     gain.connect(audioCtx.destination);
     
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.05);
+    // Sharp click
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1000, audioCtx.currentTime + timeOffset);
+    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + timeOffset + 0.05);
     
-    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+    filter.type = 'highpass';
+    filter.frequency.value = 1000;
+
+    gain.gain.setValueAtTime(1, audioCtx.currentTime + timeOffset);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + timeOffset + 0.05);
     
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.05);
+    osc.start(audioCtx.currentTime + timeOffset);
+    osc.stop(audioCtx.currentTime + timeOffset + 0.05);
+}
+
+function playTick() {
+    if (!audioCtx) return;
+    // Tick 2 times per second
+    playTickCore(0);
+    playTickCore(0.5);
 }
 
 function playRing() {
     if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    const time = audioCtx.currentTime;
     
-    osc.type = 'bell';
-    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    function ringPattern(startTime, baseFreq) {
+        // "tinii nii nii" pattern
+        for(let i=0; i<8; i++) {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            let freq = i % 2 === 0 ? baseFreq : baseFreq * 1.25;
+            osc.frequency.setValueAtTime(freq, startTime + (i * 0.15));
+            
+            gain.gain.setValueAtTime(0.7, startTime + (i * 0.15));
+            gain.gain.setTargetAtTime(0, startTime + (i * 0.15) + 0.05, 0.05);
+            
+            osc.start(startTime + (i * 0.15));
+            osc.stop(startTime + (i * 0.15) + 0.15);
+        }
+    }
     
-    gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 2.0);
-    
-    osc.start();
-    osc.stop(audioCtx.currentTime + 2.0);
+    // Play multiple times over a few seconds for longer alert
+    ringPattern(time, 800);
+    ringPattern(time + 1.5, 800);
+    ringPattern(time + 3.0, 800);
 }
 
 function formatPomoTime(seconds) {
@@ -4061,7 +4087,8 @@ function getTotalCycles() {
     let focusMin = parseInt(pomoFocusMin.value) || 50;
     let shortMin = parseInt(pomoShortMin.value) || 10;
     let totalHr = parseFloat(pomoTotalHours.value) || 4;
-    return Math.max(1, Math.round((totalHr * 60) / (focusMin + shortMin)));
+    // Use floor to ensure we don't artificially bump cycle count to 5 for 4 hrs etc.
+    return Math.max(1, Math.floor((totalHr * 60) / (focusMin + shortMin)));
 }
 
 function updatePomoDisplay() {
