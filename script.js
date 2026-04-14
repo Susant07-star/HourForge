@@ -928,6 +928,7 @@ navBtns.forEach(btn => {
     }
 
     document.addEventListener('touchstart', e => {
+        if (document.fullscreenElement) return;
         const modals = document.querySelectorAll('.modal-overlay[style*="flex"], .sidebar-drawer.open, .profile-drawer.open');
         if (modals.length > 0) return;
 
