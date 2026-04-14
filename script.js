@@ -3989,11 +3989,18 @@ function formatDateLabel(dateStr) {
 // POMODORO TIMER LOGIC
 // ==========================================
 let pomoInterval = null;
-let pomoTimeLeft = 50 * 60; // default 50 mins
 let pomoMode = 'focus'; // 'focus' or 'short'
 let isPomoRunning = false;
 let pomoCurrentCycle = 1;
 let isRingVisible = true;
+let wakeLock = null;
+
+// Read the real default from input immediately
+function getInitialTime() {
+    const focusEl = document.getElementById('pomoFocusMin');
+    return focusEl ? parseInt(focusEl.value) * 60 : 50 * 60;
+}
+let pomoTimeLeft = getInitialTime();
 
 const pomoTimeDisplay = document.getElementById('pomoTime');
 const pomoRingFill = document.getElementById('pomoRingFill');
@@ -4004,48 +4011,66 @@ const btnPomoPrev = document.getElementById('btnPomoPrev');
 const btnPomoSkip = document.getElementById('btnPomoSkip');
 const btnPomoFullscreen = document.getElementById('btnPomoFullscreen');
 const btnToggleRing = document.getElementById('btnToggleRing');
-
 const pomoMiniTime = document.getElementById('pomoMiniTime');
 const pomoMiniLabel = document.getElementById('pomoMiniLabel');
 const pomoMiniPlay = document.getElementById('pomoMiniPlay');
 const pomoMiniPlayIcon = document.getElementById('pomoMiniPlayIcon');
 const pomoMiniTimer = document.getElementById('pomoMiniTimer');
-
 const pomoFocusMin = document.getElementById('pomoFocusMin');
 const pomoShortMin = document.getElementById('pomoShortMin');
 const pomoTotalHours = document.getElementById('pomoTotalHours');
 
-// Audio Context
+// ===================== WAKE LOCK =====================
+async function requestWakeLock() {
+    if ('wakeLock' in navigator) {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+        } catch (e) {
+            console.log('Wake lock failed:', e);
+        }
+    }
+}
+
+async function releaseWakeLock() {
+    if (wakeLock) {
+        try { await wakeLock.release(); } catch(e) {}
+        wakeLock = null;
+    }
+}
+
+// Reacquire if page becomes visible again
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && isPomoRunning) {
+        requestWakeLock();
+    }
+});
+
+// ===================== AUDIO =====================
 let audioCtx = null;
 
 function initAudio() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
+// Gentle soft "tick" — low volume, soft sine
 function playTickCore(timeOffset) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    const filter = audioCtx.createBiquadFilter();
-    
-    osc.connect(filter);
-    filter.connect(gain);
+    osc.connect(gain);
     gain.connect(audioCtx.destination);
-    
-    // Sharp click
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(1000, audioCtx.currentTime + timeOffset);
-    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + timeOffset + 0.05);
-    
-    filter.type = 'highpass';
-    filter.frequency.value = 1000;
 
-    gain.gain.setValueAtTime(1, audioCtx.currentTime + timeOffset);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + timeOffset + 0.05);
-    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime + timeOffset);
+    osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + timeOffset + 0.07);
+
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime + timeOffset);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + timeOffset + 0.12);
+
     osc.start(audioCtx.currentTime + timeOffset);
-    osc.stop(audioCtx.currentTime + timeOffset + 0.05);
+    osc.stop(audioCtx.currentTime + timeOffset + 0.12);
 }
 
 function playTick() {
@@ -4054,32 +4079,32 @@ function playTick() {
     playTickCore(0.5);
 }
 
+// Gentle bell ring — like a soft singing bowl / meditation bell
 function playRing() {
     if (!audioCtx) return;
     const time = audioCtx.currentTime;
-    function ringPattern(startTime, baseFreq) {
-        for(let i=0; i<8; i++) {
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            osc.type = 'sine';
-            let freq = i % 2 === 0 ? baseFreq : baseFreq * 1.25;
-            osc.frequency.setValueAtTime(freq, startTime + (i * 0.15));
-            
-            gain.gain.setValueAtTime(0.7, startTime + (i * 0.15));
-            gain.gain.setTargetAtTime(0, startTime + (i * 0.15) + 0.05, 0.05);
-            
-            osc.start(startTime + (i * 0.15));
-            osc.stop(startTime + (i * 0.15) + 0.15);
-        }
-    }
-    ringPattern(time, 800);
-    ringPattern(time + 1.5, 800);
-    ringPattern(time + 3.0, 800);
+    const durations = [0, 0.5, 1.0, 1.6, 2.1]; // play 5 soft bell hits
+
+    durations.forEach((offset, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.type = 'sine';
+        // Slowly rising pitch across hits for a warm ascending tone
+        osc.frequency.setValueAtTime(528 + idx * 40, time + offset);
+
+        gain.gain.setValueAtTime(0, time + offset);
+        gain.gain.linearRampToValueAtTime(0.5, time + offset + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + offset + 0.9);
+
+        osc.start(time + offset);
+        osc.stop(time + offset + 0.95);
+    });
 }
 
+// ===================== UTILS =====================
 function formatPomoTime(seconds) {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -4087,85 +4112,82 @@ function formatPomoTime(seconds) {
 }
 
 function getTotalCycles() {
-    let focusMin = parseInt(pomoFocusMin.value) || 50;
-    let shortMin = parseInt(pomoShortMin.value) || 10;
-    let totalHr = parseFloat(pomoTotalHours.value) || 4;
+    const focusMin = parseInt(pomoFocusMin.value) || 50;
+    const shortMin = parseInt(pomoShortMin.value) || 10;
+    const totalHr = parseFloat(pomoTotalHours.value) || 4;
     return Math.max(1, Math.floor((totalHr * 60) / (focusMin + shortMin)));
 }
 
 function updatePomoDisplay() {
-    let formattedTime = formatPomoTime(pomoTimeLeft);
-    pomoTimeDisplay.textContent = formattedTime;
-    
-    if(pomoMiniTime) {
-        pomoMiniTime.textContent = formattedTime;
-        pomoMiniLabel.textContent = pomoMode === 'focus' ? 'Focus' : 'Break';
+    const formattedTime = formatPomoTime(pomoTimeLeft);
+    if (pomoTimeDisplay) pomoTimeDisplay.textContent = formattedTime;
+    if (pomoMiniTime) pomoMiniTime.textContent = formattedTime;
+    if (pomoMiniLabel) pomoMiniLabel.textContent = pomoMode === 'focus' ? 'Focus' : 'Break';
+
+    const totalTime = pomoMode === 'focus'
+        ? parseInt(pomoFocusMin.value) * 60
+        : parseInt(pomoShortMin.value) * 60;
+    const percentage = pomoTimeLeft / totalTime;
+    const offset = 339.29 - (339.29 * percentage);
+    if (pomoRingFill) {
+        pomoRingFill.style.strokeDashoffset = offset;
+        pomoRingFill.style.stroke = pomoMode === 'short' ? '#34d399' : '#ef4444';
     }
-    
-    let totalTime = pomoMode === 'focus' ? parseInt(pomoFocusMin.value) * 60 : parseInt(pomoShortMin.value) * 60;
-    let percentage = (pomoTimeLeft / totalTime);
-    let offset = 339.29 - (339.29 * percentage);
-    pomoRingFill.style.strokeDashoffset = offset;
-    
-    if (pomoMode === 'short') {
-        pomoRingFill.style.stroke = '#34d399';
-        if(pomoMiniTimer) pomoMiniTimer.setAttribute('data-mode', 'short');
-    } else {
-        pomoRingFill.style.stroke = '#ef4444';
-        if(pomoMiniTimer) pomoMiniTimer.setAttribute('data-mode', 'focus');
-    }
-    
+
     if (pomoSessionCount) {
-        let total = getTotalCycles();
+        const total = getTotalCycles();
         pomoSessionCount.textContent = `${Math.min(pomoCurrentCycle, total)} of ${total}`;
     }
 }
 
+// ===================== TIMER CORE =====================
 function setPomoMode(mode, autoStart = false) {
     pomoMode = mode;
-    document.querySelectorAll('.pomo-mode-btn').forEach(btn => btn.classList.remove('active'));
-    let matchedBtn = document.querySelector(`.pomo-mode-btn[data-mode="${mode}"]`);
-    if(matchedBtn) matchedBtn.classList.add('active');
-    
-    document.getElementById('pomoModeLabel').textContent = mode === 'focus' ? 'Focus' : 'Break';
-    
-    if (mode === 'focus') {
-        pomoTimeLeft = parseInt(pomoFocusMin.value) * 60;
-    } else {
-        pomoTimeLeft = parseInt(pomoShortMin.value) * 60;
-    }
+    document.querySelectorAll('.pomo-mode-btn[data-mode]').forEach(btn => btn.classList.remove('active'));
+    const matchedBtn = document.querySelector(`.pomo-mode-btn[data-mode="${mode}"]`);
+    if (matchedBtn) matchedBtn.classList.add('active');
+
+    const label = document.getElementById('pomoModeLabel');
+    if (label) label.textContent = mode === 'focus' ? 'Focus' : 'Break';
+
+    pomoTimeLeft = mode === 'focus'
+        ? parseInt(pomoFocusMin.value) * 60
+        : parseInt(pomoShortMin.value) * 60;
+
     updatePomoDisplay();
-    startPomoTimer(autoStart); 
+    startPomoTimer(autoStart);
 }
 
 function startPomoTimer(startPlaying = true) {
     clearInterval(pomoInterval);
     if (!startPlaying) {
         isPomoRunning = false;
-        pomoPlayIcon.className = 'fa-solid fa-play';
-        if(pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
+        if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-play';
+        if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
+        releaseWakeLock();
         return;
     }
-    
+
     initAudio();
     isPomoRunning = true;
-    pomoPlayIcon.className = 'fa-solid fa-pause';
-    if(pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-pause';
-    
+    if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-pause';
+    if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-pause';
+    requestWakeLock();
+
     pomoInterval = setInterval(() => {
         pomoTimeLeft--;
-        
+
         if (pomoTimeLeft <= 10 && pomoTimeLeft > 0) {
             playTick();
         }
-        
+
         if (pomoTimeLeft <= 0) {
             clearInterval(pomoInterval);
             playRing();
             isPomoRunning = false;
-            pomoPlayIcon.className = 'fa-solid fa-play';
-            if(pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
-            
+            if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-play';
+            if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
+
             if (pomoMode === 'focus') {
                 setPomoMode('short', true);
             } else {
@@ -4174,59 +4196,44 @@ function startPomoTimer(startPlaying = true) {
                     setPomoMode('focus', false);
                     pomoCurrentCycle = 1;
                     updatePomoDisplay();
+                    releaseWakeLock();
                 } else {
                     setPomoMode('focus', true);
                 }
             }
+            return;
         }
-        
+
         updatePomoDisplay();
     }, 1000);
 }
 
+// ===================== EVENT LISTENERS =====================
 document.querySelectorAll('.pomo-mode-btn[data-mode]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        setPomoMode(btn.dataset.mode, false);
-    });
+    btn.addEventListener('click', () => setPomoMode(btn.dataset.mode, false));
 });
 
-if(btnToggleRing) {
+if (btnToggleRing) {
     btnToggleRing.addEventListener('click', () => {
         isRingVisible = !isRingVisible;
-        document.querySelector('.pomo-ring').style.display = isRingVisible ? 'block' : 'none';
-        btnToggleRing.innerHTML = isRingVisible ? '<i class="fa-solid fa-bullseye"></i>' : '<i class="fa-solid fa-circle"></i>';
-        if(isRingVisible) {
-            btnToggleRing.classList.add('active');
-        } else {
-            btnToggleRing.classList.remove('active');
-        }
+        const ring = document.querySelector('.pomo-ring');
+        if (ring) ring.style.display = isRingVisible ? '' : 'none';
+        btnToggleRing.innerHTML = isRingVisible
+            ? '<i class="fa-solid fa-bullseye"></i>'
+            : '<i class="fa-regular fa-circle"></i>';
     });
 }
 
-[pomoFocusMin, pomoShortMin, pomoTotalHours].forEach(input => {
-    if(input) {
-        input.addEventListener('change', () => {
-            pomoCurrentCycle = 1;
-            setPomoMode('focus', false);
-        });
-    }
-});
-
 function toggleTimerGlobal() {
-    if (isPomoRunning) {
-        startPomoTimer(false); // Pause
-    } else {
-        startPomoTimer(true); // Play
-    }
+    if (isPomoRunning) startPomoTimer(false);
+    else startPomoTimer(true);
 }
 
 if (btnPomoStartPause) btnPomoStartPause.addEventListener('click', toggleTimerGlobal);
 if (pomoMiniPlay) pomoMiniPlay.addEventListener('click', toggleTimerGlobal);
 
 if (btnPomoPrev) {
-    btnPomoPrev.addEventListener('click', () => {
-        setPomoMode(pomoMode, false);
-    });
+    btnPomoPrev.addEventListener('click', () => setPomoMode(pomoMode, false));
 }
 
 if (btnPomoSkip) {
@@ -4245,12 +4252,21 @@ if (btnPomoSkip) {
     });
 }
 
-// Full screen Idle specific logic
+[pomoFocusMin, pomoShortMin, pomoTotalHours].forEach(input => {
+    if (input) {
+        input.addEventListener('change', () => {
+            pomoCurrentCycle = 1;
+            setPomoMode('focus', false);
+        });
+    }
+});
+
+// ===================== FULLSCREEN + IDLE FADE =====================
 let fsIdleTimer;
 const pomodoroView = document.getElementById('pomodoroView');
 
 function resetFsIdle() {
-    if(!document.fullscreenElement) return;
+    if (!document.fullscreenElement) return;
     pomodoroView.classList.remove('fullscreen-idle');
     clearTimeout(fsIdleTimer);
     fsIdleTimer = setTimeout(() => {
@@ -4258,14 +4274,14 @@ function resetFsIdle() {
     }, 3000);
 }
 
-if(pomodoroView) {
-    pomodoroView.addEventListener('mousemove', resetFsIdle);
-    pomodoroView.addEventListener('touchstart', resetFsIdle);
-    pomodoroView.addEventListener('click', resetFsIdle);
+if (pomodoroView) {
+    ['mousemove', 'touchstart', 'click'].forEach(e =>
+        pomodoroView.addEventListener(e, resetFsIdle)
+    );
 }
 
 document.addEventListener('fullscreenchange', () => {
-    if(!document.fullscreenElement) {
+    if (!document.fullscreenElement) {
         pomodoroView.classList.remove('fullscreen-idle');
         clearTimeout(fsIdleTimer);
     } else {
@@ -4278,7 +4294,7 @@ if (btnPomoFullscreen) {
         if (!document.fullscreenElement) {
             pomodoroView.requestFullscreen().then(() => {
                 if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('landscape').catch(e => console.log('Orientation lock not supported'));
+                    screen.orientation.lock('landscape').catch(() => {});
                 }
             }).catch(e => console.log(e));
         } else {
@@ -4287,5 +4303,5 @@ if (btnPomoFullscreen) {
     });
 }
 
-// Initial display
+// Initial display — runs synchronously after inputs are in DOM
 updatePomoDisplay();
