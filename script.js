@@ -3840,6 +3840,12 @@ function initBgAudio() {
     bgSessionAudio.muted = false; // MUST be false to register with OS MediaSession
     // 1-second completely silent WAV file
     bgSessionAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+
+    // ACTION HANDLERS ARE REQUIRED FOR THE NOTIFICATION TO APPEAR ON ANDROID/IOS!
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', () => toggleTimerGlobal());
+        navigator.mediaSession.setActionHandler('pause', () => toggleTimerGlobal());
+    }
 }
 
 async function requestWakeLock() {
