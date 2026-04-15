@@ -3945,9 +3945,10 @@ function formatPomoTime(seconds) {
 
 function getTotalCycles() {
     const focusMin = parseInt(pomoFocusMin.value) || 50;
-    const shortMin = parseInt(pomoShortMin.value) || 10;
+    const shortMin = parseInt(pomoShortMin.value) ?? 0; // allow 0 break
     const totalHr = parseFloat(pomoTotalHours.value) || 4;
-    return Math.max(1, Math.floor((totalHr * 60) / (focusMin + shortMin)));
+    const cycleMin = focusMin + (isNaN(shortMin) ? 0 : shortMin);
+    return Math.max(1, Math.floor((totalHr * 60) / cycleMin));
 }
 
 function updatePomoDisplay() {
