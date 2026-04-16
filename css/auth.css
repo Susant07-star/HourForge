@@ -1,0 +1,106 @@
+/* ==========================================
+   LOGIN GATE (Mandatory Google Auth)
+   ========================================== */
+.login-gate {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--bg-color);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.login-gate-content {
+    background: var(--surface-light);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    -webkit-
+}
+
+.login-gate-logo {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem auto;
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+}
+
+.login-gate-logo i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.login-gate-content h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.login-gate-content p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.google-signin-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    background: white;
+    color: #333;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.google-signin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.google-signin-btn:active {
+    transform: translateY(0);
+}
+
+.google-logo {
+    width: 20px;
+    height: 20px;
+}
+
+@media (max-width: 480px) {
+    .pomo-mini-timer {
+        bottom: 0.75rem;
+        right: 0.75rem;
+        left: 0.75rem;
+        border-radius: 0.85rem;
+        justify-content: space-between;
+    }
+
+    .pomo-mini-info {
+        flex: 1;
+    }
+}
+
