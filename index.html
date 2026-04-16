@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -167,42 +167,81 @@
 
         <!-- Dashboard View -->
         <main id="dashboardView" class="view-section active flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="false">
-            <!-- Dashboard Header -->
-            <div class="px-2">
-                <h1 class="premium-heading mb-1">Overview</h1>
-                <p class="premium-subtext">Welcome back. Let's conquer today's goals without overthinking it.</p>
-            </div>
+            <div class="dashboard-shell md:px-2">
+                <section class="premium-card dashboard-hero">
+                    <div class="dashboard-hero-grid">
+                        <div>
+                            <div class="hero-chip w-fit mb-4"><i class="fa-solid fa-crown text-amber-300"></i> Premium Study Command Center</div>
+                            <h1 class="premium-heading mb-3">Study with clarity, not chaos.</h1>
+                            <p class="premium-subtext max-w-2xl">Your dashboard should feel like mission control: calm, sharp, and ready to tell you what matters now. Start focus sessions, catch upcoming exams, and keep your revision chain alive without hunting through tabs.</p>
+                            <div class="hero-action-row">
+                                <button class="premium-btn-primary sm:w-auto" onclick="switchTab('hourLogView')"><i class="fa-solid fa-bolt"></i> Log Time Fast</button>
+                                <button class="premium-btn-secondary sm:w-auto" onclick="switchTab('pomodoroView')"><i class="fa-solid fa-hourglass-half"></i> Open Focus Timer</button>
+                            </div>
+                            <div class="dashboard-kpi-grid">
+                                <div class="dashboard-kpi">
+                                    <div class="dashboard-kpi-label">Today's Focus</div>
+                                    <div class="dashboard-kpi-value" id="dashboardFocusHours">Deep Work</div>
+                                    <div class="dashboard-kpi-note">Log sessions and protect momentum.</div>
+                                </div>
+                                <div class="dashboard-kpi">
+                                    <div class="dashboard-kpi-label">Revision Rhythm</div>
+                                    <div class="dashboard-kpi-value">2-4-7</div>
+                                    <div class="dashboard-kpi-note">Stay on schedule and reduce forgetfulness.</div>
+                                </div>
+                                <div class="dashboard-kpi">
+                                    <div class="dashboard-kpi-label">Mode</div>
+                                    <div class="dashboard-kpi-value">Offline-First</div>
+                                    <div class="dashboard-kpi-note">Your system keeps working anywhere.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="countdown-premium">
+                            <div class="countdown-tile">
+                                <span id="exam1Label" class="block text-[0.72rem] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Exam 1 in</span>
+                                <span id="preBoardCountdown" class="block text-[2.6rem] md:text-[3rem] font-extrabold text-slate-100 tracking-tight leading-none">--</span>
+                                <span class="text-[0.72rem] text-amber-400 font-bold tracking-[0.16em] mt-2 block uppercase">days remaining</span>
+                            </div>
+                            <div class="countdown-tile">
+                                <span id="exam2Label" class="block text-[0.72rem] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Exam 2 in</span>
+                                <span id="boardCountdown" class="block text-[2.6rem] md:text-[3rem] font-extrabold text-slate-100 tracking-tight leading-none">--</span>
+                                <span class="text-[0.72rem] text-emerald-400 font-bold tracking-[0.16em] mt-2 block uppercase">days remaining</span>
+                            </div>
+                            <div class="countdown-tile col-span-full flex flex-col justify-between">
+                                <div>
+                                    <div class="section-eyebrow mb-2">Today at a glance</div>
+                                    <p class="text-slate-300 text-[0.95rem] leading-relaxed">Use this tab as your daily reset point. Check what’s due, start a five-minute session, and then move into logs or focused study with one tap.</p>
+                                </div>
+                                <div id="currentDateDisplay" class="mt-4 text-[0.85rem] font-semibold text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl w-fit"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-            <!-- Exam Countdown Headers -->
-            <div class="premium-card flex justify-around items-center bg-gradient-to-br from-slate-900 to-slate-800/80 border-amber-500/20 md:mx-2">
-                <div class="text-center">
-                    <span id="exam1Label" class="block text-[0.75rem] font-bold text-slate-500 uppercase tracking-[0.2em] mb-1">Exam 1 in</span>
-                    <span id="preBoardCountdown" class="block text-[2.5rem] md:text-[3rem] font-extrabold text-slate-100 tracking-tight leading-none drop-shadow-sm">--</span>
-                    <span class="text-[0.75rem] text-amber-500 font-bold tracking-[0.1em] mt-1 block">DAYS</span>
-                </div>
-                <div class="w-[1px] h-[60px] bg-white/10"></div>
-                <div class="text-center">
-                    <span id="exam2Label" class="block text-[0.75rem] font-bold text-slate-500 uppercase tracking-[0.2em] mb-1">Exam 2 in</span>
-                    <span id="boardCountdown" class="block text-[2.5rem] md:text-[3rem] font-extrabold text-slate-100 tracking-tight leading-none drop-shadow-sm">--</span>
-                    <span class="text-[0.75rem] text-amber-500 font-bold tracking-[0.1em] mt-1 block">DAYS</span>
-                </div>
-            </div>
-
-            <!-- Dashboard Top: AI Insight + Timer -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:px-2">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- AI Psychology Insight -->
                 <div class="premium-card flex flex-col justify-center border-pink-500/20 bg-gradient-to-br from-slate-900 to-pink-500/5 hover:border-pink-500/40">
-                    <h3 class="mb-3 text-[0.9rem] font-bold flex items-center gap-2 uppercase tracking-wide text-pink-400">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-eyebrow mb-2">Mindset Signal</div>
+                            <h3 class="text-[1rem] font-bold flex items-center gap-2 uppercase tracking-wide text-pink-400">
                         <i class="fa-solid fa-lightbulb"></i> AI Insight
                     </h3>
+                        </div>
+                    </div>
                     <p id="dailyInsightText" class="text-[1rem] text-slate-300 leading-relaxed font-serif italic">"Loading insight..."</p>
                 </div>
                 
                 <!-- 5-Minute Timer -->
                 <div class="premium-card flex flex-col items-center text-center border-emerald-500/20 hover:border-emerald-500/40 bg-gradient-to-br from-slate-900 to-emerald-500/5">
-                    <h3 class="mb-1 text-[0.9rem] font-bold flex items-center justify-center gap-2 text-emerald-400 uppercase tracking-wide">
+                    <div class="section-header w-full mb-0">
+                        <div class="w-full">
+                            <div class="section-eyebrow mb-2 text-center">Start Without Resistance</div>
+                            <h3 class="text-[0.95rem] font-bold flex items-center justify-center gap-2 text-emerald-400 uppercase tracking-wide">
                         <i class="fa-solid fa-stopwatch"></i> 5-Min Rule
                     </h3>
+                        </div>
+                    </div>
                     <p class="text-[0.85rem] text-slate-400 mb-4 max-w-sm">Commit to just 5 minutes. Force your brain to start.</p>
                     <div id="countdownDisplay" class="text-[3.5rem] font-extrabold mb-5 tabular-nums tracking-tighter leading-none text-slate-100">05:00</div>
                     <div class="flex justify-center gap-3 w-full sm:w-auto">
@@ -220,13 +259,18 @@
             </div>
 
             <!-- Lower Analytics & Forms Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:px-2">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 <!-- Left Column: Add New Study Session Form -->
                 <section class="premium-card lg:col-span-1 border-indigo-500/10 flex flex-col gap-2">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-eyebrow mb-2">Capture New Material</div>
                     <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200">
                         <i class="fa-solid fa-plus text-indigo-400"></i> Log Session
                     </h2>
+                        </div>
+                    </div>
                     <form id="addSessionForm" class="flex flex-col gap-5">
                         <div class="flex flex-col gap-1.5">
                             <label for="subject" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Subject</label>
@@ -252,11 +296,13 @@
                 <!-- Right Column: Revisions Dashboard -->
                 <section class="lg:col-span-2 flex flex-col gap-4">
                     <div class="premium-card flex-1 border-pink-500/10" id="todayRevisionsPanel">
-                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 pb-4 border-b border-white/5">
-                            <h2 class="text-lg font-bold flex items-center gap-2 text-slate-200 m-0">
+                        <div class="section-header mb-6 pb-4 border-b border-white/5">
+                            <div>
+                                <div class="section-eyebrow mb-2">Immediate Action Queue</div>
+                                <h2 class="text-lg font-bold flex items-center gap-2 text-slate-200 m-0">
                                 <i class="fa-solid fa-fire text-pink-500"></i> Today's Revisions
                             </h2>
-                            <span id="currentDateDisplay" class="bg-white/5 border border-white/10 px-4 py-1.5 rounded-lg text-[0.85rem] font-semibold text-slate-300"></span>
+                            </div>
                         </div>
                         <div id="todayRevisionList" class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <!-- Revision Cards dynamically injected -->
@@ -265,7 +311,12 @@
 
                 <!-- All Tracked Topics & Filters -->
                 <div class="premium-card border-indigo-500/10">
-                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-book-open text-indigo-400"></i> Ongoing Revisions</h2>
+                    <div class="section-header">
+                        <div>
+                            <div class="section-eyebrow mb-2">Revision Inventory</div>
+                            <h2 class="text-lg font-bold mb-0 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-book-open text-indigo-400"></i> Ongoing Revisions</h2>
+                        </div>
+                    </div>
                     <div class="flex flex-wrap gap-2 mb-6" id="subjectFilterGroup">
                         <button class="filter-btn active bg-indigo-500 text-white font-medium px-4 py-2 rounded-xl transition-colors hover:-translate-y-0.5 shadow-md shadow-indigo-500/20 text-[0.9rem]" data-filter="all">All</button>
                         <!-- Subject filters populated dynamically -->
@@ -275,6 +326,8 @@
                     </div>
                 </div>
             </section>
+            </div>
+            </div>
         </main>
 
 
@@ -754,73 +807,70 @@
     </div>
 
     <!-- =================== POMODORO MODAL (Converted to Tab) =================== -->
-    <main id="pomodoroView" class="view-section pomodoro-view flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="true">
-        
-        <div class="px-2">
-            <h1 class="premium-heading mb-1"><i class="fa-solid fa-hourglass-half text-red-500 mr-2"></i> Pomodoro Timer</h1>
-            <p class="premium-subtext">Focus intensely, break effectively. Master your study rhythm.</p>
-        </div>
-
-        <div class="premium-card flex flex-col items-center justify-center min-h-[70vh] relative pt-6 md:mx-2 border-indigo-500/10">
+    <main id="pomodoroView" class="view-section pomodoro-view pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
+        <div class="glass-panel flex flex-col items-center justify-center min-h-[80vh] relative pt-6 mb-4">
+            <div class="modal-header w-full justify-center mb-4 border-b-0 pb-0">
+                <h2 class="m-0 flex items-center gap-2 text-xl font-bold text-slate-200"><i class="fa-solid fa-hourglass-half text-red-500"></i> Pomodoro Timer</h2>
+            </div>
 
             <!-- Mode selector -->
-            <div class="flex justify-center gap-1.5 mb-6 bg-slate-900/50 px-1.5 py-1.5 rounded-full border border-white/5">
-                <button class="pomo-mode-btn active bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/5 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-lg" data-mode="focus">Focus</button>
-                <button class="pomo-mode-btn bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/5 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-lg" data-mode="short">Break</button>
+            <div class="flex justify-center gap-1.5 mb-6 bg-black/20 px-1.5 py-1.5 rounded-full border border-white/10">
+                <button class="pomo-mode-btn active bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/10 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-[0_4px_12px_rgba(99,102,241,0.4)]" data-mode="focus">Focus</button>
+                <button class="pomo-mode-btn bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/10 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-[0_4px_12px_rgba(99,102,241,0.4)]" data-mode="short">Break</button>
                 <button class="bg-transparent border-none text-slate-400 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all hover:bg-white/10 hover:text-white" id="btnToggleRing" title="Toggle Ring"><i class="fa-solid fa-bullseye"></i></button>
             </div>
 
             <!-- Custom time settings (Collapsible) -->
-            <details class="pomo-settings-details w-full max-w-sm mb-6 bg-slate-900/30 rounded-2xl px-4 py-2 border border-white/5">
-                <summary class="cursor-pointer text-slate-400 font-bold outline-none py-2 select-none uppercase tracking-wide text-[0.85rem] flex items-center gap-2"><i class="fa-solid fa-gear"></i> Timer Settings</summary>
+            <details class="pomo-settings-details w-full max-w-sm mb-6 bg-white/5 rounded-2xl px-4 py-2 border border-white/10">
+                <summary class="cursor-pointer text-slate-400 font-medium outline-none py-2 select-none">ΓÜÖ∩╕Å Timer Settings</summary>
                 <div class="flex justify-between gap-3 mt-4 mb-4">
                     <div class="flex flex-col items-center gap-1 flex-1">
-                        <label class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Focus <span class="font-normal opacity-60">min</span></label>
-                        <input type="number" id="pomoFocusMin" value="50" min="1" max="120" class="premium-input bg-slate-800/80 text-center text-[1rem] p-1.5 py-2 w-full appearance-none">
+                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Focus <span class="font-normal opacity-60">min</span></label>
+                        <input type="number" id="pomoFocusMin" value="50" min="1" max="120" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
                     </div>
                     <div class="flex flex-col items-center gap-1 flex-1">
-                        <label class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Break <span class="font-normal opacity-60">min</span></label>
-                        <input type="number" id="pomoShortMin" value="10" min="0" max="60" class="premium-input bg-slate-800/80 text-center text-[1rem] p-1.5 py-2 w-full appearance-none">
+                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Break <span class="font-normal opacity-60">min</span></label>
+                        <input type="number" id="pomoShortMin" value="10" min="0" max="60" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
                     </div>
                     <div class="flex flex-col items-center gap-1 flex-1">
-                        <label class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Total <span class="font-normal opacity-60">hrs</span></label>
-                        <input type="number" id="pomoTotalHours" value="4" min="0.1" step="0.1" max="24" class="premium-input bg-slate-800/80 text-center text-[1rem] p-1.5 py-2 w-full appearance-none">
+                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Total <span class="font-normal opacity-60">hrs</span></label>
+                        <input type="number" id="pomoTotalHours" value="4" min="0.1" step="0.1" max="24" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
                     </div>
                 </div>
             </details>
 
             <div class="pomo-fullscreen-btn-wrap flex gap-3 mb-6 flex-wrap justify-center">
-                <button id="btnPomoPrev" class="premium-btn-secondary px-5 py-2 rounded-full cursor-pointer text-[0.95rem] font-semibold tracking-wide border-slate-700 hover:bg-slate-800" title="Reset Timer">
+                <button id="btnPomoPrev" class="btn-fullscreen-inline flex items-center gap-2 bg-white/10 hover:bg-white/15 border-none text-white px-5 py-2.5 rounded-full cursor-pointer transition-all text-[0.95rem]" title="Reset Timer">
                     <i class="fa-solid fa-rotate-left"></i> Reset
                 </button>
-                <button id="btnPomoFullscreen" class="premium-btn-secondary px-5 py-2 rounded-full cursor-pointer text-[0.95rem] font-semibold tracking-wide border-slate-700 hover:bg-slate-800" title="Full Screen">
+                <button id="btnPomoFullscreen" class="btn-fullscreen-inline flex items-center gap-2 bg-white/10 hover:bg-white/15 border-none text-white px-5 py-2.5 rounded-full cursor-pointer transition-all text-[0.95rem]" title="Full Screen">
                     <i class="fa-solid fa-expand"></i> Full Screen
                 </button>
             </div>
 
             <!-- Timer ring -->
-            <div class="relative w-[240px] h-[240px] mx-auto mb-8 mt-2">
-                <svg class="w-full h-full -rotate-90 filter drop-shadow-[0_0_12px_rgba(239,68,68,0.3)]" viewBox="0 0 120 120">
-                    <circle class="fill-none stroke-white/[.04] stroke-[8]" cx="60" cy="60" r="54" />
-                    <circle class="fill-none stroke-[8] [stroke-linecap:round] [stroke-dasharray:339.29] [transition:stroke-dashoffset_1s_linear,stroke_0.4s_ease]"
-                        id="pomoRingFill" cx="60" cy="60" r="54" stroke="#ef4444" stroke-dashoffset="0" />
+            <div class="relative w-[220px] h-[220px] mx-auto mb-8 mt-2">
+                <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                    <circle class="fill-none stroke-white/[.06] stroke-[6]" cx="60" cy="60" r="56" />
+                    <circle class="fill-none stroke-[6] [stroke-linecap:round] [stroke-dasharray:351.86] [transition:stroke-dashoffset_1s_linear,stroke_0.4s_ease]"
+                        id="pomoRingFill" cx="60" cy="60" r="56" stroke="#ef4444" stroke-dashoffset="0" />
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center">
-                    <div id="pomoTime" class="text-[4rem] font-black tracking-tighter leading-none bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent drop-shadow-lg">50:00</div>
-                    <div id="pomoModeLabel" class="text-[0.95rem] text-slate-400 uppercase tracking-widest mt-2 font-bold">Focus</div>
+                    <div id="pomoTime" class="text-[3.5rem] font-extrabold tracking-[-1.5px] leading-none bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent drop-shadow-md">50:00</div>
+                    <div id="pomoModeLabel" class="text-[0.9rem] text-slate-400 uppercase tracking-[1.5px] mt-2 font-semibold">Focus</div>
                 </div>
             </div>
             
-            <div class="pomo-controls flex justify-center items-center gap-6 mb-8">
-                <button id="btnPomoBack" class="pomo-ctrl-btn w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all bg-slate-800 border border-slate-700 text-slate-400 text-[1rem] hover:bg-slate-700 hover:text-white hover:-translate-y-1" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
-                <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn w-[72px] h-[72px] rounded-full flex items-center justify-center cursor-pointer transition-all bg-gradient-to-br from-red-500 to-red-600 border border-red-400/20 text-white text-[1.4rem] shadow-[0_8px_25px_rgba(239,68,68,0.4)] hover:scale-105 hover:shadow-[0_12px_35px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
-                <button id="btnPomoSkip" class="pomo-ctrl-btn w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all bg-slate-800 border border-slate-700 text-slate-400 text-[1rem] hover:bg-slate-700 hover:text-white hover:-translate-y-1" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
+            <div class="pomo-controls flex justify-center items-center gap-4 mb-6">
+                <button id="btnPomoBack" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center cursor-pointer transition-all bg-white/[.07] border border-white/10 text-slate-400 text-[0.95rem] hover:bg-white/[.12] hover:text-white hover:scale-105" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
+                <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn w-[60px] h-[60px] rounded-full flex items-center justify-center cursor-pointer transition-all bg-gradient-to-br from-red-500 to-red-600 border-none text-white text-[1.2rem] shadow-[0_6px_20px_rgba(239,68,68,0.35)] hover:scale-110 hover:shadow-[0_8px_28px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
+                <button id="btnPomoSkip" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center cursor-pointer transition-all bg-white/[.07] border border-white/10 text-slate-400 text-[0.95rem] hover:bg-white/[.12] hover:text-white hover:scale-105" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
             </div>
 
             <!-- Session counter -->
-            <div class="pomo-sessions flex flex-col items-center gap-1 mb-2 bg-indigo-500/10 border border-indigo-500/20 px-6 py-2.5 rounded-2xl">
-                <div class="pomo-session-label text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest">Current Cycle</div>
-                <div id="pomoSessionCount" class="pomo-session-count text-[1.2rem] font-black mt-0.5 text-indigo-400">1 of 4</div>
+            <div class="pomo-sessions flex flex-col items-center gap-1 mb-4">
+                <div class="pomo-session-label text-[0.75rem] text-slate-400 uppercase tracking-[0.5px]">Current Cycle</div>
+                <div id="pomoSessionCount" class="pomo-session-count text-[1.2rem] font-semibold mt-1 text-indigo-400">1 of 4</div>
             </div>
 
 
