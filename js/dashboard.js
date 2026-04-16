@@ -256,7 +256,7 @@ function renderDynamicSubjects() {
         if (allBtn) filterGroup.appendChild(allBtn);
         subjects.forEach(s => {
             const btn = document.createElement('button');
-            btn.className = 'filter-btn';
+            btn.className = 'filter-btn bg-white/5 border border-white/10 text-slate-400 px-4 py-2 rounded-full font-medium font-sans text-[0.9rem] cursor-pointer transition-all hover:bg-white/10 hover:text-slate-200 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:border-indigo-500 [&.active]:shadow-sm';
             btn.dataset.filter = s;
             btn.textContent = s;
             btn.addEventListener('click', (e) => {
@@ -801,8 +801,8 @@ function renderTodayRevisions() {
 
     if (dueToday.length === 0) {
         todayRevisionList.innerHTML = `
-            <div class="empty-state animated-entry">
-                <i class="fa-solid fa-mug-hot"></i>
+            <div class="col-span-full text-center py-12 px-4 text-slate-500 animated-entry">
+                <i class="fa-solid fa-mug-hot text-5xl mb-4 opacity-50 block -mt-4"></i>
                 <p>No 2-4-7 revisions strictly due today. Great job!</p>
             </div>
         `;
@@ -822,27 +822,26 @@ function renderTodayRevisions() {
         const color = SUBJECT_COLORS[session.subject] || 'var(--accent-primary)';
 
         const card = document.createElement('div');
-        card.className = 'revision-card animated-entry';
+        card.className = 'bg-black/30 border border-white/10 rounded-2xl p-5 relative overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.3)] hover:border-white/20 animated-entry';
         card.style.setProperty('--card-color', color);
-        // Staggered animation
         card.style.animationDelay = `${index * 0.1}s`;
 
-        // Visual check for Overdue status
         let overdueBadge = '';
         if (session.daysOverdue > 0) {
             const label = session.daysOverdue === 1 ? 'day' : 'days';
-            overdueBadge = `<span style="color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-left: 0.5rem;"><i class="fa-solid fa-circle-exclamation"></i> ${session.daysOverdue} ${label} overdue</span>`;
+            overdueBadge = `<span class="text-red-500 text-[0.8rem] font-semibold ml-2"><i class="fa-solid fa-circle-exclamation"></i> ${session.daysOverdue} ${label} overdue</span>`;
         }
 
         card.innerHTML = `
-            <div class="card-subject">${session.subject}</div>
-            <div class="card-topic">${session.topic}</div>
-            <div class="card-meta">
-                <span class="revision-badge">${session.revisionLabel}</span>
+            <div class="absolute top-0 left-0 w-1 h-full bg-[var(--card-color)]"></div>
+            <div class="text-[0.8rem] uppercase tracking-widest font-semibold mb-1 text-[var(--card-color)]">${session.subject}</div>
+            <div class="text-[1.2rem] font-semibold mb-4 leading-snug text-slate-200">${session.topic}</div>
+            <div class="flex flex-wrap justify-between items-center text-[0.9rem] text-slate-400 mb-4 gap-2">
+                <span class="bg-pink-500/20 text-pink-200 px-3 py-1 rounded-full font-semibold text-[0.8rem] w-fit whitespace-nowrap">${session.revisionLabel}</span>
                 ${overdueBadge}
-                <span><i class="fa-regular fa-clock"></i> Read: ${session.dateRead}</span>
+                <span class="whitespace-nowrap"><i class="fa-regular fa-clock"></i> Read: ${session.dateRead}</span>
             </div>
-            <button class="btn-complete-revision" onclick="completeRevision('${session.id}', '${session.revisionType}')">
+            <button class="w-full mt-auto bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-2.5 rounded-xl cursor-pointer font-medium transition-all duration-200 flex justify-center items-center gap-2 hover:bg-emerald-500/20 hover:-translate-y-[1px]" onclick="completeRevision('${session.id}', '${session.revisionType}')">
                 <i class="fa-solid fa-check"></i> Mark Completed
             </button>
         `;
@@ -862,7 +861,7 @@ function renderAllTopics() {
 
     if (filteredSessions.length === 0) {
         allTopicsList.innerHTML = `
-            <div class="empty-state">
+            <div class="text-center py-12 px-4 text-slate-500 animated-entry">
                 <p>No topics found. Log some sessions first!</p>
             </div>
         `;
@@ -873,46 +872,43 @@ function renderAllTopics() {
     filteredSessions.forEach((session, index) => {
         const color = SUBJECT_COLORS[session.subject] || 'var(--accent-primary)';
         const item = document.createElement('div');
-        item.className = 'topic-item animated-entry';
+        item.className = 'flex justify-between items-center p-4 border-b border-white/5 transition-colors duration-200 hover:bg-white/5 last:border-none animated-entry';
         item.style.animationDelay = `${index * 0.05}s`;
 
         // Visual indicators of step completion
-        // Graceful legacy migration handled previously but checking just in case
         const rev2Done = session.revisions.rev2.done ?? session.revisions.rev2 === true;
         const rev4Done = session.revisions.rev4.done ?? session.revisions.rev4 === true;
         const rev7Done = session.revisions.rev7.done ?? session.revisions.rev7 === true;
 
-        const rev2Class = rev2Done ? 'completed' : 'pending';
-        const rev4Class = rev4Done ? 'completed' : 'pending';
-        const rev7Class = rev7Done ? 'completed' : 'pending';
+        const rev2Class = rev2Done ? 'bg-emerald-500 text-white border-transparent' : 'bg-white/10 text-slate-400 border-white/10 opacity-50';
+        const rev4Class = rev4Done ? 'bg-emerald-500 text-white border-transparent' : 'bg-white/10 text-slate-400 border-white/10 opacity-50';
+        const rev7Class = rev7Done ? 'bg-emerald-500 text-white border-transparent' : 'bg-white/10 text-slate-400 border-white/10 opacity-50';
 
         const rev2Icon = rev2Done ? '<i class="fa-solid fa-check"></i>' : '2d';
         const rev4Icon = rev4Done ? '<i class="fa-solid fa-check"></i>' : '4d';
         const rev7Icon = rev7Done ? '<i class="fa-solid fa-check"></i>' : '7d';
 
-        // Persistent Delete Button (no 5-min window)
-        const deleteBtnHtml = `<button class="btn-delete" title="Delete Ongoing Revision" onclick="deleteRevisionCard(event, '${session.id}')" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2); color: #f87171; border-radius: 0.5rem; padding: 0.3rem 0.6rem; font-size: 0.75rem;"><i class="fa-solid fa-trash-can"></i></button>`;
+        // Persistent Delete Button
+        const deleteBtnHtml = `<button class="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-2.5 py-1 text-[0.75rem] transition-colors hover:bg-red-500/20 hover:text-red-300" title="Delete Ongoing Revision" onclick="deleteRevisionCard(event, '${session.id}')"><i class="fa-solid fa-trash-can"></i></button>`;
 
         item.innerHTML = `
-            <div class="topic-info-main">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem;">
-                    <h4>${session.topic}</h4>
+            <div class="flex-1 pr-4">
+                <div class="flex justify-between items-start mb-1 gap-2">
+                    <h4 class="text-[1.1rem] font-medium text-slate-200 m-0">${session.topic}</h4>
                     ${deleteBtnHtml}
                 </div>
-                <div class="topic-info-sub">
-                    <span>
-                        <div class="topic-subject-dot" style="--card-color: ${color}"></div>
+                <div class="text-[0.85rem] text-slate-400 flex max-[480px]:flex-col max-[480px]:gap-1.5 md:gap-4 mt-2">
+                    <span class="flex items-center gap-2 border border-white/10 px-2 py-0.5 rounded-md bg-black/20 w-fit">
+                        <div class="w-2.5 h-2.5 rounded-full" style="background-color: ${color}"></div>
                         ${session.subject}
                     </span>
-                    <span><i class="fa-regular fa-calendar"></i> ${session.dateRead}</span>
+                    <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar"></i> ${session.dateRead}</span>
                 </div>
             </div>
-            <div class="topic-status">
-                <div class="status-pills" title="Revision Checkpoints">
-                    <div class="status-pill ${rev2Class}" title="2-Day">${rev2Icon}</div>
-                    <div class="status-pill ${rev4Class}" title="4-Day">${rev4Icon}</div>
-                    <div class="status-pill ${rev7Class}" title="7-Day">${rev7Icon}</div>
-                </div>
+            <div class="flex gap-1.5 pl-2 border-l border-white/5">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center text-[0.75rem] cursor-help border transition-colors ${rev2Class}" title="2-Day">${rev2Icon}</div>
+                <div class="w-7 h-7 rounded-full flex items-center justify-center text-[0.75rem] cursor-help border transition-colors ${rev4Class}" title="4-Day">${rev4Icon}</div>
+                <div class="w-7 h-7 rounded-full flex items-center justify-center text-[0.75rem] cursor-help border transition-colors ${rev7Class}" title="7-Day">${rev7Icon}</div>
             </div>
         `;
 

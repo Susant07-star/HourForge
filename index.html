@@ -176,130 +176,101 @@
 
 
         <!-- Dashboard View -->
-        <main id="dashboardView" class="main-content view-section active">
+        <main id="dashboardView" class="main-content view-section active pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
             <!-- Dashboard Header -->
-            <div class="view-header" style="grid-column: 1 / -1; margin-top: -0.5rem; margin-bottom: 0.5rem; padding: 0;">
-                <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; letter-spacing: -0.5px;">Dashboard</h1>
-                <p style="color: var(--text-secondary); font-size: 0.95rem;">Jump right in. Let's conquer today's goals without overthinking it.</p>
+            <div class="col-span-full -mt-2 mb-2 p-0">
+                <h1 class="text-[2rem] font-bold text-slate-200 mb-1 tracking-[-0.5px]">Dashboard</h1>
+                <p class="text-slate-400 text-[0.95rem]">Jump right in. Let's conquer today's goals without overthinking it.</p>
             </div>
 
             <!-- Exam Countdown Headers -->
-            <div class="exam-countdown-container" style="grid-column: 1 / -1;">
-                <div class="glass-panel countdown-panel"
-                    style="display: flex; justify-content: space-around; align-items: center; padding: 1.5rem; background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(245, 158, 11, 0.05)); border-color: rgba(245, 158, 11, 0.3);">
-                    <div class="countdown-item" style="text-align: center;">
-                        <span class="countdown-label"
-                            style="display: block; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;"
-                            id="exam1Label">Exam 1
-                            in</span>
-                        <span id="preBoardCountdown" class="countdown-days"
-                            style="display: block; font-size: 2.5rem; font-weight: 800; color: #f59e0b; text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);">--</span>
-                        <span class="countdown-unit"
-                            style="font-size: 0.9rem; color: #f59e0b; font-weight: 600;">DAYS</span>
+            <div class="col-span-full">
+                <div class="glass-panel flex justify-around items-center p-6 bg-gradient-to-br from-slate-800/80 to-amber-500/5 border-amber-500/30">
+                    <div class="text-center">
+                        <span id="exam1Label" class="block text-[0.9rem] text-slate-400 uppercase tracking-widest mb-2">Exam 1 in</span>
+                        <span id="preBoardCountdown" class="block text-[2.5rem] font-extrabold text-amber-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.4)]">--</span>
+                        <span class="text-[0.9rem] text-amber-500 font-semibold">DAYS</span>
                     </div>
-                    <div class="countdown-divider" style="width: 1px; height: 50px; background: rgba(255,255,255,0.1);">
-                    </div>
-                    <div class="countdown-item" style="text-align: center;">
-                        <span class="countdown-label"
-                            style="display: block; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;"
-                            id="exam2Label">Exam 2
-                            in</span>
-                        <span id="boardCountdown" class="countdown-days"
-                            style="display: block; font-size: 2.5rem; font-weight: 800; color: #f59e0b; text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);">--</span>
-                        <span class="countdown-unit"
-                            style="font-size: 0.9rem; color: #f59e0b; font-weight: 600;">DAYS</span>
+                    <div class="w-[1px] h-[50px] bg-white/10"></div>
+                    <div class="text-center">
+                        <span id="exam2Label" class="block text-[0.9rem] text-slate-400 uppercase tracking-widest mb-2">Exam 2 in</span>
+                        <span id="boardCountdown" class="block text-[2.5rem] font-extrabold text-amber-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.4)]">--</span>
+                        <span class="text-[0.9rem] text-amber-500 font-semibold">DAYS</span>
                     </div>
                 </div>
             </div>
 
             <!-- Dashboard Top: AI Insight + Timer in a 2-col row on desktop, stacked on mobile -->
-            <div class="dashboard-top-widgets"
-                style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: var(--card-gap, 1rem);">
+            <div class="col-span-full grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- AI Psychology Insight -->
-                <div class="glass-panel ai-insight-widget"
-                    style="border-color: rgba(236, 72, 153, 0.3); background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(236, 72, 153, 0.05));">
-                    <h3
-                        style="margin-bottom: 0.5rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #fbcfe8;">
-                        <i class="fa-solid fa-brain"></i> <span
-                            style="background: linear-gradient(to right, #6366f1, #ec4899); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">AI
-                            Psychology Insight</span>
+                <div class="glass-panel border-pink-500/30 bg-gradient-to-br from-slate-800/70 to-pink-500/5">
+                    <h3 class="mb-2 text-[1rem] flex items-center gap-2 text-pink-200">
+                        <i class="fa-solid fa-brain"></i> 
+                        <span class="bg-gradient-to-r from-indigo-500 to-pink-500 text-transparent bg-clip-text">AI Psychology Insight</span>
                     </h3>
-                    <p id="dailyInsightText"
-                        style="font-size: 0.95rem; color: var(--text-primary); line-height: 1.5; font-style: italic;">
-                        "Loading insight..."</p>
+                    <p id="dailyInsightText" class="text-[0.95rem] text-slate-200 leading-relaxed italic">"Loading insight..."</p>
                 </div>
                 <!-- 5-Minute Timer -->
-                <div class="glass-panel timer-widget"
-                    style="text-align: center; border-color: rgba(16, 185, 129, 0.3);">
-                    <h3
-                        style="margin-bottom: 0.4rem; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: #34d399;">
+                <div class="glass-panel text-center border-emerald-500/30">
+                    <h3 class="mb-1.5 text-[1rem] flex items-center justify-center gap-2 text-emerald-400">
                         <i class="fa-solid fa-stopwatch"></i> 5-Min Anti-Procrastination Rule
                     </h3>
-                    <p
-                        style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.3;">
-                        Commit to just 5 minutes. The Zeigarnik effect forces your brain to finish what it starts.</p>
-                    <div id="countdownDisplay"
-                        style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.75rem; font-variant-numeric: tabular-nums;">
-                        05:00</div>
-                    <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                        <button id="btnStartTimer" class="btn-primary"
-                            style="width: auto; padding: 0.5rem 1.25rem; font-size: 0.9rem; background: var(--color-computer);"><i
-                                class="fa-solid fa-play"></i> Start</button>
-                        <button id="btnResetTimer" class="btn-utility"
-                            style="width: auto; padding: 0.5rem 0.75rem; font-size: 0.9rem; border-radius: 0.75rem;"><i
-                                class="fa-solid fa-rotate-right"></i> Reset</button>
+                    <p class="text-[0.8rem] text-slate-400 mb-3 leading-snug">Commit to just 5 minutes. The Zeigarnik effect forces your brain to finish what it starts.</p>
+                    <div id="countdownDisplay" class="text-[2.5rem] font-bold mb-3 tabular-nums">05:00</div>
+                    <div class="flex justify-center gap-2">
+                        <button id="btnStartTimer" class="px-5 py-2 text-[0.9rem] bg-[#0bc488] hover:bg-[#0bc488]/80 text-white font-semibold rounded-xl transition-all shadow-[0_4px_12px_rgba(11,196,136,0.3)]"><i class="fa-solid fa-play"></i> Start</button>
+                        <button id="btnResetTimer" class="px-3 py-2 text-[0.9rem] bg-white/5 hover:bg-white/10 text-slate-300 font-semibold rounded-xl border border-white/10 transition-colors"><i class="fa-solid fa-rotate-right"></i> Reset</button>
                     </div>
                 </div>
                 <!-- Slot: JS moves Today's Revisions here when due — spans full width -->
-                <div id="todayRevisionsSlot" style="grid-column: 1 / -1;"></div>
+                <div id="todayRevisionsSlot" class="col-span-full"></div>
             </div>
 
             <!-- Left Column: Add New Study Session Form -->
-            <section class="add-session-section glass-panel">
-                <h2><i class="fa-solid fa-plus-circle"></i> Log New Session</h2>
-                <form id="addSessionForm">
-                    <div class="form-group">
-                        <label for="subject">Subject</label>
-                        <select id="subject" required>
+            <section class="glass-panel">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-plus-circle text-indigo-400"></i> Log New Session</h2>
+                <form id="addSessionForm" class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label for="subject" class="text-sm font-semibold text-slate-400 ml-1">Subject</label>
+                        <select id="subject" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all w-full leading-tight" required>
                             <option value="" disabled selected>Select Subject...</option>
-                            <!-- Subjects populated dynamically from profile -->
+                            <!-- Subjects populated dynamically -->
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="topic">Topic / Chapter</label>
-                        <input type="text" id="topic" placeholder="e.g. Thermodynamics, Calculus..." required>
+                    <div class="flex flex-col gap-1.5">
+                        <label for="topic" class="text-sm font-semibold text-slate-400 ml-1">Topic / Chapter</label>
+                        <input type="text" id="topic" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all w-full placeholder-slate-500" placeholder="e.g. Thermodynamics..." required>
                     </div>
-                    <div class="form-group">
-                        <label for="dateRead">Date Read</label>
-                        <input type="date" id="dateRead" required>
+                    <div class="flex flex-col gap-1.5">
+                        <label for="dateRead" class="text-sm font-semibold text-slate-400 ml-1">Date Read</label>
+                        <input type="date" id="dateRead" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all w-full [color-scheme:dark]" required>
                     </div>
-                    <button type="submit" class="btn-primary">Add to Tracker <i
-                            class="fa-solid fa-arrow-right"></i></button>
+                    <button type="submit" class="mt-2 w-full bg-indigo-500 hover:bg-indigo-400 text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_12px_rgba(99,102,241,0.3)]">Add to Tracker <i class="fa-solid fa-arrow-right"></i></button>
                 </form>
             </section>
 
             <!-- Right Column: Dashboard & Topic List -->
-            <section class="dashboard-section">
-                <!-- Today's Revisions (default home — JS moves to todayRevisionsSlot when revisions exist) -->
-                <div class="today-revisions glass-panel highlight-panel" id="todayRevisionsPanel">
-                    <div class="panel-header">
-                        <h2><i class="fa-solid fa-fire"></i> Today's Revisions</h2>
-                        <span id="currentDateDisplay" class="date-badge"></span>
+            <section class="col-span-full">
+                <!-- Today's Revisions -->
+                <div class="glass-panel border-pink-500/30 shadow-[0_0_30px_rgba(236,72,153,0.1)]" id="todayRevisionsPanel">
+                    <div class="flex justify-between items-center mb-5">
+                        <h2 class="mb-0 text-xl font-bold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-fire text-pink-500"></i> Today's Revisions</h2>
+                        <span id="currentDateDisplay" class="bg-white/10 px-4 py-2 rounded-full text-[0.9rem] font-medium text-slate-200"></span>
                     </div>
-                    <div id="todayRevisionList" class="revision-cards">
-                        <!-- Revision Cards dynamically injected via JavaScript -->
+                    <div id="todayRevisionList" class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
+                        <!-- Revision Cards dynamically injected -->
                     </div>
                 </div>
 
                 <!-- All Tracked Topics & Filters -->
-                <div class="all-topics glass-panel">
-                    <h2><i class="fa-solid fa-book-open"></i> Ongoing Revisions</h2>
-                    <div class="filter-group" id="subjectFilterGroup">
-                        <button class="filter-btn active" data-filter="all">All</button>
-                        <!-- Subject filters populated dynamically from profile -->
+                <div class="glass-panel mt-5">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-book-open text-indigo-400"></i> Ongoing Revisions</h2>
+                    <div class="flex flex-wrap gap-2 mb-6" id="subjectFilterGroup">
+                        <button class="filter-btn active bg-indigo-500 text-white border-indigo-500 font-medium px-4 py-2 rounded-full transition-colors text-[0.9rem]" data-filter="all">All</button>
+                        <!-- Subject filters populated dynamically -->
                     </div>
-                    <div id="allTopicsList" class="topics-list">
-                        <!-- Listed Items dynamically injected via JavaScript -->
+                    <div id="allTopicsList" class="flex flex-col">
+                        <!-- Listed Items dynamically injected -->
                     </div>
                 </div>
             </section>
