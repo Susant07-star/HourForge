@@ -3881,7 +3881,8 @@ main#hourLogView.active {
 #pomodoroView:fullscreen .pomo-settings-details,
 #pomodoroView:fullscreen .pomo-mode-bar,
 #pomodoroView:fullscreen .pomo-sessions,
-#pomodoroView:fullscreen .btn-fullscreen-inline {
+#pomodoroView:fullscreen .btn-fullscreen-inline,
+#pomodoroView:fullscreen .pomo-fullscreen-btn-wrap {
     display: none !important;
 }
 
@@ -3927,7 +3928,8 @@ main#hourLogView.active {
 #pomodoroView:-webkit-full-screen .pomo-settings-details,
 #pomodoroView:-webkit-full-screen .pomo-mode-bar,
 #pomodoroView:-webkit-full-screen .pomo-sessions,
-#pomodoroView:-webkit-full-screen .btn-fullscreen-inline {
+#pomodoroView:-webkit-full-screen .btn-fullscreen-inline,
+#pomodoroView:-webkit-full-screen .pomo-fullscreen-btn-wrap {
     display: none !important;
 }
 
@@ -4051,7 +4053,8 @@ body.pomo-fs-active .top-bar,
 #pomodoroView.is-pomo-fs .pomo-settings-details,
 #pomodoroView.is-pomo-fs .btn-fullscreen-inline,
 #pomodoroView.is-pomo-fs .pomo-controls,
-#pomodoroView.is-pomo-fs .modal-header {
+#pomodoroView.is-pomo-fs .modal-header,
+#pomodoroView.is-pomo-fs .pomo-fullscreen-btn-wrap {
     display: none !important;
 }
 
