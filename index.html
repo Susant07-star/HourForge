@@ -306,102 +306,124 @@
             </div>
         </main>
 
+        <!-- Table View -->
+        <main id="tableView" class="table-content view-section pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
+            <div class="glass-panel p-0 overflow-hidden">
+                <div class="px-8 py-8 pb-4 border-b border-white/5">
+                    <h2 class="text-xl font-bold mb-0 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-table-list text-indigo-400"></i> Subject Logs & Status</h2>
+                </div>
+
+                <div class="flex overflow-x-auto bg-black/20 border-b border-white/5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" id="subjectTabsGroup">
+                    <!-- Subject tabs dynamically populated -->
+                </div>
+
+                <div class="overflow-x-auto p-0">
+                    <table class="w-full border-collapse min-w-[600px] text-left">
+                        <thead>
+                            <tr>
+                                <th class="p-[1rem_1.5rem] bg-black/30 border-b border-white/10 text-slate-400 font-medium text-[0.9rem] uppercase tracking-[1px]">Chapter / Topic</th>
+                                <th class="p-[1rem_1.5rem] bg-black/30 border-b border-white/10 text-slate-400 font-medium text-[0.9rem] uppercase tracking-[1px]">Date Read</th>
+                                <th class="p-[1rem_1.5rem] bg-black/30 border-b border-white/10 text-slate-400 font-medium text-[0.9rem] uppercase tracking-[1px] text-center">2-Day Rev</th>
+                                <th class="p-[1rem_1.5rem] bg-black/30 border-b border-white/10 text-slate-400 font-medium text-[0.9rem] uppercase tracking-[1px] text-center">4-Day Rev</th>
+                                <th class="p-[1rem_1.5rem] bg-black/30 border-b border-white/10 text-slate-400 font-medium text-[0.9rem] uppercase tracking-[1px] text-center">7-Day Rev</th>
+                            </tr>
+                        </thead>
+                        <tbody id="revisionTableBody" class="[&>tr]:transition-colors [&>tr]:duration-200 [&>tr:hover]:bg-white/5 [&>tr:last-child>td]:border-b-0">
+                            <!-- Table rows injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
         <!-- Time Tracker View -->
-        <main id="hourLogView" class="main-content view-section">
+        <main id="hourLogView" class="main-content view-section pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
             <!-- Time Tracker Header -->
-            <div class="view-header" style="grid-column: 1 / -1; margin-top: -0.5rem; margin-bottom: 0.5rem; padding: 0;">
-                <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; letter-spacing: -0.5px;">Log Activity</h1>
-                <p style="color: var(--text-secondary); font-size: 0.95rem;">Every minute counts. Let's log your progress instantly and build that momentum.</p>
+            <div class="col-span-full -mt-2 mb-2 p-0">
+                <h1 class="text-[2rem] font-bold text-slate-200 mb-1 tracking-[-0.5px]">Log Activity</h1>
+                <p class="text-slate-400 text-[0.95rem]">Every minute counts. Let's log your progress instantly and build that momentum.</p>
             </div>
 
-            <!-- Analytics Summary - MOVED TO TOP -->
-            <div class="time-tracker-analytics glass-panel highlight-panel"
-                style="grid-column: 1 / -1; padding: 1.5rem;">
-                <div class="analytics-value" id="totalHoursToday" style="font-size: 2.8rem;">0.0</div>
-                <div class="analytics-label" style="font-size: 0.9rem;">Hours Logged Today</div>
+            <!-- Analytics Summary -->
+            <div class="glass-panel col-span-full p-6 text-center border-[#10b981]/30 bg-gradient-to-br from-[#10b981]/10 to-black/20 shadow-[0_10px_30px_rgba(16,185,129,0.05)] rounded-3xl">
+                <div class="text-[3.5rem] font-bold leading-none mb-2 bg-gradient-to-r from-[#34d399] to-[#10b981] text-transparent bg-clip-text" id="totalHoursToday">0.0</div>
+                <div class="text-slate-400 text-[1.1rem] tracking-[1px] uppercase">Hours Logged Today</div>
             </div>
 
             <!-- Input Section -->
             <section class="add-session-section glass-panel">
-                <h2><i class="fa-solid fa-stopwatch" style="color: var(--color-computer);"></i> Log Activity</h2>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-stopwatch text-[#10b981]"></i> Log Activity</h2>
 
-                <form id="addTimeLogForm">
+                <form id="addTimeLogForm" class="flex flex-col gap-4">
 
-                    <div class="form-group">
-                        <label>Task / Activity Name</label>
-                        <input type="text" id="timeTaskInput" required
-                            placeholder="e.g. Math homework, Coding side-project" autocomplete="off">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-semibold text-slate-400 ml-1">Task / Activity Name</label>
+                        <input type="text" id="timeTaskInput" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full placeholder-slate-500" required placeholder="e.g. Math homework, Coding side-project" autocomplete="off">
                     </div>
 
-                    <!-- Quick Activity Chips (shown below task input as smart suggestions) -->
-                    <div id="quickActivityChips" class="quick-activity-chips" style="display: none; margin-bottom: 0.8rem; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-start;">
+                    <!-- Quick Activity Chips -->
+                    <div id="quickActivityChips" class="hidden mb-3 gap-1.5 flex-wrap justify-start [-webkit-overflow-scrolling:touch]">
                         <!-- Chips injected here -->
                     </div>
 
-                    <div class="form-group">
-                        <label>Subject <span style="font-size: 0.8em; opacity: 0.6;">(for accurate
-                                analytics)</span></label>
-                        <select id="timeSubjectInput">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-semibold text-slate-400 ml-1">Subject <span class="text-[0.8em] opacity-60">(for accurate analytics)</span></label>
+                        <select id="timeSubjectInput" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full leading-tight">
                             <option value="">General / Other</option>
-                            <!-- Subjects populated dynamically from profile -->
+                            <!-- Subjects populated dynamically -->
                             <option value="Sleep">Sleep</option>
                         </select>
                     </div>
 
-                    <!-- Start Time: its own full row -->
-                    <div class="form-group">
-                        <label>Start Time</label>
-                        <input type="time" id="timeStartInput" required style="width: 100%; box-sizing: border-box;">
+                    <!-- Start Time -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-semibold text-slate-400 ml-1">Start Time</label>
+                        <input type="time" id="timeStartInput" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full" required>
                     </div>
 
-                    <!-- End Time: its own row, with smart duration buttons above -->
-                    <div class="form-group">
-                        <label>End Time</label>
+                    <!-- End Time -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-semibold text-slate-400 ml-1">End Time</label>
                         <!-- Intelligent Quick Duration Buttons -->
-                        <div id="quickDurationContainer" class="quick-duration-container" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; justify-content: flex-start;">
-                            <button type="button" class="btn-duration" data-mins="15">+15m</button>
-                            <button type="button" class="btn-duration" data-mins="30">+30m</button>
-                            <button type="button" class="btn-duration" data-mins="45">+45m</button>
-                            <button type="button" class="btn-duration" data-mins="60">+1h</button>
+                        <div id="quickDurationContainer" class="flex gap-2 mb-2 flex-wrap justify-start [-webkit-overflow-scrolling:touch]">
+                            <button type="button" class="btn-duration bg-black/30 border border-white/10 text-slate-400 px-[0.6rem] py-[0.3rem] rounded-xl font-sans text-[0.75rem] cursor-pointer transition-all shrink-0 hover:bg-[#10b981]/20 hover:border-[#10b981]/40 hover:text-[#34d399]" data-mins="15">+15m</button>
+                            <button type="button" class="btn-duration bg-black/30 border border-white/10 text-slate-400 px-[0.6rem] py-[0.3rem] rounded-xl font-sans text-[0.75rem] cursor-pointer transition-all shrink-0 hover:bg-[#10b981]/20 hover:border-[#10b981]/40 hover:text-[#34d399]" data-mins="30">+30m</button>
+                            <button type="button" class="btn-duration bg-black/30 border border-white/10 text-slate-400 px-[0.6rem] py-[0.3rem] rounded-xl font-sans text-[0.75rem] cursor-pointer transition-all shrink-0 hover:bg-[#10b981]/20 hover:border-[#10b981]/40 hover:text-[#34d399]" data-mins="45">+45m</button>
+                            <button type="button" class="btn-duration bg-black/30 border border-white/10 text-slate-400 px-[0.6rem] py-[0.3rem] rounded-xl font-sans text-[0.75rem] cursor-pointer transition-all shrink-0 hover:bg-[#10b981]/20 hover:border-[#10b981]/40 hover:text-[#34d399]" data-mins="60">+1h</button>
                         </div>
-                        <input type="time" id="timeEndInput" required style="width: 100%; box-sizing: border-box;">
+                        <input type="time" id="timeEndInput" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full" required>
                     </div>
 
-                    <div class="form-group">
-                        <label>Date</label>
-                        <input type="date" id="timeDateInput" required>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-semibold text-slate-400 ml-1">Date</label>
+                        <input type="date" id="timeDateInput" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full [color-scheme:dark]" required>
                     </div>
 
-                    <div class="form-group">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <label style="margin-bottom: 0;">Short Notes <span style="font-size: 0.8em; opacity: 0.6;">(Describe what you did)</span></label>
-                            <button type="button" id="btnClearNotes" class="btn-clear-notes" title="Clear Notes" style="display: none; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem; transition: all 0.2s;">
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-sm font-semibold text-slate-400 ml-1 m-0">Short Notes <span class="text-[0.8em] opacity-60">(Describe what you did)</span></label>
+                            <button type="button" id="btnClearNotes" class="hidden bg-transparent border-none text-slate-400 cursor-pointer text-[0.85rem] px-2 py-1 rounded-md transition-all hover:text-slate-200">
                                 <i class="fa-solid fa-xmark"></i> Clear
                             </button>
                         </div>
-                        <textarea id="timeNotesInput"
-                            placeholder="Describe what you worked on... (Optional)"
-                            autocomplete="off" rows="2"></textarea>
+                        <textarea id="timeNotesInput" class="bg-black/20 border border-white/10 text-slate-200 p-[0.875rem_1rem] rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full resize-y min-h-[60px] leading-relaxed placeholder-slate-500" placeholder="Describe what you worked on... (Optional)" autocomplete="off" rows="2"></textarea>
                         <!-- Smart Note Suggestions -->
-                        <div id="smartNoteSuggestions" class="smart-note-suggestions" style="display: none; margin-top: 0.5rem; gap: 0.4rem; flex-wrap: wrap;"></div>
+                        <div id="smartNoteSuggestions" class="hidden mt-2 gap-1.5 flex-wrap justify-start"></div>
                     </div>
-                    <button type="submit" class="btn-primary"
-                        style="background: var(--color-computer); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                    <button type="submit" class="mt-2 w-full bg-[#10b981] hover:bg-emerald-400 text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_15px_rgba(16,185,129,0.3)]">
                         Save Log <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </form>
             </section>
 
             <!-- History Feed Section -->
-            <section class="dashboard-section">
+            <section class="col-span-full">
                 <div class="glass-panel">
-                    <div class="panel-header">
-                        <h2><i class="fa-solid fa-timeline"></i> Activity History</h2>
-                        <!-- simple date filter via native date picker to see other days -->
-                        <input type="date" id="historyDateFilter"
-                            style="background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: white; border-radius: 1rem; padding: 0.5rem 1rem; outline: none; font-family: inherit;">
+                    <div class="flex justify-between items-center mb-5">
+                        <h2 class="mb-0 text-xl font-bold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-timeline text-indigo-400"></i> Activity History</h2>
+                        <input type="date" id="historyDateFilter" class="bg-black/30 border border-white/10 text-white rounded-2xl px-4 py-2 outline-none font-sans [color-scheme:dark]">
                     </div>
-                    <div id="timeLogFeed" class="time-log-feed">
+                    <div id="timeLogFeed" class="flex flex-col gap-4">
                         <!-- Populated by JS -->
                     </div>
                 </div>

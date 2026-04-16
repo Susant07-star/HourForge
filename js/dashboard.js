@@ -275,12 +275,25 @@ function renderDynamicSubjects() {
         tabsGroup.innerHTML = '';
         subjects.forEach((s, i) => {
             const btn = document.createElement('button');
-            btn.className = 'sub-tab' + (i === 0 ? ' active' : '');
+            btn.className = `sub-tab px-6 py-4 bg-transparent border-b-4 border-transparent text-slate-400 font-medium whitespace-nowrap cursor-pointer transition-all hover:bg-white/5 hover:text-slate-200 outline-none ${i === 0 ? 'active' : ''}`;
             btn.dataset.subject = s;
             btn.textContent = s;
+            if (i === 0) {
+                btn.style.borderColor = `var(--color-${s.toLowerCase()})`;
+                btn.style.color = `var(--color-${s.toLowerCase()})`;
+                btn.style.backgroundColor = 'rgba(255,255,255,0.05)';
+            }
             btn.addEventListener('click', (e) => {
-                tabsGroup.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+                tabsGroup.querySelectorAll('.sub-tab').forEach(t => {
+                    t.classList.remove('active');
+                    t.style.borderColor = 'transparent';
+                    t.style.color = '';
+                    t.style.backgroundColor = 'transparent';
+                });
                 e.currentTarget.classList.add('active');
+                e.currentTarget.style.borderColor = `var(--color-${s.toLowerCase()})`;
+                e.currentTarget.style.color = `var(--color-${s.toLowerCase()})`;
+                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
                 currentTableSubject = s;
                 renderTableView();
             });
@@ -940,8 +953,8 @@ function renderTableView() {
     if (filteredSessions.length === 0) {
         revisionTableBody.innerHTML = `
             <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 3rem 1rem;">
-                    <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i><br>
+                <td colspan="5" class="text-center text-slate-400 py-12 px-4 border-b border-white/5">
+                    <i class="fa-solid fa-folder-open text-[2rem] mb-4 opacity-50 block"></i>
                     No logs found for ${currentTableSubject}. Add a session to see it here.
                 </td>
             </tr>
@@ -966,11 +979,11 @@ function renderTableView() {
                 if (revObj.completedAt) {
                     const dateObj = new Date(revObj.completedAt);
                     const shortDate = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                    dateHtml = `<div class="status-date">${shortDate}</div>`;
+                    dateHtml = `<div class="text-[0.65rem] font-medium mt-1 text-slate-400 whitespace-nowrap">${shortDate}</div>`;
                 }
                 return `
-                    <div class="status-cell-wrapper">
-                        <div class="status-cell done"><i class="fa-solid fa-check"></i></div>
+                    <div class="flex flex-col items-center justify-center gap-1">
+                        <div class="w-9 h-9 rounded-full flex flex-col items-center justify-center m-auto text-[1rem] transition-all bg-[#10b981]/15 text-[#34d399] border border-[#10b981]/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]"><i class="fa-solid fa-check"></i></div>
                         ${dateHtml}
                     </div>
                 `;
@@ -1021,11 +1034,11 @@ function renderTableView() {
                     if (revType === 'rev7' && rev4.done) isActivelyOverdue = true;
                 }
 
-                const dateHtml = `<div class="status-date" style="${isActivelyOverdue ? 'color: #ef4444;' : 'color: var(--text-secondary); opacity: 0.7;'}">Due: ${shortDate}</div>`;
+                const dateHtml = `<div class="text-[0.65rem] font-medium mt-1 whitespace-nowrap" style="${isActivelyOverdue ? 'color: #ef4444;' : 'color: var(--text-secondary); opacity: 0.7;'}">Due: ${shortDate}</div>`;
 
                 return `
-                    <div class="status-cell-wrapper">
-                        <div class="status-cell pending" ${isActivelyOverdue ? 'style="border-color: #ef4444; color: #ef4444;"' : ''}>
+                    <div class="flex flex-col items-center justify-center gap-1">
+                        <div class="w-9 h-9 rounded-full flex flex-col items-center justify-center m-auto text-[1rem] transition-all bg-white/5 text-slate-400 border border-dashed border-white/20" ${isActivelyOverdue ? 'style="border-color: #ef4444; color: #ef4444;"' : ''}>
                             <i class="fa-solid ${isActivelyOverdue ? 'fa-circle-exclamation' : 'fa-hourglass-start'}" style="${isActivelyOverdue ? '' : 'opacity:0.3;'}"></i>
                         </div>
                         ${dateHtml}
@@ -1035,11 +1048,11 @@ function renderTableView() {
         };
 
         tr.innerHTML = `
-            <td data-label="Chapter / Topic" style="font-weight: 500;">${session.topic}</td>
-            <td data-label="Date Read" style="color: var(--text-secondary);"><i class="fa-regular fa-calendar" style="margin-right: 0.5rem; opacity: 0.7;"></i>${session.dateRead}</td>
-            <td data-label="2-Day Rev" class="center-col">${getStatusCell(session, 'rev2')}</td>
-            <td data-label="4-Day Rev" class="center-col">${getStatusCell(session, 'rev4')}</td>
-            <td data-label="7-Day Rev" class="center-col">${getStatusCell(session, 'rev7')}</td>
+            <td class="p-[1rem_1.5rem] border-b border-white/5 font-medium min-w-[150px]">${session.topic}</td>
+            <td class="p-[1rem_1.5rem] border-b border-white/5 text-slate-400 min-w-[140px]"><i class="fa-regular fa-calendar" style="margin-right: 0.5rem; opacity: 0.7;"></i>${session.dateRead}</td>
+            <td class="p-[1rem_1.5rem] border-b border-white/5 text-center">${getStatusCell(session, 'rev2')}</td>
+            <td class="p-[1rem_1.5rem] border-b border-white/5 text-center">${getStatusCell(session, 'rev4')}</td>
+            <td class="p-[1rem_1.5rem] border-b border-white/5 text-center">${getStatusCell(session, 'rev7')}</td>
         `;
 
         fragment.appendChild(tr);
