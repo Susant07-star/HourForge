@@ -550,34 +550,41 @@ function showToast(message, type = 'info') {
 let _profileModalSubjects = []; // Temp state for subject tags in modal
 
 function showProfileModal() {
+    // Support both old modal (#profileModal) and current drawer (#profileDrawer)
     const modal = document.getElementById('profileModal');
-    if (!modal) return;
-    modal.style.display = 'flex';
-
+    if (modal) modal.style.display = 'flex';
+    // Always populate the form fields (they live in the profile drawer now)
     const profile = getProfile();
-    document.getElementById('profileName').value = profile.name || '';
-    document.getElementById('profileGrade').value = profile.grade || '';
+    const nameEl = document.getElementById('profileName');
+    const gradeEl = document.getElementById('profileGrade');
+    if (nameEl) nameEl.value = profile.name || '';
+    if (gradeEl) gradeEl.value = profile.grade || '';
 
     // Handle custom faculty
     const customFacultyInput = document.getElementById('profileCustomFaculty');
-    if (profile.faculty && !FACULTY_PRESETS[profile.faculty]) {
-        // It's a custom faculty name not in presets
-        document.getElementById('profileFaculty').value = 'Custom';
-        customFacultyInput.value = profile.faculty;
-        customFacultyInput.style.display = 'block';
-    } else {
-        document.getElementById('profileFaculty').value = profile.faculty || '';
-        customFacultyInput.value = '';
-        customFacultyInput.style.display = profile.faculty === 'Custom' ? 'block' : 'none';
+    const facultyEl = document.getElementById('profileFaculty');
+    if (facultyEl) {
+        if (profile.faculty && !FACULTY_PRESETS[profile.faculty]) {
+            facultyEl.value = 'Custom';
+            if (customFacultyInput) { customFacultyInput.value = profile.faculty; customFacultyInput.style.display = 'block'; }
+        } else {
+            facultyEl.value = profile.faculty || '';
+            if (customFacultyInput) { customFacultyInput.value = ''; customFacultyInput.style.display = profile.faculty === 'Custom' ? 'block' : 'none'; }
+        }
     }
-    document.getElementById('profileExam1Label').value = profile.exam1Label || '';
-    document.getElementById('profileExam1Date').value = profile.exam1Date || '';
-    document.getElementById('profileExam2Label').value = profile.exam2Label || '';
-    document.getElementById('profileExam2Date').value = profile.exam2Date || '';
+    const e1l = document.getElementById('profileExam1Label');
+    const e1d = document.getElementById('profileExam1Date');
+    const e2l = document.getElementById('profileExam2Label');
+    const e2d = document.getElementById('profileExam2Date');
+    if (e1l) e1l.value = profile.exam1Label || '';
+    if (e1d) e1d.value = profile.exam1Date || '';
+    if (e2l) e2l.value = profile.exam2Label || '';
+    if (e2d) e2d.value = profile.exam2Date || '';
 
     _profileModalSubjects = [...(profile.subjects || [])];
     renderProfileSubjectTags();
 }
+
 
 // ==========================================
 // STUDENT PROFILE DRAWER
