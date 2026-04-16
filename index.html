@@ -552,27 +552,26 @@
                 </div>
             </div>
         </main>
-    </div>
-
-    <!-- =================== SLIDE-UP PROFILE DRAWER =================== -->
-    <div id="profileDrawerOverlay" class="bottom-sheet-overlay" style="display: none;"></div>
-    <div id="profileDrawer" class="bottom-sheet">
-        <div class="bottom-sheet-handle"></div>
-        <div class="bottom-sheet-header">
-            <h2><i class="fa-solid fa-user-graduate" style="color: #6366f1;"></i> My Study Profile</h2>
-            <button id="btnCloseProfile" class="sheet-close-btn" title="Close"><i class="fa-solid fa-xmark"></i></button>
+    </di    <!-- =================== SLIDE-UP PROFILE DRAWER =================== -->
+    <div id="profileDrawerOverlay" class="bottom-sheet-overlay fixed inset-0 bg-black/60 z-[1000] opacity-0 invisible transition-all duration-300" style="display:none;"></div>
+    <div id="profileDrawer" class="bottom-sheet fixed bottom-0 left-0 right-0 bg-[#13112e] border-t border-white/10 rounded-t-3xl z-[1001] px-6 pt-4 pb-[calc(2rem+env(safe-area-inset-bottom))] translate-y-full transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.32,0.72,0,1)] max-h-[90vh] overflow-y-auto shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div class="w-10 h-[5px] bg-white/20 rounded-full mx-auto mb-6"></div>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-[1.35rem] font-bold flex items-center gap-2 m-0"><i class="fa-solid fa-user-graduate text-indigo-400"></i> My Study Profile</h2>
+            <button id="btnCloseProfile" class="w-9 h-9 rounded-full flex items-center justify-center bg-white/8 border-none text-slate-400 cursor-pointer transition-all hover:bg-white/15 hover:text-slate-200" title="Close"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div class="bottom-sheet-content">
-            <p class="profile-desc">Set up your profile to personalize subjects, AI feedback, and exam tracking. Your profile syncs automatically.</p>
-            <form id="profileForm" class="profile-form">
-                <div class="form-group">
-                    <label for="profileName">Your Name <span style="font-size: 0.8em; opacity: 0.6;">(optional)</span></label>
-                    <input type="text" id="profileName" placeholder="e.g. Susant" autocomplete="off">
+        <div>
+            <p class="text-slate-400 text-[0.9rem] mb-6 leading-relaxed">Set up your profile to personalize subjects, AI feedback, and exam tracking. Your profile syncs automatically.</p>
+            <form id="profileForm" class="profile-form flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-sm font-semibold text-slate-400 ml-1" for="profileName">Your Name <span class="text-[0.8em] opacity-60">(optional)</span></label>
+                    <input type="text" id="profileName" placeholder="e.g. Susant" autocomplete="off"
+                        class="bg-black/25 border border-white/10 text-slate-200 px-5 py-4 rounded-xl text-[1rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="profileGrade">Class / Grade Level</label>
-                        <select id="profileGrade">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-semibold text-slate-400 ml-1" for="profileGrade">Class / Grade Level</label>
+                        <select id="profileGrade" class="bg-black/25 border border-white/10 text-slate-200 px-5 py-4 rounded-xl text-[1rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
                             <option value="">Select...</option>
                             <option value="Class 1">Class 1</option>
                             <option value="Class 2">Class 2</option>
@@ -590,64 +589,62 @@
                             <option value="Master">Master</option>
                         </select>
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="profileFaculty">Faculty</label>
-                    <select id="profileFaculty">
-                        <option value="">Select...</option>
-                        <option value="Science">Science</option>
-                        <option value="Management">Management</option>
-                        <option value="Humanities">Humanities</option>
-                        <option value="Education">Education</option>
-                        <option value="Law">Law</option>
-                        <option value="Custom">Custom (pick your own)</option>
-                    </select>
-                    <input type="text" id="profileCustomFaculty" placeholder="Type your faculty name..."
-                        style="display: none; margin-top: 0.5rem;" autocomplete="off">
-                </div>
-
-                <div class="form-group">
-                    <label>Subjects <span style="font-size: 0.8em; opacity: 0.6;">(auto-filled from faculty)</span></label>
-                    <div id="profileSubjectTags" class="profile-subject-tags">
-                        <!-- Tags rendered dynamically -->
-                    </div>
-                    <div class="profile-add-subject-row">
-                        <input type="text" id="profileNewSubject" placeholder="Add a subject..." autocomplete="off">
-                        <button type="button" id="btnAddSubject" class="btn-add-subject"><i class="fa-solid fa-plus"></i></button>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-semibold text-slate-400 ml-1" for="profileFaculty">Faculty</label>
+                        <select id="profileFaculty" class="bg-black/25 border border-white/10 text-slate-200 px-5 py-4 rounded-xl text-[1rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
+                            <option value="">Select...</option>
+                            <option value="Science">Science</option>
+                            <option value="Management">Management</option>
+                            <option value="Humanities">Humanities</option>
+                            <option value="Education">Education</option>
+                            <option value="Law">Law</option>
+                            <option value="Custom">Custom (pick your own)</option>
+                        </select>
+                        <input type="text" id="profileCustomFaculty" placeholder="Type your faculty name..." style="display:none; margin-top:0.5rem;" autocomplete="off"
+                            class="bg-black/25 border border-white/10 text-slate-200 px-5 py-4 rounded-xl text-[1rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
                     </div>
                 </div>
 
-                <div class="form-group" style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
-                    <label>Exam Dates <span style="font-size: 0.8em; opacity: 0.6;">(optional)</span></label>
-                    <div class="form-row">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label for="profileExam1Label" style="font-size: 0.8rem;">Exam 1 Name</label>
-                            <input type="text" id="profileExam1Label" placeholder="e.g. Pre-Board">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label for="profileExam1Date" style="font-size: 0.8rem;">Exam 1 Date</label>
-                            <input type="date" id="profileExam1Date">
-                        </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-sm font-semibold text-slate-400 ml-1">Subjects <span class="text-[0.8em] opacity-60">(auto-filled from faculty)</span></label>
+                    <div id="profileSubjectTags" class="profile-subject-tags flex flex-wrap gap-2 py-1"></div>
+                    <div class="flex gap-2 mt-1">
+                        <input type="text" id="profileNewSubject" placeholder="Add a subject..." autocomplete="off"
+                            class="flex-1 bg-black/25 border border-white/10 text-slate-200 px-4 py-3 rounded-xl text-[1rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
+                        <button type="button" id="btnAddSubject" class="btn-add-subject w-11 h-11 flex items-center justify-center bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded-xl cursor-pointer transition-all hover:bg-indigo-500/30 text-[1rem]"><i class="fa-solid fa-plus"></i></button>
                     </div>
-                    <div class="form-row" style="margin-top: 0.5rem;">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label for="profileExam2Label" style="font-size: 0.8rem;">Exam 2 Name</label>
-                            <input type="text" id="profileExam2Label" placeholder="e.g. Final Board">
+                </div>
+
+                <div class="flex flex-col gap-3 pt-4 border-t border-white/10">
+                    <label class="text-sm font-semibold text-slate-400 ml-1">Exam Dates <span class="text-[0.8em] opacity-60">(optional)</span></label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[0.8rem] text-slate-500 ml-1" for="profileExam1Label">Exam 1 Name</label>
+                            <input type="text" id="profileExam1Label" placeholder="e.g. Pre-Board"
+                                class="bg-black/25 border border-white/10 text-slate-200 px-4 py-3 rounded-xl text-[0.95rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
                         </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label for="profileExam2Date" style="font-size: 0.8rem;">Exam 2 Date</label>
-                            <input type="date" id="profileExam2Date">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[0.8rem] text-slate-500 ml-1" for="profileExam1Date">Exam 1 Date</label>
+                            <input type="date" id="profileExam1Date" class="bg-black/25 border border-white/10 text-slate-200 px-4 py-3 rounded-xl text-[0.95rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors [color-scheme:dark]">
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[0.8rem] text-slate-500 ml-1" for="profileExam2Label">Exam 2 Name</label>
+                            <input type="text" id="profileExam2Label" placeholder="e.g. Final Board"
+                                class="bg-black/25 border border-white/10 text-slate-200 px-4 py-3 rounded-xl text-[0.95rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[0.8rem] text-slate-500 ml-1" for="profileExam2Date">Exam 2 Date</label>
+                            <input type="date" id="profileExam2Date" class="bg-black/25 border border-white/10 text-slate-200 px-4 py-3 rounded-xl text-[0.95rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors [color-scheme:dark]">
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary profile-save-btn" style="margin-top: 1.5rem; width: 100%; border-radius: 1rem; padding: 1rem;">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Save & Sync Profile
+                <button type="submit" class="mt-2 w-full bg-indigo-500 hover:bg-indigo-400 text-white font-semibold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_15px_rgba(99,102,241,0.3)]">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Save &amp; Sync Profile
                 </button>
             </form>
         </div>
-    </div>
+    </div></div>
 
     <!-- =================== INFO MODAL =================== -->
     <div id="infoModal" class="modal-overlay" style="display:none;">
