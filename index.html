@@ -861,99 +861,99 @@
 
     <!-- =================== POMODORO MODAL (Converted to Tab) =================== -->
     <main id="pomodoroView" class="view-section pomodoro-view">
-        <div class="glass-panel pomodoro-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; position: relative; padding-top: 1.5rem;">
-            <div class="modal-header" style="width: 100%; justify-content: center; margin-bottom: 1rem; border-bottom: none; padding-bottom: 0;">
-                <h2 style="margin: 0;"><i class="fa-solid fa-hourglass-half" style="color:#ef4444;"></i> Pomodoro Timer</h2>
+        <div class="glass-panel pomodoro-panel flex flex-col items-center justify-center min-h-[80vh] relative pt-6">
+            <div class="modal-header w-full justify-center mb-4 border-b-0 pb-0">
+                <h2 class="m-0 flex items-center gap-2 text-xl font-bold text-slate-200"><i class="fa-solid fa-hourglass-half text-red-500"></i> Pomodoro Timer</h2>
             </div>
 
             <!-- Mode selector -->
-            <div class="pomo-mode-bar">
-                <button class="pomo-mode-btn active" data-mode="focus" data-duration="3000">Focus</button>
-                <button class="pomo-mode-btn" data-mode="short" data-duration="600">Break</button>
-                <button class="pomo-mode-btn" id="btnToggleRing" title="Toggle Ring Style"><i class="fa-solid fa-bullseye"></i></button>
+            <div class="pomo-mode-bar flex justify-center gap-1.5 mb-6 bg-black/20 px-1.5 py-1.5 rounded-full border border-white/10">
+                <button class="pomo-mode-btn active bg-transparent border-none text-slate-400 px-4 py-1.5 rounded-full font-sans text-[0.82rem] font-semibold cursor-pointer transition-all" data-mode="focus">Focus</button>
+                <button class="pomo-mode-btn bg-transparent border-none text-slate-400 px-4 py-1.5 rounded-full font-sans text-[0.82rem] font-semibold cursor-pointer transition-all" data-mode="short">Break</button>
+                <button class="bg-transparent border-none text-slate-400 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all hover:bg-white/10 hover:text-white" id="btnToggleRing" title="Toggle Ring"><i class="fa-solid fa-bullseye"></i></button>
             </div>
 
             <!-- Custom time settings (Collapsible) -->
-            <details class="pomo-settings-details" style="width: 100%; max-width: 400px; margin-top: 1rem; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 0.5rem 1rem;">
-                <summary style="cursor: pointer; color: var(--text-secondary); font-weight: 500; outline: none; padding: 0.5rem 0;">⚙️ Timer Settings</summary>
-                <div class="pomo-settings-row" style="margin-top: 1rem; display: flex; justify-content: space-between;">
-                    <div class="pomo-setting" style="text-align: center;">
-                        <label>Focus <span class="pomo-setting-unit">min</span></label>
-                        <input type="number" id="pomoFocusMin" class="pomo-setting-input" value="50" min="1" max="120" style="width: 60px;">
+            <details class="pomo-settings-details w-full max-w-sm mb-6 bg-white/5 rounded-2xl px-4 py-2 border border-white/10">
+                <summary class="cursor-pointer text-slate-400 font-medium outline-none py-2 select-none">⚙️ Timer Settings</summary>
+                <div class="flex justify-between gap-3 mt-4 mb-4">
+                    <div class="flex flex-col items-center gap-1 flex-1">
+                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Focus <span class="font-normal opacity-60">min</span></label>
+                        <input type="number" id="pomoFocusMin" value="50" min="1" max="120" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
                     </div>
-                    <div class="pomo-setting" style="text-align: center;">
-                        <label>Break <span class="pomo-setting-unit">min</span></label>
-                        <input type="number" id="pomoShortMin" class="pomo-setting-input" value="10" min="0" max="60" style="width: 60px;">
+                    <div class="flex flex-col items-center gap-1 flex-1">
+                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Break <span class="font-normal opacity-60">min</span></label>
+                        <input type="number" id="pomoShortMin" value="10" min="0" max="60" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
                     </div>
-                    <div class="pomo-setting" style="text-align: center;">
-                        <label>Duration <span class="pomo-setting-unit">hrs</span></label>
-                        <input type="number" id="pomoTotalHours" class="pomo-setting-input" value="4" min="0.1" step="0.1" max="24" style="width: 60px;">
+                    <div class="flex flex-col items-center gap-1 flex-1">
+                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Total <span class="font-normal opacity-60">hrs</span></label>
+                        <input type="number" id="pomoTotalHours" value="4" min="0.1" step="0.1" max="24" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
                     </div>
                 </div>
             </details>
 
-            <div class="pomo-fullscreen-btn-wrap" style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; justify-content: center;">
-                <button id="btnPomoPrev" class="btn-fullscreen-inline" title="Reset Timer" style="background: rgba(255,255,255,0.1); border:none; padding: 0.6rem 1.2rem; border-radius: 2rem; color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+            <div class="pomo-fullscreen-btn-wrap flex gap-3 mb-6 flex-wrap justify-center">
+                <button id="btnPomoPrev" class="btn-fullscreen-inline flex items-center gap-2 bg-white/10 hover:bg-white/15 border-none text-white px-5 py-2.5 rounded-full cursor-pointer transition-all text-[0.95rem]" title="Reset Timer">
                     <i class="fa-solid fa-rotate-left"></i> Reset
                 </button>
-                <button id="btnPomoFullscreen" class="btn-fullscreen-inline" title="Full Screen" style="background: rgba(255,255,255,0.1); border:none; padding: 0.6rem 1.2rem; border-radius: 2rem; color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
-                    <i class="fa-solid fa-expand"></i> Enter Full Screen
+                <button id="btnPomoFullscreen" class="btn-fullscreen-inline flex items-center gap-2 bg-white/10 hover:bg-white/15 border-none text-white px-5 py-2.5 rounded-full cursor-pointer transition-all text-[0.95rem]" title="Full Screen">
+                    <i class="fa-solid fa-expand"></i> Full Screen
                 </button>
             </div>
 
             <!-- Timer ring -->
-            <div class="pomo-ring-wrap" style="margin: 1.5rem 0;">
-                <svg class="pomo-ring" viewBox="0 0 120 120">
-                    <circle class="pomo-ring-bg" cx="60" cy="60" r="54" />
-                    <circle class="pomo-ring-fill" id="pomoRingFill" cx="60" cy="60" r="54" stroke-dasharray="339.29"
-                        stroke-dashoffset="0" />
+            <div class="pomo-ring-wrap relative w-[200px] h-[200px] mx-auto mb-6">
+                <svg class="pomo-ring w-[200px] h-[200px] -rotate-90" viewBox="0 0 120 120">
+                    <circle class="pomo-ring-bg fill-none stroke-white/[.06] stroke-[8]" cx="60" cy="60" r="54" />
+                    <circle class="pomo-ring-fill fill-none stroke-[8] [stroke-linecap:round] [stroke-dasharray:339.29] [transition:stroke-dashoffset_1s_linear,stroke_0.4s_ease]"
+                        id="pomoRingFill" cx="60" cy="60" r="54" stroke="#ef4444" stroke-dashoffset="0" />
                 </svg>
-                <div class="pomo-timer-display">
-                    <div id="pomoTime">50:00</div>
-                    <div id="pomoModeLabel" class="pomo-mode-label">Focus</div>
+                <div class="pomo-timer-display absolute inset-0 flex flex-col items-center justify-center">
+                    <div id="pomoTime" class="text-[3rem] font-bold tracking-[-1px] leading-none bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">50:00</div>
+                    <div id="pomoModeLabel" class="pomo-mode-label text-[0.8rem] text-slate-400 uppercase tracking-[1px] mt-1">Focus</div>
                 </div>
             </div>
             
-            <div class="pomo-controls">
-                <button id="btnPomoBack" class="pomo-ctrl-btn" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
-                <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
-                <button id="btnPomoSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
+            <div class="pomo-controls flex justify-center items-center gap-4 mb-6">
+                <button id="btnPomoBack" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center cursor-pointer transition-all bg-white/[.07] border border-white/10 text-slate-400 text-[0.95rem] hover:bg-white/[.12] hover:text-white hover:scale-105" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
+                <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn w-[60px] h-[60px] rounded-full flex items-center justify-center cursor-pointer transition-all bg-gradient-to-br from-red-500 to-red-600 border-none text-white text-[1.2rem] shadow-[0_6px_20px_rgba(239,68,68,0.35)] hover:scale-110 hover:shadow-[0_8px_28px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
+                <button id="btnPomoSkip" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center cursor-pointer transition-all bg-white/[.07] border border-white/10 text-slate-400 text-[0.95rem] hover:bg-white/[.12] hover:text-white hover:scale-105" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
             </div>
 
-            <!-- Session dots -->
-            <div class="pomo-sessions" style="margin-top: 1rem;">
-                <div class="pomo-session-label">Current Cycle</div>
-                <div id="pomoSessionCount" class="pomo-session-count" style="font-size: 1.2rem; margin-top: 0.3rem; color: var(--accent-primary);">1 of 4</div>
+            <!-- Session counter -->
+            <div class="pomo-sessions flex flex-col items-center gap-1 mb-4">
+                <div class="pomo-session-label text-[0.75rem] text-slate-400 uppercase tracking-[0.5px]">Current Cycle</div>
+                <div id="pomoSessionCount" class="pomo-session-count text-[1.2rem] font-semibold mt-1 text-indigo-400">1 of 4</div>
             </div>
 
 
-            <!-- ========= FULLSCREEN FLOATING CONTROLS ========= -->
+            <!-- ====== FULLSCREEN FLOATING CONTROLS (shown only in fullscreen via overrides.css) ====== -->
             <div id="pomoFullscreenControls" class="fs-visible" style="flex-direction: column; align-items: center; gap: 1rem;">
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div class="fs-cycle-text" id="fsCycleText" style="margin: 0;">1 of 4</div>
-                    <button id="btnFsToggleRing" class="pomo-ctrl-btn" title="Toggle Ring Style" style="width: 40px; height: 40px; font-size: 1.1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-bullseye"></i></button>
+                <div class="flex gap-4 items-center">
+                    <div class="fs-cycle-text text-indigo-400 text-[1.1rem] font-bold bg-[rgba(10,8,32,0.7)] backdrop-blur-md px-5 py-1.5 rounded-[20px] border border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.5)]" id="fsCycleText">1 of 4</div>
+                    <button id="btnFsToggleRing" class="pomo-ctrl-btn w-10 h-10 text-[1.1rem] rounded-full flex items-center justify-center bg-white/[.07] border border-white/10 text-slate-400 cursor-pointer transition-all hover:bg-white/[.12] hover:text-white" title="Toggle Ring"><i class="fa-solid fa-bullseye"></i></button>
                 </div>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <button id="btnFsPrev" class="pomo-ctrl-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
-                    <button id="btnFsBack" class="pomo-ctrl-btn" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
-                    <button id="btnFsPlayPause" class="pomo-ctrl-btn pomo-main-btn"><i class="fa-solid fa-play" id="pomoFsPlayIcon"></i></button>
-                    <button id="btnFsSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
-                    <button id="btnFsExit" class="pomo-ctrl-btn" title="Exit Full Screen" style="margin-left: 0.5rem;"><i class="fa-solid fa-compress"></i></button>
+                <div class="flex gap-4 items-center">
+                    <button id="btnFsPrev" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center bg-white/[.07] border border-white/10 text-slate-400 cursor-pointer transition-all hover:bg-white/[.12] hover:text-white text-[0.95rem]" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
+                    <button id="btnFsBack" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center bg-white/[.07] border border-white/10 text-slate-400 cursor-pointer transition-all hover:bg-white/[.12] hover:text-white text-[0.95rem]" title="Previous"><i class="fa-solid fa-backward-step"></i></button>
+                    <button id="btnFsPlayPause" class="pomo-ctrl-btn pomo-main-btn w-[60px] h-[60px] rounded-full flex items-center justify-center bg-gradient-to-br from-red-500 to-red-600 border-none text-white text-[1.2rem] shadow-[0_6px_20px_rgba(239,68,68,0.35)] cursor-pointer transition-all hover:scale-110"><i class="fa-solid fa-play" id="pomoFsPlayIcon"></i></button>
+                    <button id="btnFsSkip" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center bg-white/[.07] border border-white/10 text-slate-400 cursor-pointer transition-all hover:bg-white/[.12] hover:text-white text-[0.95rem]" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
+                    <button id="btnFsExit" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center bg-white/[.07] border border-white/10 text-slate-400 cursor-pointer transition-all hover:bg-white/[.12] hover:text-white text-[0.95rem] ml-2" title="Exit Fullscreen"><i class="fa-solid fa-compress"></i></button>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- =================== FLOATING MINI TIMER =================== -->
-    <div id="pomoMiniTimer" class="pomo-mini-timer" style="display:none;">
-        <button id="pomoMiniPlay" class="pomo-mini-play">
+    <div id="pomoMiniTimer" class="pomo-mini-timer fixed bottom-5 right-5 z-[8888] items-center gap-2.5 bg-[rgba(15,23,42,0.92)] border border-white/10 border-l-[3px] border-l-red-500 rounded-2xl px-3.5 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.45),0_0_20px_rgba(239,68,68,0.1)]" style="display:none;">
+        <button id="pomoMiniPlay" class="pomo-mini-play w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all shrink-0 bg-red-500/15 border border-red-500/30 text-red-400 text-[0.8rem] hover:bg-red-500/30 hover:scale-110">
             <i class="fa-solid fa-play" id="pomoMiniPlayIcon"></i>
         </button>
-        <div class="pomo-mini-info">
-            <div id="pomoMiniTime" class="pomo-mini-time">50:00</div>
-            <div id="pomoMiniLabel" class="pomo-mini-label">Focus</div>
+        <div class="pomo-mini-info flex flex-col items-center min-w-[52px]">
+            <div id="pomoMiniTime" class="pomo-mini-time text-[1.05rem] font-extrabold tracking-[-0.5px] text-slate-100 leading-none">50:00</div>
+            <div id="pomoMiniLabel" class="pomo-mini-label text-[0.6rem] text-slate-400 uppercase tracking-[0.5px] mt-[3px]">Focus</div>
         </div>
-        <button id="pomoMiniOpen" class="pomo-mini-open" title="Open Timer">
+        <button id="pomoMiniOpen" class="pomo-mini-open w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all shrink-0 bg-white/[.07] border border-white/10 text-slate-400 text-[0.8rem] hover:bg-white/[.12] hover:text-white" title="Open Timer">
             <i class="fa-solid fa-up-right-from-square"></i>
         </button>
     </div>
