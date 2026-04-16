@@ -2476,36 +2476,49 @@ option {
 .app-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 64px 1.5rem 1.5rem;
+  width: 100%;
+  padding: 64px 0.75rem calc(88px + env(safe-area-inset-bottom));
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 .view-section {
   display: none;
   touch-action: pan-y;
   width: 100%;
   opacity: 0;
+  min-width: 0;
   transition: opacity 0.3s ease;
 }
 .view-section.active {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--card-gap, 1.25rem);
-  align-content: start;
   opacity: 1;
   animation: fadeIn 0.35s ease-out forwards;
 }
+.view-section > * {
+  width: 100%;
+}
 main#tableView.active {
-  display: block;
+  display: flex;
 }
 main#hourLogView.active {
-  display: grid;
+  display: flex;
 }
 main#insightsView.active {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+}
+main#pomodoroView.active {
+  display: flex;
+  flex-direction: column;
+}
+main#dashboardView.active {
+  display: flex;
+  flex-direction: column;
 }
 .pomodoro-view {
   min-height: 80vh;
@@ -2534,6 +2547,32 @@ main#insightsView.active {
   background-color: #0d0b26;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+header.fixed {
+  backdrop-filter: saturate(140%) blur(14px);
+  -webkit-backdrop-filter: saturate(140%) blur(14px);
+}
+#dashboardView,
+#tableView,
+#hourLogView,
+#insightsView,
+#pomodoroView {
+  width: 100%;
+}
+#tableView .premium-card,
+#hourLogView .premium-card,
+#insightsView .premium-card,
+#pomodoroView .premium-card,
+#dashboardView .premium-card,
+#timeLogFeed,
+#todayRevisionList {
+  width: 100%;
+}
+#insightsView canvas {
+  max-width: 100%;
+}
+#insightsView .premium-card:has(canvas) {
+  min-height: 360px;
 }
 .form-group {
   margin-bottom: 1.5rem;
@@ -2902,12 +2941,12 @@ main#insightsView.active {
 }
 @media (max-width: 1024px) {
   .app-container {
-    padding: 64px 1rem 1rem;
+    padding: 64px 1rem calc(88px + env(safe-area-inset-bottom));
   }
 }
 @media (max-width: 768px) {
   .app-container {
-    padding: 64px 0.4rem 0.4rem !important;
+    padding: 64px 0.75rem calc(92px + env(safe-area-inset-bottom)) !important;
   }
   .main-content {
     grid-template-columns: 1fr;
@@ -2916,6 +2955,10 @@ main#insightsView.active {
   .glass-panel {
     padding: 0.8rem;
     border-radius: 1rem;
+  }
+  .premium-card {
+    padding: 1rem;
+    border-radius: 1.15rem;
   }
   .glass-panel h2 {
     font-size: 1.2rem;
