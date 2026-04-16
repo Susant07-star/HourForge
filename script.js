@@ -482,6 +482,21 @@ async function applyCloudData(cloudData) {
     });
     aiRatingsHistory = Object.values(aiMap);
     
+    // Timer Settings
+    if (cloudData.pomoSettings) {
+        if (document.getElementById('pomoFocusMin')) document.getElementById('pomoFocusMin').value = cloudData.pomoSettings.focusMin || 50;
+        if (document.getElementById('pomoShortMin')) document.getElementById('pomoShortMin').value = cloudData.pomoSettings.shortMin || 10;
+        if (document.getElementById('pomoTotalHours')) document.getElementById('pomoTotalHours').value = cloudData.pomoSettings.totalHours || 4;
+        localStorage.setItem('pomoFocusMin', cloudData.pomoSettings.focusMin);
+        localStorage.setItem('pomoShortMin', cloudData.pomoSettings.shortMin);
+        localStorage.setItem('pomoTotalHours', cloudData.pomoSettings.totalHours);
+        
+        if (typeof getInitialTime === 'function' && !isPomoRunning) {
+            pomoTimeLeft = getInitialTime();
+            if (typeof updatePomoDisplay === 'function') updatePomoDisplay();
+        }
+    }
+    
     // Save to LocalStorage
     localStorage.setItem('studySessions', JSON.stringify(studySessions));
     localStorage.setItem('timeLogs', JSON.stringify(timeLogs));
@@ -597,6 +612,11 @@ async function uploadDataToCloud() {
                 studySessions,
                 timeLogs,
                 aiRatingsHistory,
+                pomoSettings: {
+                    focusMin: document.getElementById('pomoFocusMin')?.value || 50,
+                    shortMin: document.getElementById('pomoShortMin')?.value || 10,
+                    totalHours: document.getElementById('pomoTotalHours')?.value || 4
+                },
                 dbMigrationDone: localStorage.getItem('dbMigrationDone')
             }
         };
@@ -3799,6 +3819,14 @@ let wakeLock = null;
 // Read the real default from input immediately
 function getInitialTime() {
     const focusEl = document.getElementById('pomoFocusMin');
+    const shortEl = document.getElementById('pomoShortMin');
+    const totalEl = document.getElementById('pomoTotalHours');
+    
+    // Restore from localStorage first if available locally
+    if (focusEl && localStorage.getItem('pomoFocusMin')) focusEl.value = localStorage.getItem('pomoFocusMin');
+    if (shortEl && localStorage.getItem('pomoShortMin')) shortEl.value = localStorage.getItem('pomoShortMin');
+    if (totalEl && localStorage.getItem('pomoTotalHours')) totalEl.value = localStorage.getItem('pomoTotalHours');
+
     return focusEl ? parseInt(focusEl.value) * 60 : 50 * 60;
 }
 let pomoTimeLeft = getInitialTime();
@@ -4217,6 +4245,12 @@ if (btnPomoBack) {
 [pomoFocusMin, pomoShortMin, pomoTotalHours].forEach(input => {
     if (input) {
         input.addEventListener('change', () => {
+            if (pomoFocusMin) localStorage.setItem('pomoFocusMin', pomoFocusMin.value);
+            if (pomoShortMin) localStorage.setItem('pomoShortMin', pomoShortMin.value);
+            if (pomoTotalHours) localStorage.setItem('pomoTotalHours', pomoTotalHours.value);
+            
+            if (typeof uploadDataToCloud === 'function') uploadDataToCloud();
+            
             pomoCurrentCycle = 1;
             setPomoMode('focus', false);
         });
