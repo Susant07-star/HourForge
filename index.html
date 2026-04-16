@@ -911,9 +911,10 @@
             </div>
             
             <div class="pomo-controls">
+                <button id="btnPomoBack" class="pomo-ctrl-btn" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
                 <button id="btnPomoPrev" class="pomo-ctrl-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
                 <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
-                <button id="btnPomoSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward"></i></button>
+                <button id="btnPomoSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
                 
             </div>
 
@@ -925,12 +926,15 @@
 
 
             <!-- ========= FULLSCREEN FLOATING CONTROLS ========= -->
-            <div id="pomoFullscreenControls" class="fs-visible">
-                <div class="fs-cycle-text" id="fsCycleText" style="margin-left: 0; margin-right: 1.5rem;">1 of 4</div>
-                <button id="btnFsPrev" class="pomo-ctrl-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
-                <button id="btnFsPlayPause" class="pomo-ctrl-btn pomo-main-btn"><i class="fa-solid fa-play" id="pomoFsPlayIcon"></i></button>
-                <button id="btnFsSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward"></i></button>
-                <button id="btnFsExit" class="pomo-ctrl-btn" title="Exit Full Screen" style="margin-left: 1.5rem;"><i class="fa-solid fa-compress"></i></button>
+            <div id="pomoFullscreenControls" class="fs-visible" style="flex-direction: column; align-items: center; gap: 1rem;">
+                <div class="fs-cycle-text" id="fsCycleText" style="margin: 0;">1 of 4</div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button id="btnFsBack" class="pomo-ctrl-btn" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
+                    <button id="btnFsPrev" class="pomo-ctrl-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
+                    <button id="btnFsPlayPause" class="pomo-ctrl-btn pomo-main-btn"><i class="fa-solid fa-play" id="pomoFsPlayIcon"></i></button>
+                    <button id="btnFsSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
+                    <button id="btnFsExit" class="pomo-ctrl-btn" title="Exit Full Screen" style="margin-left: 0.5rem;"><i class="fa-solid fa-compress"></i></button>
+                </div>
             </div>
         </div>
     </main>
