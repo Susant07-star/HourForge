@@ -17,9 +17,17 @@ function switchTab(viewId, animate = true) {
     const idx = SWIPE_TABS.indexOf(viewId);
     if (idx !== -1) currentTabIndex = idx;
 
-    document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.view-section').forEach((section) => {
+        section.classList.remove('active');
+        section.style.display = '';
+        section.setAttribute('aria-hidden', 'true');
+    });
     const target = document.getElementById(viewId);
-    if (target) target.classList.add('active');
+    if (target) {
+        target.classList.add('active');
+        target.style.display = '';
+        target.setAttribute('aria-hidden', 'false');
+    }
 
     document.querySelectorAll('.bottom-nav-item').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.view === viewId);
@@ -163,9 +171,17 @@ navBtns.forEach(btn => {
             if (!isSame) {
                 // Pre-emptively set the DOM state so there is NO FLASH when we strip the absolute positioning
                 const targetViewId = SWIPE_TABS[targetIndex];
-                document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.view-section').forEach((section) => {
+                    section.classList.remove('active');
+                    section.style.display = '';
+                    section.setAttribute('aria-hidden', 'true');
+                });
                 const targetEl = document.getElementById(targetViewId);
-                if (targetEl) targetEl.classList.add('active');
+                if (targetEl) {
+                    targetEl.classList.add('active');
+                    targetEl.style.display = '';
+                    targetEl.setAttribute('aria-hidden', 'false');
+                }
 
                 // Now execute the logical switch (which will update the bottom nav UI and trigger charts)
                 // Pass false for 'animate' so switchTab doesn't override our smooth scroll position

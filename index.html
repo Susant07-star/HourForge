@@ -166,7 +166,7 @@
 
 
         <!-- Dashboard View -->
-        <main id="dashboardView" class="view-section active flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0">
+        <main id="dashboardView" class="view-section active flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="false">
             <!-- Dashboard Header -->
             <div class="px-2">
                 <h1 class="premium-heading mb-1">Overview</h1>
@@ -279,7 +279,7 @@
 
 
         <!-- Table View -->
-        <main id="tableView" class="view-section active flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" style="display:none;">
+        <main id="tableView" class="view-section flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="true">
             <!-- Table View Header -->
             <div class="px-2">
                 <h1 class="premium-heading mb-1">Study Logs Map</h1>
@@ -315,7 +315,7 @@
         </main>
 
         <!-- Time Tracker View -->
-        <main id="hourLogView" class="view-section active flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" style="display: none;">
+        <main id="hourLogView" class="view-section flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="true">
             <!-- Time Tracker Header -->
             <div class="px-2">
                 <h1 class="premium-heading mb-1">Log Activity</h1>
@@ -411,7 +411,7 @@
         </main>
 
         <!-- AI Insights View -->
-        <main id="insightsView" class="view-section flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" style="display:none;">
+        <main id="insightsView" class="view-section flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="true">
             <!-- Insights Header -->
             <div class="px-2">
                 <h1 class="premium-heading mb-1">AI Insights</h1>
@@ -754,7 +754,7 @@
     </div>
 
     <!-- =================== POMODORO MODAL (Converted to Tab) =================== -->
-    <main id="pomodoroView" class="view-section pomodoro-view flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" style="display:none;">
+    <main id="pomodoroView" class="view-section pomodoro-view flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="true">
         
         <div class="px-2">
             <h1 class="premium-heading mb-1"><i class="fa-solid fa-hourglass-half text-red-500 mr-2"></i> Pomodoro Timer</h1>
@@ -945,7 +945,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v34';
+            const CURRENT_SW_VERSION = 'v36';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh

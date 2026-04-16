@@ -104,12 +104,14 @@ option {
    APP CONTAINER
    ============================================================ */
 .app-container {
-    @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
-    padding-top: 5rem; /* Space for fixed header */
+    @apply w-full max-w-6xl mx-auto px-3 sm:px-5 lg:px-8;
+    padding-top: 4.75rem; /* Space for fixed header */
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
 /* ============================================================
@@ -120,28 +122,29 @@ option {
     touch-action: pan-y;
     width: 100%;
     opacity: 0;
+    min-width: 0;
     transition: opacity 0.3s ease;
 }
 
 .view-section.active {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: var(--card-gap, 1.25rem);
-    align-content: start;
     opacity: 1;
     animation: fadeIn 0.35s ease-out forwards;
 }
 
-/* Table view is block, not grid */
-main#tableView.active  { display: block; }
+.view-section > * {
+    width: 100%;
+}
 
-/* Hour log view is grid */
-main#hourLogView.active { display: grid; }
-
-/* Insights view is flex column */
-main#insightsView.active {
+main#tableView.active,
+main#hourLogView.active,
+main#insightsView.active,
+main#pomodoroView.active,
+main#dashboardView.active {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
 }
 
 /* Pomodoro full page */
@@ -173,6 +176,40 @@ main#insightsView.active {
     @apply bg-[#0d0b26] border-t border-white/5;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+}
+
+header.fixed {
+    backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+}
+
+#dashboardView,
+#tableView,
+#hourLogView,
+#insightsView,
+#pomodoroView {
+    width: 100%;
+}
+
+#tableView .premium-card,
+#hourLogView .premium-card,
+#insightsView .premium-card,
+#pomodoroView .premium-card,
+#dashboardView .premium-card {
+    width: 100%;
+}
+
+#timeLogFeed,
+#todayRevisionList {
+    width: 100%;
+}
+
+#insightsView canvas {
+    max-width: 100%;
+}
+
+#insightsView .premium-card:has(canvas) {
+    min-height: 360px;
 }
 
 /* ============================================================
@@ -541,7 +578,7 @@ main#insightsView.active {
    ============================================================ */
 @media (max-width: 1024px) {
     .app-container {
-        padding: 64px 1rem 1rem;
+        padding: 64px 1rem calc(88px + env(safe-area-inset-bottom));
     }
 }
 
@@ -550,7 +587,7 @@ main#insightsView.active {
    ============================================================ */
 @media (max-width: 768px) {
     .app-container {
-        padding: 64px 0.4rem 0.4rem !important;
+        padding: 64px 0.75rem calc(92px + env(safe-area-inset-bottom)) !important;
     }
 
     .main-content {
@@ -561,6 +598,11 @@ main#insightsView.active {
     .glass-panel {
         padding: 0.8rem;
         border-radius: 1rem;
+    }
+
+    .premium-card {
+        padding: 1rem;
+        border-radius: 1.15rem;
     }
 
     .glass-panel h2 {
