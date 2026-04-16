@@ -220,10 +220,13 @@ function updatePomoDisplay() {
     // --------------------------------------------------------
 
     const percentage = pomoTimeLeft / totalTime;
-    const offset = 339.29 - (339.29 * percentage);
+    
     if (pomoRingFill) {
+        const radius = parseFloat(pomoRingFill.getAttribute('r')) || 56;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (circumference * percentage);
         pomoRingFill.style.strokeDashoffset = offset;
-        pomoRingFill.style.stroke = pomoMode === 'short' ? '#34d399' : '#ef4444';
+        pomoRingFill.style.stroke = pomoMode === 'short' ? '#10b981' : '#ef4444';
     }
 
     if (pomoSessionCount) {

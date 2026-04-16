@@ -23,10 +23,12 @@
 6. **Revision Scheduled**: 3 revision tasks (2-day, 4-day, 7-day) are automatically created in the `revision_tasks` table.
 
 ## 5. Important Files
-- **`script.js`**: The monolithic main engine. Handles state, sync, and DOM rendering.
+- **`js/store.js`**: Local data boot, normalization, recovery, and IndexedDB helpers.
+- **`js/supabase.js`**: Auth, cloud sync, and deep-merge logic.
+- **`js/dashboard.js`** / **`js/timeTracker.js`**: Main dashboard and study/time logging UI flows.
 - **`js/charts.js`**: The analytics and AI prompt engine. Handles Groq API communication.
 - **`index.html`**: The monolithic view layer (all screens are here).
-- **`style.css`**: The design system (Glassmorphism, custom swipe logic).
+- **`css/tailwind.css`** + **`css/overrides.css`**: The current design system output and app-specific overrides.
 - **`sw.js`**: Service worker for PWA functionality.
 
 ## 6. Development Warnings

@@ -17,14 +17,13 @@
 }
 
 body {
-    @apply bg-[#0a0820] text-slate-200 overflow-x-hidden min-h-screen;
+    @apply bg-slate-950 text-slate-200 overflow-x-hidden min-h-screen;
     font-family: 'Outfit', sans-serif;
-    background:
-        radial-gradient(ellipse at 10% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 88% 85%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
-        #0a0820;
+    /* Clean, modern dark theme gradient (Linear/Notion style) */
+    background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
     background-attachment: fixed;
 }
+
 
 /* Kill the animated orbs from older CSS — kept for safety */
 body::before, body::after {
@@ -69,22 +68,44 @@ option {
 }
 
 /* ============================================================
-   GLASS PANEL
+   SAAS DESIGN SYSTEM COMPONENTS
+   ============================================================ */
+@layer components {
+    .premium-card {
+        @apply bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-white/[0.04];
+    }
+    .premium-btn-primary {
+        @apply w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-semibold transition-all duration-200 hover:-translate-y-0.5 shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2 border-none cursor-pointer;
+    }
+    .premium-btn-secondary {
+        @apply px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 border border-white/10 font-medium transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer;
+    }
+    .premium-input {
+        @apply w-full bg-black/40 border border-white/10 text-slate-200 px-4 py-2.5 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-sans text-[1rem];
+    }
+    .premium-heading {
+        @apply text-[1.5rem] md:text-[2rem] font-bold text-slate-100 tracking-tight leading-tight;
+    }
+    .premium-subtext {
+        @apply text-sm md:text-[1rem] text-slate-400 leading-relaxed;
+    }
+}
+
+/* ============================================================
+   GLASS PANEL (Legacy - Pending Purge)
    ============================================================ */
 .glass-panel {
-    @apply bg-[#141235] border border-white/5 rounded-3xl p-8 shadow-2xl;
+    @apply bg-[#141235] border border-white/5 rounded-3xl p-6 shadow-xl;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    contain: layout style;
 }
 
 /* ============================================================
    APP CONTAINER
    ============================================================ */
 .app-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 64px 1.5rem 1.5rem;
+    @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+    padding-top: 5rem; /* Space for fixed header */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     display: flex;
