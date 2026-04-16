@@ -12,7 +12,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=2.1">
+    <!-- Modular CSS Styles -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/insights.css">
+    <link rel="stylesheet" href="css/tablet.css">
+    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/pomodoro.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/overrides.css">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
@@ -1049,7 +1061,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v32';
+            const CURRENT_SW_VERSION = 'v33';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh

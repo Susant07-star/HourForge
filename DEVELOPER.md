@@ -12,7 +12,7 @@ HourForge is a **Vanilla JS Single Page Application (SPA)** with Progressive Web
 
 **Core Files:**
 - `index.html`: The monolithic view layer containing all markup, dialogs, and the PWA loading sequence. Views are toggled via CSS `.active` classes.
-- `style.css`: All styling. Uses CSS variables for theming and standard glassmorphism UI.
+- `css/`: Directory containing logically split CSS files. Key modules include `variables.css` (themes), `layout.css`, `dashboard.css`, and `pomodoro.css`.
 - `js/`: Directory containing logically split JS files instead of a single monolith.
   - `config.js`: Profile and dynamic theme config.
   - `utils.js`: Toast notifications and utilities.

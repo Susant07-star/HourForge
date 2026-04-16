@@ -1,8 +1,19 @@
-const CACHE_NAME = 'hourforge-v32';
+const CACHE_NAME = 'hourforge-v33';
 const ASSETS = [
     './',
     './index.html',
-    './style.css',
+    './css/variables.css',
+    './css/base.css',
+    './css/dashboard.css',
+    './css/components.css',
+    './css/insights.css',
+    './css/tablet.css',
+    './css/profile.css',
+    './css/modals.css',
+    './css/pomodoro.css',
+    './css/auth.css',
+    './css/layout.css',
+    './css/overrides.css',
     './js/config.js',
     './js/utils.js',
     './js/store.js',
