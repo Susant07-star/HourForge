@@ -151,25 +151,25 @@
         </aside>
 
         <!-- ===================== TOP BAR ===================== -->
-        <header class="top-bar">
-            <button id="btnHamburger" class="top-bar-btn hamburger-btn" aria-label="Menu">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
+        <header class="fixed top-0 left-0 right-0 z-[200] h-14 flex items-center justify-between px-3 bg-[#0a0820]/95 border-b border-white/5">
+            <button id="btnHamburger" class="text-slate-200 p-2 flex flex-col items-center justify-center gap-[5px] rounded-[10px] hover:bg-white/5 transition-colors min-w-[44px] min-h-[44px]" aria-label="Menu">
+                <span class="block w-[22px] h-[2px] bg-slate-200 rounded-sm transition-all duration-300 [:is(body.sidebar-open)_&]:translate-y-[7px] [:is(body.sidebar-open)_&]:rotate-45"></span>
+                <span class="block w-[22px] h-[2px] bg-slate-200 rounded-sm transition-all duration-300 [:is(body.sidebar-open)_&]:opacity-0"></span>
+                <span class="block w-[22px] h-[2px] bg-slate-200 rounded-sm transition-all duration-300 [:is(body.sidebar-open)_&]:-translate-y-[7px] [:is(body.sidebar-open)_&]:-rotate-45"></span>
             </button>
 
-            <div class="top-bar-title">
-                <i class="fa-solid fa-brain"></i>
-                <span>HourForge</span>
-                <span id="topBarStreak" class="topbar-streak" style="display:none;">
-                    <i class="fa-solid fa-fire"></i> <span id="topBarStreakCount">0</span>
+            <div class="flex items-center gap-2 text-[1.15rem] font-bold text-slate-200 tracking-wide">
+                <i class="fa-solid fa-brain text-indigo-400 text-[1.1rem]"></i>
+                <span class="max-sm:text-base">HourForge</span>
+                <span id="topBarStreak" class="flex items-center gap-1 bg-orange-500/15 border border-orange-500/30 px-2 py-[0.15rem] rounded-full text-xs font-bold text-orange-500 ml-1" style="display:none;">
+                    <i class="fa-solid fa-fire text-orange-500 text-xs"></i> <span id="topBarStreakCount">0</span>
                 </span>
             </div>
 
-            <div class="top-bar-right">
-                <button id="btnProfileIcon" class="top-bar-avatar-btn" title="My Profile" aria-label="Profile">
-                    <img id="topAvatarImg" src="" alt="" onerror="this.style.display='none'; document.getElementById('topAvatarFallback').style.display='flex';" style="display:none;">
-                    <div id="topAvatarFallback" class="avatar-fallback"><i class="fa-solid fa-user-graduate"></i></div>
+            <div class="flex items-center gap-2">
+                <button id="btnProfileIcon" class="w-[38px] h-[38px] border-2 border-indigo-400/40 rounded-full overflow-hidden flex items-center justify-center transition-all duration-200 hover:border-indigo-400 hover:scale-105 p-0 bg-transparent" title="My Profile" aria-label="Profile">
+                    <img id="topAvatarImg" src="" alt="" class="w-full h-full object-cover rounded-full" onerror="this.style.display='none'; document.getElementById('topAvatarFallback').style.display='flex';" style="display:none;">
+                    <div id="topAvatarFallback" class="w-full h-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-sm rounded-full"><i class="fa-solid fa-user-graduate"></i></div>
                 </button>
             </div>
         </header>
