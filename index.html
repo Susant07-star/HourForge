@@ -15,17 +15,7 @@
     <!-- Tailwind CSS (Next Gen Design System & Baselines) -->
     <link rel="stylesheet" href="css/tailwind.css">
     <!-- Modular Custom CSS Styles -->
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/dashboard.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/insights.css">
-    <link rel="stylesheet" href="css/tablet.css">
-    <link rel="stylesheet" href="css/profile.css">
-    <link rel="stylesheet" href="css/modals.css">
-    <link rel="stylesheet" href="css/pomodoro.css">
     <link rel="stylesheet" href="css/auth.css">
-    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/overrides.css">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -178,9 +168,9 @@
         <!-- Dashboard View -->
         <main id="dashboardView" class="main-content view-section active pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
             <!-- Dashboard Header -->
-            <div class="col-span-full -mt-2 mb-2 p-0">
-                <h1 class="text-[2rem] font-bold text-slate-200 mb-1 tracking-[-0.5px]">Dashboard</h1>
-                <p class="text-slate-400 text-[0.95rem]">Jump right in. Let's conquer today's goals without overthinking it.</p>
+            <div class="col-span-full mb-4">
+                <h1 class="text-[2rem] font-extrabold text-slate-200 mb-1 tracking-tight">Dashboard</h1>
+                <p class="text-slate-400 text-[1rem]">Jump right in. Let's conquer today's goals without overthinking it.</p>
             </div>
 
             <!-- Exam Countdown Headers -->
@@ -216,10 +206,10 @@
                         <i class="fa-solid fa-stopwatch"></i> 5-Min Anti-Procrastination Rule
                     </h3>
                     <p class="text-[0.8rem] text-slate-400 mb-3 leading-snug">Commit to just 5 minutes. The Zeigarnik effect forces your brain to finish what it starts.</p>
-                    <div id="countdownDisplay" class="text-[2.5rem] font-bold mb-3 tabular-nums">05:00</div>
-                    <div class="flex justify-center gap-2">
-                        <button id="btnStartTimer" class="px-5 py-2 text-[0.9rem] bg-[#0bc488] hover:bg-[#0bc488]/80 text-white font-semibold rounded-xl transition-all shadow-[0_4px_12px_rgba(11,196,136,0.3)]"><i class="fa-solid fa-play"></i> Start</button>
-                        <button id="btnResetTimer" class="px-3 py-2 text-[0.9rem] bg-white/5 hover:bg-white/10 text-slate-300 font-semibold rounded-xl border border-white/10 transition-colors"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+                    <div id="countdownDisplay" class="text-[3rem] font-extrabold mb-4 tabular-nums tracking-tight">05:00</div>
+                    <div class="flex justify-center gap-3">
+                        <button id="btnStartTimer" class="px-6 py-2.5 text-[0.95rem] bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl transition-all hover:-translate-y-1 shadow-[0_8px_20px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Start</button>
+                        <button id="btnResetTimer" class="px-4 py-2.5 text-[0.95rem] bg-white/5 hover:bg-white/10 text-slate-300 font-semibold rounded-xl border border-white/10 transition-all hover:-translate-y-1 flex items-center justify-center gap-2"><i class="fa-solid fa-rotate-right"></i> Reset</button>
                     </div>
                 </div>
                 <!-- Slot: JS moves Today's Revisions here when due — spans full width -->
@@ -245,7 +235,7 @@
                         <label for="dateRead" class="text-sm font-semibold text-slate-400 ml-1">Date Read</label>
                         <input type="date" id="dateRead" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all w-full [color-scheme:dark]" required>
                     </div>
-                    <button type="submit" class="mt-2 w-full bg-indigo-500 hover:bg-indigo-400 text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_12px_rgba(99,102,241,0.3)]">Add to Tracker <i class="fa-solid fa-arrow-right"></i></button>
+                    <button type="submit" class="mt-3 w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-transform hover:-translate-y-1 shadow-[0_8px_20px_rgba(99,102,241,0.4)] text-[1.05rem]">Add to Tracker <i class="fa-solid fa-arrow-right"></i></button>
                 </form>
             </section>
 
@@ -276,41 +266,18 @@
             </section>
         </main>
 
-        <!-- Table View -->
-        <main id="tableView" class="table-content view-section">
-            <div class="glass-panel table-panel">
-                <div class="table-header-section">
-                    <h2><i class="fa-solid fa-table-list"></i> Subject Logs & Status</h2>
-                </div>
-
-                <div class="subject-tabs" id="subjectTabsGroup">
-                    <!-- Subject tabs populated dynamically from profile -->
-                </div>
-
-                <div class="table-container">
-                    <table class="revision-table">
-                        <thead>
-                            <tr>
-                                <th>Chapter / Topic</th>
-                                <th>Date Read</th>
-                                <th class="center-col">2-Day Rev</th>
-                                <th class="center-col">4-Day Rev</th>
-                                <th class="center-col">7-Day Rev</th>
-                            </tr>
-                        </thead>
-                        <tbody id="revisionTableBody">
-                            <!-- Table rows injected via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
 
         <!-- Table View -->
         <main id="tableView" class="table-content view-section pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
+            <!-- Table View Header -->
+            <div class="col-span-full mb-4">
+                <h1 class="text-[2rem] font-extrabold text-slate-200 mb-1 tracking-tight">Log Table</h1>
+                <p class="text-slate-400 text-[1rem]">Track your revision progress across all subjects over time.</p>
+            </div>
+
             <div class="glass-panel p-0 overflow-hidden">
                 <div class="px-8 py-8 pb-4 border-b border-white/5">
-                    <h2 class="text-xl font-bold mb-0 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-table-list text-indigo-400"></i> Subject Logs & Status</h2>
+                    <h2 class="text-xl font-bold mb-0 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-table-list text-indigo-400"></i> Subject Status</h2>
                 </div>
 
                 <div class="flex overflow-x-auto bg-black/20 border-b border-white/5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" id="subjectTabsGroup">
@@ -339,9 +306,9 @@
         <!-- Time Tracker View -->
         <main id="hourLogView" class="main-content view-section pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
             <!-- Time Tracker Header -->
-            <div class="col-span-full -mt-2 mb-2 p-0">
-                <h1 class="text-[2rem] font-bold text-slate-200 mb-1 tracking-[-0.5px]">Log Activity</h1>
-                <p class="text-slate-400 text-[0.95rem]">Every minute counts. Let's log your progress instantly and build that momentum.</p>
+            <div class="col-span-full mb-4">
+                <h1 class="text-[2rem] font-extrabold text-slate-200 mb-1 tracking-tight">Log Activity</h1>
+                <p class="text-slate-400 text-[1rem]">Every minute counts. Log your progress instantly and build momentum.</p>
             </div>
 
             <!-- Analytics Summary -->
@@ -410,7 +377,7 @@
                         <!-- Smart Note Suggestions -->
                         <div id="smartNoteSuggestions" class="hidden mt-2 gap-1.5 flex-wrap justify-start"></div>
                     </div>
-                    <button type="submit" class="mt-2 w-full bg-[#10b981] hover:bg-emerald-400 text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_15px_rgba(16,185,129,0.3)]">
+                    <button type="submit" class="mt-4 w-full bg-gradient-to-r from-emerald-500 to-[#10b981] hover:from-emerald-400 hover:to-[#34d399] text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-transform hover:-translate-y-1 shadow-[0_8px_20px_rgba(16,185,129,0.3)] text-[1.05rem]">
                         Save Log <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </form>
@@ -431,123 +398,119 @@
         </main>
 
         <!-- AI Insights View -->
-        <main id="insightsView" class="view-section insights-view">
+        <main id="insightsView" class="view-section pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
+            <!-- Insights Header -->
+            <div class="col-span-full mb-4">
+                <h1 class="text-[2rem] font-extrabold text-slate-200 mb-1 tracking-tight">AI Insights</h1>
+                <p class="text-slate-400 text-[1rem]">Analyze your performance and get personalized study feedback.</p>
+            </div>
+
             <!-- API Key Configuration -->
-            <div class="glass-panel insights-api-config">
-                <div class="api-config-row">
-                    <div class="api-config-info">
-                        <h3><i class="fa-solid fa-key" style="color: #fbbf24;"></i> Groq API Key <span
-                                style="font-size: 0.75em; opacity: 0.6;">(Free)</span></h3>
-                        <p id="apiKeyStatus">No API key configured — <a href="https://console.groq.com/keys"
-                                target="_blank" style="color: #a5b4fc; text-decoration: underline;">Get free key
-                                here</a></p>
-                    </div>
-                    <div class="api-config-actions">
-                        <input type="password" id="geminiApiKeyInput" placeholder="Paste your Groq API key..."
-                            autocomplete="off">
-                        <button id="btnSaveApiKey" class="btn-save-key"><i class="fa-solid fa-check"></i> Save</button>
-                    </div>
+            <div class="glass-panel flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 border-amber-500/30 bg-gradient-to-r from-slate-900 to-amber-500/5">
+                <div class="flex-1">
+                    <h3 class="text-[1.1rem] font-bold text-amber-400 flex items-center gap-2 mb-1"><i class="fa-solid fa-key"></i> Groq API Key <span class="text-[0.75em] opacity-60 text-slate-400 font-normal">(Free)</span></h3>
+                    <p id="apiKeyStatus" class="text-[0.85rem] text-slate-400">No API key configured — <a href="https://console.groq.com/keys" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline transition-colors">Get free key here</a></p>
+                </div>
+                <div class="flex gap-2 w-full lg:w-auto">
+                    <input type="password" id="geminiApiKeyInput" placeholder="Paste Groq key..." class="flex-1 lg:w-[280px] bg-black/40 border border-white/10 text-slate-200 px-4 py-2.5 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all outline-none" autocomplete="off">
+                    <button id="btnSaveApiKey" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold px-4 py-2.5 rounded-xl transition-transform hover:-translate-y-1 shadow-[0_4px_12px_rgba(245,158,11,0.3)] flex justify-center items-center gap-2 shrink-0"><i class="fa-solid fa-check"></i> Save</button>
                 </div>
             </div>
 
             <!-- Period Selector + Generate Button -->
-            <div class="insights-controls">
-                <div class="period-selector">
-                    <button class="period-btn active" data-period="today">Today</button>
-                    <button class="period-btn" data-period="week">This Week</button>
-                    <button class="period-btn" data-period="month">This Month</button>
+            <div class="flex flex-col sm:flex-row gap-4 justify-between items-center mb-6">
+                <div class="flex p-1 bg-black/30 border border-white/10 rounded-xl" id="periodSelectorGroup">
+                    <button class="period-btn active px-4 py-2 rounded-lg text-[0.9rem] font-medium transition-all text-slate-400 hover:text-slate-200" data-period="today">Today</button>
+                    <button class="period-btn px-4 py-2 rounded-lg text-[0.9rem] font-medium transition-all text-slate-400 hover:text-slate-200" data-period="week">This Week</button>
+                    <button class="period-btn px-4 py-2 rounded-lg text-[0.9rem] font-medium transition-all text-slate-400 hover:text-slate-200" data-period="month">This Month</button>
                 </div>
-                <button id="btnGenerateInsights" class="btn-generate">
+                <button id="btnGenerateInsights" class="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-indigo-500 hover:from-pink-400 hover:to-indigo-400 text-white font-bold px-6 py-3 rounded-xl transition-transform hover:-translate-y-1 shadow-[0_8px_20px_rgba(236,72,153,0.3)] flex justify-center items-center gap-2 text-[1.05rem]">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Insights
                 </button>
             </div>
 
             <!-- Insights History Browser -->
-            <div class="insights-history-bar glass-panel">
-                <div class="history-nav">
-                    <button id="btnPrevDay" class="history-arrow" title="Previous Day"><i
-                            class="fa-solid fa-chevron-left"></i></button>
-                    <div class="history-date-display">
-                        <i class="fa-solid fa-calendar-day" style="color: #6366f1;"></i>
-                        <input type="date" id="insightsDatePicker"
-                            style="background: transparent; border: none; color: white; font-family: inherit; font-size: 0.95rem; cursor: pointer; outline: none;">
+            <div class="flex items-center justify-between glass-panel py-3 px-4 mb-6 relative">
+                <div class="flex items-center w-full justify-between lg:justify-start lg:gap-8">
+                    <button id="btnPrevDay" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-slate-300 transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-calendar-day text-indigo-400 text-lg"></i>
+                        <input type="date" id="insightsDatePicker" class="bg-transparent border-none text-white font-sans text-[1.1rem] md:text-[1.2rem] font-semibold cursor-pointer outline-none [color-scheme:dark] select-none">
                     </div>
-                    <button id="btnNextDay" class="history-arrow" title="Next Day"><i
-                            class="fa-solid fa-chevron-right"></i></button>
+                    <button id="btnNextDay" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-slate-300 transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
-                <span id="insightsHistoryStatus"
-                    style="font-size: 0.8rem; color: var(--text-secondary); opacity: 0.7;"></span>
+                <span id="insightsHistoryStatus" class="hidden lg:block absolute right-6 text-[0.8rem] text-slate-400 font-medium"></span>
             </div>
 
             <!-- Charts Grid -->
-            <div class="insights-grid">
-                <div class="chart-panel glass-panel">
-                    <h3><i class="fa-solid fa-chart-area" style="color: #6366f1;"></i> Study Hours Trend</h3>
-                    <p class="chart-description">Daily study hours over the selected period. <span id="chartRangeStudy"
-                            style="opacity:0.6;"></span></p>
-                    <div class="chart-container">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Chart 1 -->
+                <div class="glass-panel flex flex-col p-6 border-indigo-500/20">
+                    <h3 class="text-[1.15rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-area text-indigo-400"></i> Study Hours Trend</h3>
+                    <p class="text-slate-400 text-[0.85rem] mb-4 leading-snug">Daily study hours over the selected period. <span id="chartRangeStudy" class="opacity-60 ml-1"></span></p>
+                    <div class="relative w-full h-[220px] md:h-[260px]">
                         <canvas id="chartStudyHours"></canvas>
                     </div>
                 </div>
-                <div class="chart-panel glass-panel">
-                    <h3><i class="fa-solid fa-chart-pie" style="color: #ec4899;"></i> Subject Distribution</h3>
-                    <p class="chart-description">Time per subject. <span id="chartRangeSubject"
-                            style="opacity:0.6;"></span></p>
-                    <div class="chart-container">
+                <!-- Chart 2 -->
+                <div class="glass-panel flex flex-col p-6 border-pink-500/20">
+                    <h3 class="text-[1.15rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-pink-400"></i> Subject Distribution</h3>
+                    <p class="text-slate-400 text-[0.85rem] mb-4 leading-snug">Time per subject. <span id="chartRangeSubject" class="opacity-60 ml-1"></span></p>
+                    <div class="relative w-full h-[220px] md:h-[260px]">
                         <canvas id="chartSubjectDist"></canvas>
                     </div>
                 </div>
-                <div class="chart-panel glass-panel">
-                    <h3><i class="fa-solid fa-chart-bar" style="color: #10b981;"></i> Peak Productivity Hours</h3>
-                    <p class="chart-description">Which hours you study most. <span id="chartRangePeak"
-                            style="opacity:0.6;"></span></p>
-                    <div class="chart-container">
+                <!-- Chart 3 -->
+                <div class="glass-panel flex flex-col p-6 border-emerald-500/20">
+                    <h3 class="text-[1.15rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-bar text-emerald-400"></i> Peak Productivity Hours</h3>
+                    <p class="text-slate-400 text-[0.85rem] mb-4 leading-snug">Which hours you study most. <span id="chartRangePeak" class="opacity-60 ml-1"></span></p>
+                    <div class="relative w-full h-[220px] md:h-[260px]">
                         <canvas id="chartPeakHours"></canvas>
                     </div>
                 </div>
-                <div class="chart-panel glass-panel">
-                    <h3><i class="fa-solid fa-bullseye" style="color: #f59e0b;"></i> Revision Completion</h3>
-                    <p class="chart-description">2-4-7 spaced repetition progress. <span id="chartRangeRev"
-                            style="opacity:0.6;"></span></p>
-                    <div class="chart-container">
+                <!-- Chart 4 -->
+                <div class="glass-panel flex flex-col p-6 border-amber-500/20">
+                    <h3 class="text-[1.15rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-bullseye text-amber-400"></i> Revision Completion</h3>
+                    <p class="text-slate-400 text-[0.85rem] mb-4 leading-snug">2-4-7 spaced repetition progress. <span id="chartRangeRev" class="opacity-60 ml-1"></span></p>
+                    <div class="relative w-full h-[220px] md:h-[260px]">
                         <canvas id="chartRevisionRate"></canvas>
                     </div>
                 </div>
-                <div class="chart-panel glass-panel" style="grid-column: 1 / -1; min-height: 280px;">
-                    <h3><i class="fa-solid fa-star" style="color: #fbbf24;"></i> AI Rating Trend</h3>
-                    <p class="chart-description">Your performance score history across analyzed periods.</p>
-                    <div class="chart-container" style="height: 220px;">
+                <!-- AI Rating Timeline (Full Row) -->
+                <div class="glass-panel flex flex-col p-6 border-amber-500/20 col-span-1 lg:col-span-2">
+                    <h3 class="text-[1.15rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-star text-amber-400"></i> AI Rating Trend</h3>
+                    <p class="text-slate-400 text-[0.85rem] mb-4 leading-snug">Your performance score history across analyzed periods.</p>
+                    <div class="relative w-full h-[200px] md:h-[240px]">
                         <canvas id="chartAIRating"></canvas>
                     </div>
                 </div>
             </div>
 
             <!-- AI Feedback Panel -->
-            <div class="ai-feedback-panel glass-panel">
-                <div class="ai-feedback-header">
-                    <h3><i class="fa-solid fa-robot" style="color: #6366f1;"></i> AI Analysis & Feedback</h3>
-                    <div id="aiLoadingIndicator" class="ai-loading" style="display: none;">
-                        <div class="ai-loading-dot"></div>
-                        <div class="ai-loading-dot"></div>
-                        <div class="ai-loading-dot"></div>
+            <div class="glass-panel border-indigo-500/30 shadow-[0_0_40px_rgba(99,102,241,0.06)] relative overflow-hidden flex flex-col">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
+                    <h3 class="text-[1.25rem] font-bold flex items-center gap-2 text-indigo-300"><i class="fa-solid fa-robot"></i> AI Analysis & Feedback</h3>
+                    <div id="aiLoadingIndicator" class="flex gap-1.5" style="display: none;">
+                        <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                        <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                        <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce"></div>
                     </div>
                 </div>
 
-                <div id="aiRatingContainer" class="ai-rating-container" style="display: none;">
-                    <div class="ai-rating-score">
-                        <span id="aiRatingNumber">0</span><span class="ai-rating-total">/10</span>
+                <div id="aiRatingContainer" class="flex flex-col items-center justify-center p-6 bg-indigo-500/5 rounded-2xl border border-indigo-500/10 mb-6" style="display: none;">
+                    <div class="flex items-baseline gap-1 text-[3.5rem] font-bold text-slate-100 leading-none mb-3">
+                        <span id="aiRatingNumber">0</span><span class="text-[1.5rem] text-slate-400 opacity-60">/10</span>
                     </div>
-                    <div id="aiRatingStars" class="ai-rating-stars">
+                    <div id="aiRatingStars" class="flex gap-1.5 text-[1.4rem] text-slate-600 mb-2">
                         <!-- Stars injected via JS -->
                     </div>
-                    <div class="ai-rating-label">Overall Performance</div>
+                    <div class="text-[0.9rem] font-semibold text-indigo-300 uppercase tracking-widest">Overall Performance</div>
                 </div>
 
-                <div id="aiFeedbackContent" class="ai-feedback-content">
-                    <div class="ai-placeholder">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <p>Click <strong>"Generate AI Insights"</strong> to get personalized study feedback & analysis
-                            powered by Groq AI.</p>
+                <div id="aiFeedbackContent" class="text-[0.95rem] text-slate-300 leading-relaxed [&>p]:mb-4 [&>ul]:mb-4 [&>ul]:pl-5 [&>ul]:list-disc [&>ul>li]:mb-2 [&>ol]:mb-4 [&>ol]:pl-5 [&>ol]:list-decimal">
+                    <div class="flex flex-col items-center justify-center py-10 px-4 text-center text-slate-400">
+                        <i class="fa-solid fa-wand-magic-sparkles text-3xl text-indigo-500/50 mb-3"></i>
+                        <p class="max-w-md">Click <strong class="text-slate-300">"Generate AI Insights"</strong> to get personalized study feedback & analysis powered by Groq AI.</p>
                     </div>
                 </div>
             </div>
@@ -859,16 +822,16 @@
     </div>
 
     <!-- =================== POMODORO MODAL (Converted to Tab) =================== -->
-    <main id="pomodoroView" class="view-section pomodoro-view">
-        <div class="glass-panel pomodoro-panel flex flex-col items-center justify-center min-h-[80vh] relative pt-6">
+    <main id="pomodoroView" class="view-section pomodoro-view pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
+        <div class="glass-panel flex flex-col items-center justify-center min-h-[80vh] relative pt-6 mb-4">
             <div class="modal-header w-full justify-center mb-4 border-b-0 pb-0">
                 <h2 class="m-0 flex items-center gap-2 text-xl font-bold text-slate-200"><i class="fa-solid fa-hourglass-half text-red-500"></i> Pomodoro Timer</h2>
             </div>
 
             <!-- Mode selector -->
-            <div class="pomo-mode-bar flex justify-center gap-1.5 mb-6 bg-black/20 px-1.5 py-1.5 rounded-full border border-white/10">
-                <button class="pomo-mode-btn active bg-transparent border-none text-slate-400 px-4 py-1.5 rounded-full font-sans text-[0.82rem] font-semibold cursor-pointer transition-all" data-mode="focus">Focus</button>
-                <button class="pomo-mode-btn bg-transparent border-none text-slate-400 px-4 py-1.5 rounded-full font-sans text-[0.82rem] font-semibold cursor-pointer transition-all" data-mode="short">Break</button>
+            <div class="flex justify-center gap-1.5 mb-6 bg-black/20 px-1.5 py-1.5 rounded-full border border-white/10">
+                <button class="pomo-mode-btn active bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/10 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-[0_4px_12px_rgba(99,102,241,0.4)]" data-mode="focus">Focus</button>
+                <button class="pomo-mode-btn bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/10 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-[0_4px_12px_rgba(99,102,241,0.4)]" data-mode="short">Break</button>
                 <button class="bg-transparent border-none text-slate-400 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all hover:bg-white/10 hover:text-white" id="btnToggleRing" title="Toggle Ring"><i class="fa-solid fa-bullseye"></i></button>
             </div>
 
@@ -901,15 +864,15 @@
             </div>
 
             <!-- Timer ring -->
-            <div class="pomo-ring-wrap relative w-[200px] h-[200px] mx-auto mb-6">
-                <svg class="pomo-ring w-[200px] h-[200px] -rotate-90" viewBox="0 0 120 120">
-                    <circle class="pomo-ring-bg fill-none stroke-white/[.06] stroke-[8]" cx="60" cy="60" r="54" />
-                    <circle class="pomo-ring-fill fill-none stroke-[8] [stroke-linecap:round] [stroke-dasharray:339.29] [transition:stroke-dashoffset_1s_linear,stroke_0.4s_ease]"
-                        id="pomoRingFill" cx="60" cy="60" r="54" stroke="#ef4444" stroke-dashoffset="0" />
+            <div class="relative w-[220px] h-[220px] mx-auto mb-8 mt-2">
+                <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                    <circle class="fill-none stroke-white/[.06] stroke-[6]" cx="60" cy="60" r="56" />
+                    <circle class="fill-none stroke-[6] [stroke-linecap:round] [stroke-dasharray:351.86] [transition:stroke-dashoffset_1s_linear,stroke_0.4s_ease]"
+                        id="pomoRingFill" cx="60" cy="60" r="56" stroke="#ef4444" stroke-dashoffset="0" />
                 </svg>
-                <div class="pomo-timer-display absolute inset-0 flex flex-col items-center justify-center">
-                    <div id="pomoTime" class="text-[3rem] font-bold tracking-[-1px] leading-none bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">50:00</div>
-                    <div id="pomoModeLabel" class="pomo-mode-label text-[0.8rem] text-slate-400 uppercase tracking-[1px] mt-1">Focus</div>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <div id="pomoTime" class="text-[3.5rem] font-extrabold tracking-[-1.5px] leading-none bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent drop-shadow-md">50:00</div>
+                    <div id="pomoModeLabel" class="text-[0.9rem] text-slate-400 uppercase tracking-[1.5px] mt-2 font-semibold">Focus</div>
                 </div>
             </div>
             

@@ -855,9 +855,9 @@ function renderTimeLogs() {
             notesHtml = `<div class="text-[0.9rem] text-slate-400 mt-2 font-serif italic col-span-full"><i class="fa-solid fa-quote-left opacity-50 mr-1.5"></i> ${log.notes}</div>`;
         }
         let actionBtnsHtml = `
-            <div class="flex gap-2 mt-2">
-                <button class="bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 rounded-lg px-2.5 py-1 text-[0.8rem] font-medium transition-colors hover:bg-indigo-500/20 hover:text-indigo-200" title="Edit this log" onclick="editTimeLog('${log.id}')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                <button class="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-2.5 py-1 text-[0.8rem] font-medium transition-colors hover:bg-red-500/20 hover:text-red-300" title="Delete this log" onclick="deleteTimeLog('${log.id}')"><i class="fa-solid fa-trash-can"></i> Delete</button>
+            <div class="flex gap-2.5 mt-3">
+                <button class="bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 rounded-lg px-4 py-1.5 text-[0.85rem] font-semibold transition-all duration-200 hover:bg-indigo-500/20 hover:text-indigo-200 hover:-translate-y-[1px] hover:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/50" title="Edit this log" onclick="editTimeLog('${log.id}')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                <button class="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-4 py-1.5 text-[0.85rem] font-semibold transition-all duration-200 hover:bg-red-500/20 hover:text-red-300 hover:-translate-y-[1px] hover:border-red-500/40 focus:ring-2 focus:ring-red-500/50" title="Delete this log" onclick="deleteTimeLog('${log.id}')"><i class="fa-solid fa-trash-can"></i> Delete</button>
             </div>`;
 
         const subjectBadge = log.subject ? `<span class="inline-block bg-indigo-500/15 text-indigo-300 px-2.5 py-0.5 rounded-full text-[0.7rem] font-semibold ml-2 align-middle tracking-wide uppercase">${log.subject}</span>` : '';
