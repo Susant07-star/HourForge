@@ -893,9 +893,14 @@
                 </div>
             </details>
 
-            <button id="btnPomoFullscreen" class="btn-fullscreen-inline" title="Full Screen" style="margin-top: 1.5rem; background: rgba(255,255,255,0.1); border:none; padding: 0.6rem 1.2rem; border-radius: 2rem; color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
-                <i class="fa-solid fa-expand"></i> Enter Full Screen
-            </button>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; justify-content: center;">
+                <button id="btnPomoPrev" class="btn-fullscreen-inline" title="Reset Timer" style="background: rgba(255,255,255,0.1); border:none; padding: 0.6rem 1.2rem; border-radius: 2rem; color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+                <button id="btnPomoFullscreen" class="btn-fullscreen-inline" title="Full Screen" style="background: rgba(255,255,255,0.1); border:none; padding: 0.6rem 1.2rem; border-radius: 2rem; color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+                    <i class="fa-solid fa-expand"></i> Enter Full Screen
+                </button>
+            </div>
 
             <!-- Timer ring -->
             <div class="pomo-ring-wrap" style="margin: 1.5rem 0;">
@@ -912,10 +917,8 @@
             
             <div class="pomo-controls">
                 <button id="btnPomoBack" class="pomo-ctrl-btn" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
-                <button id="btnPomoPrev" class="pomo-ctrl-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
                 <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
                 <button id="btnPomoSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
-                
             </div>
 
             <!-- Session dots -->
@@ -1035,7 +1038,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v30';
+            const CURRENT_SW_VERSION = 'v31';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh

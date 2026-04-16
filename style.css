@@ -3987,7 +3987,14 @@ main#hourLogView.active {
     color: var(--accent-primary);
     font-size: 1.1rem;
     font-weight: bold;
-    margin-left: 0.5rem;
+    background: rgba(10, 8, 32, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 0.4rem 1.2rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    margin: 0;
 }
 
 #pomodoroView:fullscreen .pomo-controls,
