@@ -1,7 +1,8 @@
-const CACHE_NAME = 'hourforge-v33';
+const CACHE_NAME = 'hourforge-v34';
 const ASSETS = [
     './',
     './index.html',
+    './css/tailwind.css',
     './css/variables.css',
     './css/base.css',
     './css/dashboard.css',
