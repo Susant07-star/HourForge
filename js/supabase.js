@@ -138,83 +138,52 @@ function deepMergeArrays(localArr, cloudArr) {
     if (!localArr) localArr = [];
     if (!cloudArr) cloudArr = [];
     const map = new Map();
-    const normalizeMergedItem = (item) => {
-        if (
-            typeof normalizeStudySession === 'function' &&
-            item &&
-            typeof item === 'object' &&
-            ('dateRead' in item || 'revisions' in item)
-        ) {
-            return normalizeStudySession(item);
-        }
-        return item;
-    };
-    const getLatestStamp = (obj) => {
-        if (!obj || typeof obj !== 'object') return 0;
-
-        let latest = 0;
-        const numericUpdatedAt = Number(obj.updated_at);
-        if (Number.isFinite(numericUpdatedAt) && numericUpdatedAt > 0) {
-            latest = Math.max(latest, numericUpdatedAt);
-        }
-
-        const parseDateValue = (value) => {
-            if (!value) return 0;
-            const parsed = new Date(value).getTime();
-            return Number.isFinite(parsed) ? parsed : 0;
-        };
-
-        latest = Math.max(
-            latest,
-            parseDateValue(obj.updatedAt),
-            parseDateValue(obj.createdAt),
-            parseDateValue(obj.created_at)
-        );
-
-        if (obj.revisions) {
-            for (const rev of Object.values(obj.revisions)) {
-                if (rev && typeof rev === 'object' && rev.completedAt) {
-                    latest = Math.max(latest, parseDateValue(rev.completedAt));
-                }
-            }
-        }
-
-        return latest;
-    };
-
     // Add all local items
     for (const item of localArr) {
-        if (item.id) map.set(item.id, normalizeMergedItem(item));
+        if (item.id) map.set(item.id, item);
     }
     // Merge cloud items
     for (const item of cloudArr) {
         if (item.id) {
-            const normalizedItem = normalizeMergedItem(item);
             const existing = map.get(item.id);
             if (!existing) {
-                map.set(normalizedItem.id, normalizedItem);
+                map.set(item.id, item);
             } else {
+                // If both exist, pick the newest one based on timestamps
+                const getLatestStamp = (obj) => {
+                    let latest = obj.createdAt ? new Date(obj.createdAt).getTime() : 0;
+                    if (obj.updatedAt) latest = Math.max(latest, new Date(obj.updatedAt).getTime());
+                    if (obj.revisions) {
+                        for (const rev of Object.values(obj.revisions)) {
+                            if (rev && typeof rev === 'object' && rev.completedAt) {
+                                latest = Math.max(latest, new Date(rev.completedAt).getTime());
+                            }
+                        }
+                    }
+                    return latest;
+                };
+                
                 const localStr = JSON.stringify(existing);
-                const cloudStr = JSON.stringify(normalizedItem);
+                const cloudStr = JSON.stringify(item);
                 
                 if (localStr === cloudStr) continue;
                 
                 const localDate = getLatestStamp(existing);
-                const cloudDate = getLatestStamp(normalizedItem);
-
+                const cloudDate = getLatestStamp(item);
+                
                 if (cloudDate > localDate) {
-                    map.set(normalizedItem.id, normalizedItem);
+                    map.set(item.id, item);
                 } else if (cloudDate === localDate) {
                     if (cloudStr.length > localStr.length) {
-                        map.set(normalizedItem.id, normalizedItem);
+                        map.set(item.id, item);
                     }
                 }
             }
         }
     }
     return Array.from(map.values()).sort((a, b) => {
-        const dateA = getLatestStamp(a);
-        const dateB = getLatestStamp(b);
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return dateB - dateA; 
     });
 }
@@ -227,9 +196,6 @@ async function applyCloudData(cloudData) {
     
     // Deep Merge Arrays instead of overwriting
     studySessions = deepMergeArrays(studySessions, cloudData.studySessions);
-    if (typeof normalizeStudySessionsArray === 'function') {
-        studySessions = normalizeStudySessionsArray(studySessions);
-    }
     timeLogs = deepMergeArrays(timeLogs, cloudData.timeLogs);
     
     // Merge AI Ratings
@@ -270,17 +236,13 @@ async function applyCloudData(cloudData) {
 
     // Re-render UI aggressively if app is already initialized
     if (isAppInitialized) {
-        if (typeof scheduleAppRefresh === 'function') {
-            scheduleAppRefresh();
-        } else {
-            renderDynamicSubjects();
-            renderDashboard();
-            renderTableView();
-            if (typeof renderTimeLogs === 'function') renderTimeLogs();
-            if (typeof updateExamCountdowns === 'function') updateExamCountdowns();
-            if (typeof updateExamCountdown === 'function') updateExamCountdown(); // fallback
-            if (typeof updateStreakUI === 'function') updateStreakUI();
-        }
+        renderDynamicSubjects();
+        renderDashboard();
+        renderTableView();
+        if (typeof renderTimeLogs === 'function') renderTimeLogs();
+        if (typeof updateExamCountdowns === 'function') updateExamCountdowns();
+        if (typeof updateExamCountdown === 'function') updateExamCountdown(); // fallback
+        if (typeof updateStreakUI === 'function') updateStreakUI();
     }
 }
 

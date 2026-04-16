@@ -1,0 +1,47 @@
+:root {
+    --bg-primary: #0f172a;
+    /* Slate 900 */
+    --bg-secondary: #1e293b;
+    /* Slate 800 */
+    --accent-primary: #6366f1;
+    /* Indigo 500 */
+    --accent-hover: #4f46e5;
+    /* Indigo 600 */
+    --accent-glow: rgba(99, 102, 241, 0.4);
+    --text-primary: #f8fafc;
+    /* Slate 50 */
+    --text-secondary: #94a3b8;
+    /* Slate 400 */
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+
+    /* Subject Colors */
+    --color-physics: #ef4444;
+    /* Red */
+    --color-chemistry: #3b82f6;
+    /* Blue */
+    --color-maths: #f59e0b;
+    /* Amber */
+    --color-computer: #10b981;
+    /* Emerald */
+    --color-english: #ec4899;
+    /* Pink */
+    --color-nepali: #8b5cf6;
+    /* Violet */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Base Styles & Typography */

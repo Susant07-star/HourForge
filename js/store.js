@@ -49,136 +49,9 @@
  * @property {boolean} setupComplete
  */
 
-function parseLocalArray(key) {
-    const raw = localStorage.getItem(key);
-    if (!raw) return [];
-    try {
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-    } catch (err) {
-        // #region agent log
-        fetch('http://127.0.0.1:7317/ingest/ebb4b885-2dc8-4803-826d-97791a2423c5',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'130ae0'},body:JSON.stringify({sessionId:'130ae0',runId:'pre-fix',hypothesisId:'H3',location:'js/store.js:parseLocalArray',message:'Failed to parse localStorage JSON',data:{key,rawLength:raw.length,error:String(err&&err.message||err)},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
-        return [];
-    }
-}
-
-function normalizeRevisionState(revision) {
-    if (typeof revision === 'boolean') {
-        return { done: revision, completedAt: null };
-    }
-
-    if (!revision || typeof revision !== 'object') {
-        return { done: false, completedAt: null };
-    }
-
-    return {
-        done: !!revision.done,
-        completedAt: revision.completedAt || null
-    };
-}
-
-function normalizeStudySession(session) {
-    if (!session || typeof session !== 'object') return session;
-
-    return {
-        ...session,
-        revisions: {
-            rev2: normalizeRevisionState(session.revisions && session.revisions.rev2),
-            rev4: normalizeRevisionState(session.revisions && session.revisions.rev4),
-            rev7: normalizeRevisionState(session.revisions && session.revisions.rev7)
-        }
-    };
-}
-
-function normalizeStudySessionsArray(sessions) {
-    if (!Array.isArray(sessions)) return [];
-    return sessions.map(normalizeStudySession);
-}
-
-const scheduledUiJobs = new Map();
-
-function scheduleUiJob(name, fn, delay = 80) {
-    if (scheduledUiJobs.has(name)) {
-        clearTimeout(scheduledUiJobs.get(name));
-    }
-
-    const timerId = setTimeout(() => {
-        scheduledUiJobs.delete(name);
-        try {
-            fn();
-        } catch (err) {
-            console.warn(`Scheduled UI job failed: ${name}`, err);
-        }
-    }, delay);
-
-    scheduledUiJobs.set(name, timerId);
-}
-
-function scheduleRenderDashboard(delay = 80) {
-    scheduleUiJob('renderDashboard', () => {
-        if (typeof renderDashboard === 'function') renderDashboard();
-    }, delay);
-}
-
-function scheduleRenderTableView(delay = 80) {
-    scheduleUiJob('renderTableView', () => {
-        if (typeof renderTableView === 'function') renderTableView();
-    }, delay);
-}
-
-function scheduleRenderTimeLogs(delay = 80) {
-    scheduleUiJob('renderTimeLogs', () => {
-        if (typeof renderTimeLogs === 'function') renderTimeLogs();
-    }, delay);
-}
-
-function scheduleRenderDynamicSubjects(delay = 80) {
-    scheduleUiJob('renderDynamicSubjects', () => {
-        if (typeof renderDynamicSubjects === 'function') renderDynamicSubjects();
-    }, delay);
-}
-
-function scheduleRenderAllTopics(delay = 80) {
-    scheduleUiJob('renderAllTopics', () => {
-        if (typeof renderAllTopics === 'function') renderAllTopics();
-    }, delay);
-}
-
-function scheduleAppRefresh(options = {}) {
-    const {
-        subjects = true,
-        dashboard = true,
-        table = true,
-        timeLogs = true,
-        examCountdowns = true,
-        streak = true,
-        delay = 80
-    } = options;
-
-    if (subjects) scheduleRenderDynamicSubjects(delay);
-    if (dashboard) scheduleRenderDashboard(delay);
-    if (table) scheduleRenderTableView(delay);
-    if (timeLogs) scheduleRenderTimeLogs(delay);
-
-    if (examCountdowns) {
-        scheduleUiJob('updateExamCountdowns', () => {
-            if (typeof updateExamCountdowns === 'function') updateExamCountdowns();
-            if (typeof updateExamCountdown === 'function') updateExamCountdown();
-        }, delay);
-    }
-
-    if (streak) {
-        scheduleUiJob('updateStreakUI', () => {
-            if (typeof updateStreakUI === 'function') updateStreakUI();
-            if (typeof calculateAndRenderStreak === 'function') calculateAndRenderStreak();
-        }, delay);
-    }
-}
-
-let studySessions = normalizeStudySessionsArray(parseLocalArray('studySessions'));
-let timeLogs = parseLocalArray('timeLogs');
-let aiRatingsHistory = parseLocalArray('aiRatingsHistory');
+let studySessions = JSON.parse(localStorage.getItem('studySessions')) || [];
+let timeLogs = JSON.parse(localStorage.getItem('timeLogs')) || [];
+let aiRatingsHistory = JSON.parse(localStorage.getItem('aiRatingsHistory')) || [];
 
 // Migrate old dateLabel formats to YYYY-MM-DD, add period field, and deduplicate
 {
@@ -349,8 +222,10 @@ async function migrateDatabaseIfNeeded() {
 // ==========================================
 async function recoverDataIfNeeded() {
     // If localStorage already has data, no recovery needed
-    const hasLocalSessions = parseLocalArray('studySessions').length > 0;
-    const hasLocalTimeLogs = parseLocalArray('timeLogs').length > 0;
+    const lsSessions = localStorage.getItem('studySessions');
+    const lsTimeLogs = localStorage.getItem('timeLogs');
+    const hasLocalSessions = lsSessions && JSON.parse(lsSessions).length > 0;
+    const hasLocalTimeLogs = lsTimeLogs && JSON.parse(lsTimeLogs).length > 0;
 
     if (hasLocalSessions || hasLocalTimeLogs) return false;
 
@@ -361,7 +236,7 @@ async function recoverDataIfNeeded() {
         const idbSessions = await idb.get('studySessions');
         const idbTimeLogs = await idb.get('timeLogs');
         if ((idbSessions && idbSessions.length > 0) || (idbTimeLogs && idbTimeLogs.length > 0)) {
-            studySessions = normalizeStudySessionsArray(idbSessions || []);
+            studySessions = idbSessions || [];
             timeLogs = idbTimeLogs || [];
             localStorage.setItem('studySessions', JSON.stringify(studySessions));
             localStorage.setItem('timeLogs', JSON.stringify(timeLogs));
@@ -376,12 +251,3 @@ async function recoverDataIfNeeded() {
     // (We rely exclusively on IndexedDB mirror which was initialized above)
     return false;
 }
-
-window.normalizeStudySession = normalizeStudySession;
-window.normalizeStudySessionsArray = normalizeStudySessionsArray;
-window.scheduleRenderDashboard = scheduleRenderDashboard;
-window.scheduleRenderTableView = scheduleRenderTableView;
-window.scheduleRenderTimeLogs = scheduleRenderTimeLogs;
-window.scheduleRenderDynamicSubjects = scheduleRenderDynamicSubjects;
-window.scheduleRenderAllTopics = scheduleRenderAllTopics;
-window.scheduleAppRefresh = scheduleAppRefresh;

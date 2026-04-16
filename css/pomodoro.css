@@ -1,0 +1,346 @@
+/* ==========================================
+   POMODORO TIMER
+   ========================================== */
+.pomodoro-modal {
+    max-width: 380px;
+    text-align: center;
+}
+
+/* Mode bar */
+.pomo-mode-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.3rem;
+    border-radius: 2rem;
+    border: 1px solid var(--glass-border);
+}
+
+.pomo-mode-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.45rem 0.9rem;
+    border-radius: 1.5rem;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+}
+
+.pomo-mode-btn.active {
+    background: var(--accent-primary);
+    color: white;
+    box-shadow: 0 2px 10px var(--accent-glow);
+}
+
+/* SVG Ring */
+.pomo-ring-wrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 1.5rem;
+}
+
+.pomo-ring {
+    width: 200px;
+    height: 200px;
+    transform: rotate(-90deg);
+}
+
+.pomo-ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.06);
+    stroke-width: 8;
+}
+
+.pomo-ring-fill {
+    fill: none;
+    stroke: #ef4444;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 339.29;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.4s ease;
+}
+
+.pomo-timer-display {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#pomoTime {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1;
+    background: linear-gradient(to right, #f1f5f9, #cbd5e1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.pomo-mode-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.3rem;
+}
+
+/* Controls */
+.pomo-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.pomo-ctrl-btn {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    -webkit-text-fill-color: var(--text-secondary);
+}
+
+.pomo-ctrl-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    -webkit-text-fill-color: white;
+    transform: scale(1.08);
+}
+
+.pomo-main-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-color: transparent;
+    color: white;
+    -webkit-text-fill-color: white;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
+}
+
+.pomo-main-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 28px rgba(239, 68, 68, 0.5);
+    background: linear-gradient(135deg, #f87171, #ef4444);
+}
+
+/* Session counter */
+.pomo-sessions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.pomo-session-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pomo-session-dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.pomo-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+}
+
+.pomo-dot.filled {
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    border-color: transparent;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.pomo-session-count {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.pomo-tip {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+/* ==========================================
+   POMODORO SETTINGS ROW
+   ========================================== */
+.pomo-settings-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+}
+
+.pomo-setting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    flex: 1;
+}
+
+.pomo-setting label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.pomo-setting-unit {
+    font-weight: 400;
+    opacity: 0.6;
+}
+
+.pomo-setting-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 0.4rem;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.pomo-setting-input:focus {
+    outline: none;
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+/* ==========================================
+   FLOATING MINI TIMER
+   ========================================== */
+.pomo-mini-timer {
+    position: fixed;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    z-index: 8888;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #ef4444;
+    border-radius: 1rem;
+    padding: 0.6rem 0.85rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(239, 68, 68, 0.1);
+    animation: miniTimerSlideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.pomo-mini-timer[data-mode="short"] {
+    border-left-color: #34d399;
+}
+
+.pomo-mini-timer[data-mode="long"] {
+    border-left-color: #6366f1;
+}
+
+@keyframes miniTimerSlideIn {
+    from {
+        transform: translateX(120px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.pomo-mini-play,
+.pomo-mini-open {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.8rem;
+    -webkit-text-fill-color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.pomo-mini-play {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    -webkit-text-fill-color: #f87171;
+}
+
+.pomo-mini-play:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: scale(1.1);
+}
+
+.pomo-mini-open:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    -webkit-text-fill-color: white;
+}
+
+.pomo-mini-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 52px;
+}
+
+.pomo-mini-time {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.pomo-mini-label {
+    font-size: 0.6rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.15rem;
+}
+

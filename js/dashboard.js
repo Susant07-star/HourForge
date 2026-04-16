@@ -119,11 +119,9 @@ async function init() {
     setInterval(() => {
         updateExamCountdowns();
         if (document.getElementById('dashboardView').classList.contains('active')) {
-            if (typeof scheduleRenderAllTopics === 'function') scheduleRenderAllTopics(20);
-            else renderAllTopics();
+            renderAllTopics();
         } else if (document.getElementById('hourLogView').classList.contains('active')) {
-            if (typeof scheduleRenderTimeLogs === 'function') scheduleRenderTimeLogs(20);
-            else renderTimeLogs();
+            renderTimeLogs();
         }
     }, 60000);
 
@@ -258,7 +256,7 @@ function renderDynamicSubjects() {
         if (allBtn) filterGroup.appendChild(allBtn);
         subjects.forEach(s => {
             const btn = document.createElement('button');
-            btn.className = 'filter-btn bg-white/5 border border-white/10 text-slate-400 px-4 py-2 rounded-full font-medium font-sans text-[0.9rem] cursor-pointer transition-all hover:bg-white/10 hover:text-slate-200 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:border-indigo-500 [&.active]:shadow-sm';
+            btn.className = 'filter-btn';
             btn.dataset.filter = s;
             btn.textContent = s;
             btn.addEventListener('click', (e) => {
@@ -277,25 +275,12 @@ function renderDynamicSubjects() {
         tabsGroup.innerHTML = '';
         subjects.forEach((s, i) => {
             const btn = document.createElement('button');
-            btn.className = `sub-tab px-6 py-4 bg-transparent border-b-4 border-transparent text-slate-400 font-medium whitespace-nowrap cursor-pointer transition-all hover:bg-white/5 hover:text-slate-200 outline-none ${i === 0 ? 'active' : ''}`;
+            btn.className = 'sub-tab' + (i === 0 ? ' active' : '');
             btn.dataset.subject = s;
             btn.textContent = s;
-            if (i === 0) {
-                btn.style.borderColor = `var(--color-${s.toLowerCase()})`;
-                btn.style.color = `var(--color-${s.toLowerCase()})`;
-                btn.style.backgroundColor = 'rgba(255,255,255,0.05)';
-            }
             btn.addEventListener('click', (e) => {
-                tabsGroup.querySelectorAll('.sub-tab').forEach(t => {
-                    t.classList.remove('active');
-                    t.style.borderColor = 'transparent';
-                    t.style.color = '';
-                    t.style.backgroundColor = 'transparent';
-                });
+                tabsGroup.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
                 e.currentTarget.classList.add('active');
-                e.currentTarget.style.borderColor = `var(--color-${s.toLowerCase()})`;
-                e.currentTarget.style.color = `var(--color-${s.toLowerCase()})`;
-                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
                 currentTableSubject = s;
                 renderTableView();
             });
@@ -816,8 +801,8 @@ function renderTodayRevisions() {
 
     if (dueToday.length === 0) {
         todayRevisionList.innerHTML = `
-            <div class="col-span-full text-center py-12 px-4 text-slate-500 animated-entry">
-                <i class="fa-solid fa-mug-hot text-5xl mb-4 opacity-50 block -mt-4"></i>
+            <div class="empty-state animated-entry">
+                <i class="fa-solid fa-mug-hot"></i>
                 <p>No 2-4-7 revisions strictly due today. Great job!</p>
             </div>
         `;
@@ -837,30 +822,27 @@ function renderTodayRevisions() {
         const color = SUBJECT_COLORS[session.subject] || 'var(--accent-primary)';
 
         const card = document.createElement('div');
-        card.className = 'premium-card relative overflow-hidden flex flex-col hover:-translate-y-1 animated-entry';
+        card.className = 'revision-card animated-entry';
         card.style.setProperty('--card-color', color);
+        // Staggered animation
         card.style.animationDelay = `${index * 0.1}s`;
 
+        // Visual check for Overdue status
         let overdueBadge = '';
         if (session.daysOverdue > 0) {
             const label = session.daysOverdue === 1 ? 'day' : 'days';
-            overdueBadge = `<span class="text-red-500 text-[0.75rem] font-bold tracking-wide ml-2"><i class="fa-solid fa-circle-exclamation"></i> ${session.daysOverdue} ${label} overdue</span>`;
+            overdueBadge = `<span style="color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-left: 0.5rem;"><i class="fa-solid fa-circle-exclamation"></i> ${session.daysOverdue} ${label} overdue</span>`;
         }
 
         card.innerHTML = `
-            <div class="absolute top-0 left-0 w-1 h-full bg-[var(--card-color)] opacity-70"></div>
-            <div class="text-[0.75rem] uppercase tracking-[0.15em] font-bold mb-1 text-[var(--card-color)]">${session.subject}</div>
-            <div class="text-[1.25rem] font-bold mb-5 leading-tight text-white">${session.topic}</div>
-            
-            <div class="flex flex-col gap-2 mb-6">
-                <div class="flex items-center gap-2">
-                    <span class="bg-pink-500/10 border border-pink-500/20 text-pink-400 px-3 py-1 rounded-md font-semibold text-[0.8rem] whitespace-nowrap">${session.revisionLabel}</span>
-                    ${overdueBadge}
-                </div>
-                <div class="text-[0.85rem] text-slate-400 font-medium"><i class="fa-regular fa-calendar-check opacity-70 mr-1.5"></i> Read: ${session.dateRead}</div>
+            <div class="card-subject">${session.subject}</div>
+            <div class="card-topic">${session.topic}</div>
+            <div class="card-meta">
+                <span class="revision-badge">${session.revisionLabel}</span>
+                ${overdueBadge}
+                <span><i class="fa-regular fa-clock"></i> Read: ${session.dateRead}</span>
             </div>
-            
-            <button class="w-full mt-auto premium-btn-secondary border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/50 hover:text-emerald-300" onclick="completeRevision('${session.id}', '${session.revisionType}')">
+            <button class="btn-complete-revision" onclick="completeRevision('${session.id}', '${session.revisionType}')">
                 <i class="fa-solid fa-check"></i> Mark Completed
             </button>
         `;
@@ -880,7 +862,7 @@ function renderAllTopics() {
 
     if (filteredSessions.length === 0) {
         allTopicsList.innerHTML = `
-            <div class="text-center py-12 px-4 text-slate-500 animated-entry">
+            <div class="empty-state">
                 <p>No topics found. Log some sessions first!</p>
             </div>
         `;
@@ -891,41 +873,46 @@ function renderAllTopics() {
     filteredSessions.forEach((session, index) => {
         const color = SUBJECT_COLORS[session.subject] || 'var(--accent-primary)';
         const item = document.createElement('div');
-        item.className = 'premium-card p-5 border border-white/5 transition-colors duration-200 hover:border-indigo-500/30 animated-entry flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
+        item.className = 'topic-item animated-entry';
         item.style.animationDelay = `${index * 0.05}s`;
 
         // Visual indicators of step completion
+        // Graceful legacy migration handled previously but checking just in case
         const rev2Done = session.revisions.rev2.done ?? session.revisions.rev2 === true;
         const rev4Done = session.revisions.rev4.done ?? session.revisions.rev4 === true;
         const rev7Done = session.revisions.rev7.done ?? session.revisions.rev7 === true;
 
-        const rev2Class = rev2Done ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' : 'bg-transparent text-slate-500 border-white/10 border-dashed';
-        const rev4Class = rev4Done ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' : 'bg-transparent text-slate-500 border-white/10 border-dashed';
-        const rev7Class = rev7Done ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' : 'bg-transparent text-slate-500 border-white/10 border-dashed';
+        const rev2Class = rev2Done ? 'completed' : 'pending';
+        const rev4Class = rev4Done ? 'completed' : 'pending';
+        const rev7Class = rev7Done ? 'completed' : 'pending';
 
         const rev2Icon = rev2Done ? '<i class="fa-solid fa-check"></i>' : '2d';
         const rev4Icon = rev4Done ? '<i class="fa-solid fa-check"></i>' : '4d';
         const rev7Icon = rev7Done ? '<i class="fa-solid fa-check"></i>' : '7d';
 
-        // Persistent Delete Button
-        const deleteBtnHtml = `<button class="w-8 h-8 rounded-full flex items-center justify-center bg-transparent text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-colors shrink-0" title="Delete Ongoing Revision" onclick="deleteRevisionCard(event, '${session.id}')"><i class="fa-solid fa-xmark"></i></button>`;
+        // Persistent Delete Button (no 5-min window)
+        const deleteBtnHtml = `<button class="btn-delete" title="Delete Ongoing Revision" onclick="deleteRevisionCard(event, '${session.id}')" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2); color: #f87171; border-radius: 0.5rem; padding: 0.3rem 0.6rem; font-size: 0.75rem;"><i class="fa-solid fa-trash-can"></i></button>`;
 
         item.innerHTML = `
-            <div class="flex-1 min-w-0 pr-4">
-                <div class="flex items-center gap-2 mb-1.5">
-                    <div class="w-2 h-2 rounded-full shadow-sm" style="background-color: ${color}"></div>
-                    <h4 class="text-[1.05rem] font-semibold text-slate-200 truncate m-0">${session.topic}</h4>
+            <div class="topic-info-main">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem;">
+                    <h4>${session.topic}</h4>
+                    ${deleteBtnHtml}
                 </div>
-                <div class="text-[0.8rem] text-slate-400 font-medium pl-4">Read on ${session.dateRead}</div>
+                <div class="topic-info-sub">
+                    <span>
+                        <div class="topic-subject-dot" style="--card-color: ${color}"></div>
+                        ${session.subject}
+                    </span>
+                    <span><i class="fa-regular fa-calendar"></i> ${session.dateRead}</span>
+                </div>
             </div>
-            
-            <div class="flex items-center gap-4 w-full md:w-auto mt-2 md:mt-0 justify-between md:justify-end">
-                <div class="flex gap-2">
-                    <span class="flex items-center justify-center w-8 h-8 rounded border text-[0.7rem] font-bold transition-all ${rev2Class}" title="2 Days Revision">${rev2Icon}</span>
-                    <span class="flex items-center justify-center w-8 h-8 rounded border text-[0.7rem] font-bold transition-all ${rev4Class}" title="4 Days Revision">${rev4Icon}</span>
-                    <span class="flex items-center justify-center w-8 h-8 rounded border text-[0.7rem] font-bold transition-all ${rev7Class}" title="7 Days Revision">${rev7Icon}</span>
+            <div class="topic-status">
+                <div class="status-pills" title="Revision Checkpoints">
+                    <div class="status-pill ${rev2Class}" title="2-Day">${rev2Icon}</div>
+                    <div class="status-pill ${rev4Class}" title="4-Day">${rev4Icon}</div>
+                    <div class="status-pill ${rev7Class}" title="7-Day">${rev7Icon}</div>
                 </div>
-                ${deleteBtnHtml}
             </div>
         `;
 
@@ -957,8 +944,8 @@ function renderTableView() {
     if (filteredSessions.length === 0) {
         revisionTableBody.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center text-slate-400 py-12 px-4 border-b border-white/5">
-                    <i class="fa-solid fa-folder-open text-[2rem] mb-4 opacity-50 block"></i>
+                <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 3rem 1rem;">
+                    <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i><br>
                     No logs found for ${currentTableSubject}. Add a session to see it here.
                 </td>
             </tr>
@@ -983,11 +970,11 @@ function renderTableView() {
                 if (revObj.completedAt) {
                     const dateObj = new Date(revObj.completedAt);
                     const shortDate = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                    dateHtml = `<div class="text-[0.65rem] font-medium mt-1 text-slate-400 whitespace-nowrap">${shortDate}</div>`;
+                    dateHtml = `<div class="status-date">${shortDate}</div>`;
                 }
                 return `
-                    <div class="flex flex-col items-center justify-center gap-1">
-                        <div class="w-9 h-9 rounded-full flex flex-col items-center justify-center m-auto text-[1rem] transition-all bg-[#10b981]/15 text-[#34d399] border border-[#10b981]/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]"><i class="fa-solid fa-check"></i></div>
+                    <div class="status-cell-wrapper">
+                        <div class="status-cell done"><i class="fa-solid fa-check"></i></div>
                         ${dateHtml}
                     </div>
                 `;
@@ -1038,11 +1025,11 @@ function renderTableView() {
                     if (revType === 'rev7' && rev4.done) isActivelyOverdue = true;
                 }
 
-                const dateHtml = `<div class="text-[0.65rem] font-medium mt-1 whitespace-nowrap" style="${isActivelyOverdue ? 'color: #ef4444;' : 'color: var(--text-secondary); opacity: 0.7;'}">Due: ${shortDate}</div>`;
+                const dateHtml = `<div class="status-date" style="${isActivelyOverdue ? 'color: #ef4444;' : 'color: var(--text-secondary); opacity: 0.7;'}">Due: ${shortDate}</div>`;
 
                 return `
-                    <div class="flex flex-col items-center justify-center gap-1">
-                        <div class="w-9 h-9 rounded-full flex flex-col items-center justify-center m-auto text-[1rem] transition-all bg-white/5 text-slate-400 border border-dashed border-white/20" ${isActivelyOverdue ? 'style="border-color: #ef4444; color: #ef4444;"' : ''}>
+                    <div class="status-cell-wrapper">
+                        <div class="status-cell pending" ${isActivelyOverdue ? 'style="border-color: #ef4444; color: #ef4444;"' : ''}>
                             <i class="fa-solid ${isActivelyOverdue ? 'fa-circle-exclamation' : 'fa-hourglass-start'}" style="${isActivelyOverdue ? '' : 'opacity:0.3;'}"></i>
                         </div>
                         ${dateHtml}
@@ -1052,11 +1039,11 @@ function renderTableView() {
         };
 
         tr.innerHTML = `
-            <td class="p-[1rem_1.5rem] border-b border-white/5 font-medium min-w-[150px]">${session.topic}</td>
-            <td class="p-[1rem_1.5rem] border-b border-white/5 text-slate-400 min-w-[140px]"><i class="fa-regular fa-calendar" style="margin-right: 0.5rem; opacity: 0.7;"></i>${session.dateRead}</td>
-            <td class="p-[1rem_1.5rem] border-b border-white/5 text-center">${getStatusCell(session, 'rev2')}</td>
-            <td class="p-[1rem_1.5rem] border-b border-white/5 text-center">${getStatusCell(session, 'rev4')}</td>
-            <td class="p-[1rem_1.5rem] border-b border-white/5 text-center">${getStatusCell(session, 'rev7')}</td>
+            <td data-label="Chapter / Topic" style="font-weight: 500;">${session.topic}</td>
+            <td data-label="Date Read" style="color: var(--text-secondary);"><i class="fa-regular fa-calendar" style="margin-right: 0.5rem; opacity: 0.7;"></i>${session.dateRead}</td>
+            <td data-label="2-Day Rev" class="center-col">${getStatusCell(session, 'rev2')}</td>
+            <td data-label="4-Day Rev" class="center-col">${getStatusCell(session, 'rev4')}</td>
+            <td data-label="7-Day Rev" class="center-col">${getStatusCell(session, 'rev7')}</td>
         `;
 
         fragment.appendChild(tr);

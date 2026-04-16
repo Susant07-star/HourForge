@@ -220,8 +220,7 @@ function updatePomoDisplay() {
     // --------------------------------------------------------
 
     const percentage = pomoTimeLeft / totalTime;
-    const circumference = 2 * Math.PI * (parseFloat(pomoRingFill?.getAttribute('r')) || 56);
-    const offset = circumference - (circumference * percentage);
+    const offset = 339.29 - (339.29 * percentage);
     if (pomoRingFill) {
         pomoRingFill.style.strokeDashoffset = offset;
         pomoRingFill.style.stroke = pomoMode === 'short' ? '#34d399' : '#ef4444';
