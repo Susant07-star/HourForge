@@ -638,7 +638,10 @@ function renderQuickActivityChips() {
 
 // ------------------------------------------
 
-historyDateFilter.addEventListener('change', renderTimeLogs);
+historyDateFilter.addEventListener('change', () => {
+    if (typeof scheduleRenderTimeLogs === 'function') scheduleRenderTimeLogs(20);
+    else renderTimeLogs();
+});
 
 addTimeLogForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -741,7 +744,8 @@ addTimeLogForm.addEventListener('submit', (e) => {
     }
 
     saveToLocalStorage();
-    renderTimeLogs();
+    if (typeof scheduleRenderTimeLogs === 'function') scheduleRenderTimeLogs(20);
+    else renderTimeLogs();
 
     // Auto-backup trigger
     autoBackupSync();
@@ -842,35 +846,33 @@ function renderTimeLogs() {
         };
 
         const item = document.createElement('div');
-        item.className = 'grid grid-cols-[1fr_auto] items-center gap-4 bg-black/20 border border-white/5 border-l-4 rounded-2xl p-5 transition-all duration-300 hover:bg-white/5 hover:translate-x-1 hover:shadow-lg animated-entry';
+        item.className = 'premium-card p-4 flex flex-col md:flex-row justify-between md:items-center gap-4 transition-all duration-300 hover:border-emerald-500/20 hover:-translate-y-1 hover:shadow-lg animated-entry';
         
-        if (log.subject) {
-            item.style.borderLeftColor = `var(--color-${log.subject.toLowerCase()})`;
-        } else {
-            item.style.borderLeftColor = '#10b981';
-        }
+        let subjectColor = log.subject ? `var(--color-${log.subject.toLowerCase()})` : '#10b981';
 
         let notesHtml = '';
         if (log.notes) {
-            notesHtml = `<div class="text-[0.9rem] text-slate-400 mt-2 font-serif italic col-span-full"><i class="fa-solid fa-quote-left opacity-50 mr-1.5"></i> ${log.notes}</div>`;
+            notesHtml = `<div class="text-[0.85rem] text-slate-400 mt-2 font-serif italic"><i class="fa-solid fa-quote-left opacity-30 mr-1.5"></i> ${log.notes}</div>`;
         }
+        
+        // Use standard design system buttons
         let actionBtnsHtml = `
-            <div class="flex gap-2.5 mt-3">
-                <button class="bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 rounded-lg px-4 py-1.5 text-[0.85rem] font-semibold transition-all duration-200 hover:bg-indigo-500/20 hover:text-indigo-200 hover:-translate-y-[1px] hover:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/50" title="Edit this log" onclick="editTimeLog('${log.id}')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                <button class="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-4 py-1.5 text-[0.85rem] font-semibold transition-all duration-200 hover:bg-red-500/20 hover:text-red-300 hover:-translate-y-[1px] hover:border-red-500/40 focus:ring-2 focus:ring-red-500/50" title="Delete this log" onclick="deleteTimeLog('${log.id}')"><i class="fa-solid fa-trash-can"></i> Delete</button>
+            <div class="flex gap-2 w-full md:w-auto mt-2 md:mt-0 justify-end md:justify-start shrink-0">
+                <button class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/10 hover:border-indigo-500/40 w-auto flex-1 md:flex-none" title="Edit this log" onclick="editTimeLog('${log.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
+                <button class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-red-400 border-red-500/20 hover:bg-red-500/10 hover:border-red-500/40 w-auto flex-1 md:flex-none" title="Delete this log" onclick="deleteTimeLog('${log.id}')"><i class="fa-solid fa-trash-can"></i> Delete</button>
             </div>`;
 
-        const subjectBadge = log.subject ? `<span class="inline-block bg-indigo-500/15 text-indigo-300 px-2.5 py-0.5 rounded-full text-[0.7rem] font-semibold ml-2 align-middle tracking-wide uppercase">${log.subject}</span>` : '';
+        const subjectBadge = log.subject ? `<span class="inline-flex items-center gap-1.5 border border-white/10 bg-black/20 text-slate-300 px-2 py-0.5 rounded-md text-[0.7rem] font-bold tracking-wider uppercase ml-2"><div class="w-1.5 h-1.5 rounded-full" style="background-color: ${subjectColor}"></div>${log.subject}</span>` : '';
 
         item.innerHTML = `
-            <div class="flex flex-col">
-                <div class="text-[1.15rem] font-medium mb-1 text-slate-200">${log.task}${subjectBadge}</div>
-                <div class="text-[0.9rem] text-slate-400 flex items-center gap-1.5"><i class="fa-regular fa-clock"></i> ${formatTime(log.startTime)} - ${formatTime(log.endTime)}</div>
+            <div class="flex-1 min-w-0">
+                <div class="text-[1.1rem] font-bold mb-1 text-slate-100 flex items-center leading-tight truncate">${log.task}${subjectBadge}</div>
+                <div class="text-[0.85rem] text-slate-400 flex items-center gap-1.5 font-medium"><i class="fa-regular fa-clock opacity-70"></i> ${formatTime(log.startTime)} - ${formatTime(log.endTime)}</div>
                 ${notesHtml}
-                ${actionBtnsHtml}
             </div>
-            <div class="text-[1.25rem] font-bold text-emerald-400 text-right">
-                ${log.duration} <span class="text-[0.8rem] text-slate-400 font-medium">hrs</span>
+            <div class="flex flex-col items-end shrink-0 md:ml-4">
+                <div class="text-[1.5rem] font-black text-emerald-400 mb-1 leading-none tracking-tight">${log.duration.toFixed(1)}<span class="text-[0.85rem] font-bold text-emerald-500/50 uppercase tracking-[0.2em] ml-1">HRS</span></div>
+                ${actionBtnsHtml}
             </div>
         `;
         fragment.appendChild(item);

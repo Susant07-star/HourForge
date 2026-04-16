@@ -166,100 +166,111 @@
 
 
         <!-- Dashboard View -->
-        <main id="dashboardView" class="main-content view-section active pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
+        <main id="dashboardView" class="view-section active flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0">
             <!-- Dashboard Header -->
-            <div class="col-span-full mb-4">
-                <h1 class="text-[2rem] font-extrabold text-slate-200 mb-1 tracking-tight">Dashboard</h1>
-                <p class="text-slate-400 text-[1rem]">Jump right in. Let's conquer today's goals without overthinking it.</p>
+            <div class="px-2">
+                <h1 class="premium-heading mb-1">Overview</h1>
+                <p class="premium-subtext">Welcome back. Let's conquer today's goals without overthinking it.</p>
             </div>
 
             <!-- Exam Countdown Headers -->
-            <div class="col-span-full">
-                <div class="glass-panel flex justify-around items-center p-6 bg-gradient-to-br from-slate-800/80 to-amber-500/5 border-amber-500/30">
-                    <div class="text-center">
-                        <span id="exam1Label" class="block text-[0.9rem] text-slate-400 uppercase tracking-widest mb-2">Exam 1 in</span>
-                        <span id="preBoardCountdown" class="block text-[2.5rem] font-extrabold text-amber-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.4)]">--</span>
-                        <span class="text-[0.9rem] text-amber-500 font-semibold">DAYS</span>
-                    </div>
-                    <div class="w-[1px] h-[50px] bg-white/10"></div>
-                    <div class="text-center">
-                        <span id="exam2Label" class="block text-[0.9rem] text-slate-400 uppercase tracking-widest mb-2">Exam 2 in</span>
-                        <span id="boardCountdown" class="block text-[2.5rem] font-extrabold text-amber-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.4)]">--</span>
-                        <span class="text-[0.9rem] text-amber-500 font-semibold">DAYS</span>
-                    </div>
+            <div class="premium-card flex justify-around items-center bg-gradient-to-br from-slate-900 to-slate-800/80 border-amber-500/20 md:mx-2">
+                <div class="text-center">
+                    <span id="exam1Label" class="block text-[0.75rem] font-bold text-slate-500 uppercase tracking-[0.2em] mb-1">Exam 1 in</span>
+                    <span id="preBoardCountdown" class="block text-[2.5rem] md:text-[3rem] font-extrabold text-slate-100 tracking-tight leading-none drop-shadow-sm">--</span>
+                    <span class="text-[0.75rem] text-amber-500 font-bold tracking-[0.1em] mt-1 block">DAYS</span>
+                </div>
+                <div class="w-[1px] h-[60px] bg-white/10"></div>
+                <div class="text-center">
+                    <span id="exam2Label" class="block text-[0.75rem] font-bold text-slate-500 uppercase tracking-[0.2em] mb-1">Exam 2 in</span>
+                    <span id="boardCountdown" class="block text-[2.5rem] md:text-[3rem] font-extrabold text-slate-100 tracking-tight leading-none drop-shadow-sm">--</span>
+                    <span class="text-[0.75rem] text-amber-500 font-bold tracking-[0.1em] mt-1 block">DAYS</span>
                 </div>
             </div>
 
-            <!-- Dashboard Top: AI Insight + Timer in a 2-col row on desktop, stacked on mobile -->
-            <div class="col-span-full grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Dashboard Top: AI Insight + Timer -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:px-2">
                 <!-- AI Psychology Insight -->
-                <div class="glass-panel border-pink-500/30 bg-gradient-to-br from-slate-800/70 to-pink-500/5">
-                    <h3 class="mb-2 text-[1rem] flex items-center gap-2 text-pink-200">
-                        <i class="fa-solid fa-brain"></i> 
-                        <span class="bg-gradient-to-r from-indigo-500 to-pink-500 text-transparent bg-clip-text">AI Psychology Insight</span>
+                <div class="premium-card flex flex-col justify-center border-pink-500/20 bg-gradient-to-br from-slate-900 to-pink-500/5 hover:border-pink-500/40">
+                    <h3 class="mb-3 text-[0.9rem] font-bold flex items-center gap-2 uppercase tracking-wide text-pink-400">
+                        <i class="fa-solid fa-lightbulb"></i> AI Insight
                     </h3>
-                    <p id="dailyInsightText" class="text-[0.95rem] text-slate-200 leading-relaxed italic">"Loading insight..."</p>
+                    <p id="dailyInsightText" class="text-[1rem] text-slate-300 leading-relaxed font-serif italic">"Loading insight..."</p>
                 </div>
+                
                 <!-- 5-Minute Timer -->
-                <div class="glass-panel text-center border-emerald-500/30">
-                    <h3 class="mb-1.5 text-[1rem] flex items-center justify-center gap-2 text-emerald-400">
-                        <i class="fa-solid fa-stopwatch"></i> 5-Min Anti-Procrastination Rule
+                <div class="premium-card flex flex-col items-center text-center border-emerald-500/20 hover:border-emerald-500/40 bg-gradient-to-br from-slate-900 to-emerald-500/5">
+                    <h3 class="mb-1 text-[0.9rem] font-bold flex items-center justify-center gap-2 text-emerald-400 uppercase tracking-wide">
+                        <i class="fa-solid fa-stopwatch"></i> 5-Min Rule
                     </h3>
-                    <p class="text-[0.8rem] text-slate-400 mb-3 leading-snug">Commit to just 5 minutes. The Zeigarnik effect forces your brain to finish what it starts.</p>
-                    <div id="countdownDisplay" class="text-[3rem] font-extrabold mb-4 tabular-nums tracking-tight">05:00</div>
-                    <div class="flex justify-center gap-3">
-                        <button id="btnStartTimer" class="px-6 py-2.5 text-[0.95rem] bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl transition-all hover:-translate-y-1 shadow-[0_8px_20px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Start</button>
-                        <button id="btnResetTimer" class="px-4 py-2.5 text-[0.95rem] bg-white/5 hover:bg-white/10 text-slate-300 font-semibold rounded-xl border border-white/10 transition-all hover:-translate-y-1 flex items-center justify-center gap-2"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+                    <p class="text-[0.85rem] text-slate-400 mb-4 max-w-sm">Commit to just 5 minutes. Force your brain to start.</p>
+                    <div id="countdownDisplay" class="text-[3.5rem] font-extrabold mb-5 tabular-nums tracking-tighter leading-none text-slate-100">05:00</div>
+                    <div class="flex justify-center gap-3 w-full sm:w-auto">
+                        <button id="btnStartTimer" class="premium-btn-primary bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20">
+                            <i class="fa-solid fa-play"></i> Start
+                        </button>
+                        <button id="btnResetTimer" class="premium-btn-secondary">
+                            <i class="fa-solid fa-rotate-right"></i> Reset
+                        </button>
                     </div>
                 </div>
-                <!-- Slot: JS moves Today's Revisions here when due — spans full width -->
-                <div id="todayRevisionsSlot" class="col-span-full"></div>
+
+                <!-- Slot: JS moves Today's Revisions here when due -->
+                <div id="todayRevisionsSlot" class="col-span-1 lg:col-span-2"></div>
             </div>
 
-            <!-- Left Column: Add New Study Session Form -->
-            <section class="glass-panel">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-plus-circle text-indigo-400"></i> Log New Session</h2>
-                <form id="addSessionForm" class="flex flex-col gap-4">
-                    <div class="flex flex-col gap-1.5">
-                        <label for="subject" class="text-sm font-semibold text-slate-400 ml-1">Subject</label>
-                        <select id="subject" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all w-full leading-tight" required>
-                            <option value="" disabled selected>Select Subject...</option>
-                            <!-- Subjects populated dynamically -->
-                        </select>
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label for="topic" class="text-sm font-semibold text-slate-400 ml-1">Topic / Chapter</label>
-                        <input type="text" id="topic" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all w-full placeholder-slate-500" placeholder="e.g. Thermodynamics..." required>
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label for="dateRead" class="text-sm font-semibold text-slate-400 ml-1">Date Read</label>
-                        <input type="date" id="dateRead" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all w-full [color-scheme:dark]" required>
-                    </div>
-                    <button type="submit" class="mt-3 w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-transform hover:-translate-y-1 shadow-[0_8px_20px_rgba(99,102,241,0.4)] text-[1.05rem]">Add to Tracker <i class="fa-solid fa-arrow-right"></i></button>
-                </form>
-            </section>
+            <!-- Lower Analytics & Forms Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:px-2">
+                
+                <!-- Left Column: Add New Study Session Form -->
+                <section class="premium-card lg:col-span-1 border-indigo-500/10 flex flex-col gap-2">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200">
+                        <i class="fa-solid fa-plus text-indigo-400"></i> Log Session
+                    </h2>
+                    <form id="addSessionForm" class="flex flex-col gap-5">
+                        <div class="flex flex-col gap-1.5">
+                            <label for="subject" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Subject</label>
+                            <select id="subject" class="premium-input bg-slate-900/50" required>
+                                <option value="" disabled selected>Select Subject...</option>
+                                <!-- Subjects populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label for="topic" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Topic</label>
+                            <input type="text" id="topic" class="premium-input bg-slate-900/50" placeholder="e.g. Thermodynamics" required>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label for="dateRead" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Date Read</label>
+                            <input type="date" id="dateRead" class="premium-input bg-slate-900/50 [color-scheme:dark]" required>
+                        </div>
+                        <button type="submit" class="premium-btn-primary mt-2">
+                            <i class="fa-solid fa-arrow-right"></i> Add to Tracker
+                        </button>
+                    </form>
+                </section>
 
-            <!-- Right Column: Dashboard & Topic List -->
-            <section class="col-span-full">
-                <!-- Today's Revisions -->
-                <div class="glass-panel border-pink-500/30 shadow-[0_0_30px_rgba(236,72,153,0.1)]" id="todayRevisionsPanel">
-                    <div class="flex justify-between items-center mb-5">
-                        <h2 class="mb-0 text-xl font-bold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-fire text-pink-500"></i> Today's Revisions</h2>
-                        <span id="currentDateDisplay" class="bg-white/10 px-4 py-2 rounded-full text-[0.9rem] font-medium text-slate-200"></span>
-                    </div>
-                    <div id="todayRevisionList" class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
+                <!-- Right Column: Revisions Dashboard -->
+                <section class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="premium-card flex-1 border-pink-500/10" id="todayRevisionsPanel">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 pb-4 border-b border-white/5">
+                            <h2 class="text-lg font-bold flex items-center gap-2 text-slate-200 m-0">
+                                <i class="fa-solid fa-fire text-pink-500"></i> Today's Revisions
+                            </h2>
+                            <span id="currentDateDisplay" class="bg-white/5 border border-white/10 px-4 py-1.5 rounded-lg text-[0.85rem] font-semibold text-slate-300"></span>
+                        </div>
+                        <div id="todayRevisionList" class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <!-- Revision Cards dynamically injected -->
                     </div>
                 </div>
 
                 <!-- All Tracked Topics & Filters -->
-                <div class="glass-panel mt-5">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-book-open text-indigo-400"></i> Ongoing Revisions</h2>
+                <div class="premium-card border-indigo-500/10">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-book-open text-indigo-400"></i> Ongoing Revisions</h2>
                     <div class="flex flex-wrap gap-2 mb-6" id="subjectFilterGroup">
-                        <button class="filter-btn active bg-indigo-500 text-white border-indigo-500 font-medium px-4 py-2 rounded-full transition-colors text-[0.9rem]" data-filter="all">All</button>
+                        <button class="filter-btn active bg-indigo-500 text-white font-medium px-4 py-2 rounded-xl transition-colors hover:-translate-y-0.5 shadow-md shadow-indigo-500/20 text-[0.9rem]" data-filter="all">All</button>
                         <!-- Subject filters populated dynamically -->
                     </div>
-                    <div id="allTopicsList" class="flex flex-col">
+                    <div id="allTopicsList" class="flex flex-col gap-3">
                         <!-- Listed Items dynamically injected -->
                     </div>
                 </div>
@@ -268,16 +279,16 @@
 
 
         <!-- Table View -->
-        <main id="tableView" class="table-content view-section pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
+        <main id="tableView" class="view-section active flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" style="display:none;">
             <!-- Table View Header -->
-            <div class="col-span-full mb-4">
-                <h1 class="text-[2rem] font-extrabold text-slate-200 mb-1 tracking-tight">Log Table</h1>
-                <p class="text-slate-400 text-[1rem]">Track your revision progress across all subjects over time.</p>
+            <div class="px-2">
+                <h1 class="premium-heading mb-1">Study Logs Map</h1>
+                <p class="premium-subtext">Track your chapter completion status and revision drops across all subjects.</p>
             </div>
 
-            <div class="glass-panel p-0 overflow-hidden">
-                <div class="px-8 py-8 pb-4 border-b border-white/5">
-                    <h2 class="text-xl font-bold mb-0 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-table-list text-indigo-400"></i> Subject Status</h2>
+            <div class="premium-card p-0 overflow-hidden md:mx-2 border-indigo-500/10 flex flex-col">
+                <div class="p-6 pb-4 border-b border-white/5 bg-gradient-to-r from-slate-900/50 to-transparent">
+                    <h2 class="text-lg font-bold mb-0 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-table-list text-indigo-400"></i> Subject Status Board</h2>
                 </div>
 
                 <div class="flex overflow-x-auto bg-black/20 border-b border-white/5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" id="subjectTabsGroup">
@@ -304,213 +315,217 @@
         </main>
 
         <!-- Time Tracker View -->
-        <main id="hourLogView" class="main-content view-section pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
+        <main id="hourLogView" class="view-section active flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" style="display: none;">
             <!-- Time Tracker Header -->
-            <div class="col-span-full mb-4">
-                <h1 class="text-[2rem] font-extrabold text-slate-200 mb-1 tracking-tight">Log Activity</h1>
-                <p class="text-slate-400 text-[1rem]">Every minute counts. Log your progress instantly and build momentum.</p>
+            <div class="px-2">
+                <h1 class="premium-heading mb-1">Log Activity</h1>
+                <p class="premium-subtext">Every minute counts. Log your progress instantly and build momentum.</p>
             </div>
 
             <!-- Analytics Summary -->
-            <div class="glass-panel col-span-full p-6 text-center border-[#10b981]/30 bg-gradient-to-br from-[#10b981]/10 to-black/20 shadow-[0_10px_30px_rgba(16,185,129,0.05)] rounded-3xl">
-                <div class="text-[3.5rem] font-bold leading-none mb-2 bg-gradient-to-r from-[#34d399] to-[#10b981] text-transparent bg-clip-text" id="totalHoursToday">0.0</div>
-                <div class="text-slate-400 text-[1.1rem] tracking-[1px] uppercase">Hours Logged Today</div>
+            <div class="premium-card text-center border-emerald-500/10 bg-gradient-to-br from-emerald-500/5 to-transparent flex flex-col justify-center items-center py-10 md:mx-2">
+                <div class="text-[3.5rem] md:text-[4.5rem] font-extrabold leading-none mb-2 bg-gradient-to-r from-emerald-400 to-emerald-600 text-transparent bg-clip-text drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]" id="totalHoursToday">0.0</div>
+                <div class="text-emerald-500/60 text-[0.85rem] font-bold tracking-[0.2em] uppercase">Hours Logged Today</div>
             </div>
 
-            <!-- Input Section -->
-            <section class="add-session-section glass-panel">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-stopwatch text-[#10b981]"></i> Log Activity</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:px-2">
+                <!-- Input Section -->
+                <section class="premium-card lg:col-span-1 border-indigo-500/10 flex flex-col gap-2">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-stopwatch text-emerald-400"></i> New Log</h2>
 
-                <form id="addTimeLogForm" class="flex flex-col gap-4">
+                    <form id="addTimeLogForm" class="flex flex-col gap-5">
 
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-sm font-semibold text-slate-400 ml-1">Task / Activity Name</label>
-                        <input type="text" id="timeTaskInput" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full placeholder-slate-500" required placeholder="e.g. Math homework, Coding side-project" autocomplete="off">
-                    </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Task / Activity Name</label>
+                            <input type="text" id="timeTaskInput" class="premium-input bg-slate-900/50" required placeholder="e.g. Math homework" autocomplete="off">
+                        </div>
 
-                    <!-- Quick Activity Chips -->
-                    <div id="quickActivityChips" class="hidden mb-3 gap-1.5 flex-wrap justify-start [-webkit-overflow-scrolling:touch]">
-                        <!-- Chips injected here -->
-                    </div>
+                        <!-- Quick Activity Chips -->
+                        <div id="quickActivityChips" class="hidden mb-1 gap-1.5 flex-wrap justify-start">
+                            <!-- Chips injected here -->
+                        </div>
 
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-sm font-semibold text-slate-400 ml-1">Subject <span class="text-[0.8em] opacity-60">(for accurate analytics)</span></label>
-                        <select id="timeSubjectInput" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full leading-tight">
-                            <option value="">General / Other</option>
-                            <!-- Subjects populated dynamically -->
-                            <option value="Sleep">Sleep</option>
-                        </select>
-                    </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Subject</label>
+                            <select id="timeSubjectInput" class="premium-input bg-slate-900/50 text-[0.95rem]">
+                                <option value="">General / Other</option>
+                                <!-- Subjects populated dynamically -->
+                                <option value="Sleep">Sleep</option>
+                            </select>
+                        </div>
 
-                    <!-- Start Time -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-sm font-semibold text-slate-400 ml-1">Start Time</label>
-                        <input type="time" id="timeStartInput" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full" required>
-                    </div>
+                        <!-- Time block -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Start</label>
+                                <input type="time" id="timeStartInput" class="premium-input bg-slate-900/50" required>
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">End</label>
+                                <input type="time" id="timeEndInput" class="premium-input bg-slate-900/50" required>
+                            </div>
+                        </div>
 
-                    <!-- End Time -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-sm font-semibold text-slate-400 ml-1">End Time</label>
                         <!-- Intelligent Quick Duration Buttons -->
-                        <div id="quickDurationContainer" class="flex gap-2 mb-2 flex-wrap justify-start [-webkit-overflow-scrolling:touch]">
-                            <button type="button" class="btn-duration bg-black/30 border border-white/10 text-slate-400 px-[0.6rem] py-[0.3rem] rounded-xl font-sans text-[0.75rem] cursor-pointer transition-all shrink-0 hover:bg-[#10b981]/20 hover:border-[#10b981]/40 hover:text-[#34d399]" data-mins="15">+15m</button>
-                            <button type="button" class="btn-duration bg-black/30 border border-white/10 text-slate-400 px-[0.6rem] py-[0.3rem] rounded-xl font-sans text-[0.75rem] cursor-pointer transition-all shrink-0 hover:bg-[#10b981]/20 hover:border-[#10b981]/40 hover:text-[#34d399]" data-mins="30">+30m</button>
-                            <button type="button" class="btn-duration bg-black/30 border border-white/10 text-slate-400 px-[0.6rem] py-[0.3rem] rounded-xl font-sans text-[0.75rem] cursor-pointer transition-all shrink-0 hover:bg-[#10b981]/20 hover:border-[#10b981]/40 hover:text-[#34d399]" data-mins="45">+45m</button>
-                            <button type="button" class="btn-duration bg-black/30 border border-white/10 text-slate-400 px-[0.6rem] py-[0.3rem] rounded-xl font-sans text-[0.75rem] cursor-pointer transition-all shrink-0 hover:bg-[#10b981]/20 hover:border-[#10b981]/40 hover:text-[#34d399]" data-mins="60">+1h</button>
+                        <div id="quickDurationContainer" class="flex gap-2 flex-wrap justify-start">
+                            <button type="button" class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10 w-auto" data-mins="15">+15m</button>
+                            <button type="button" class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10 w-auto" data-mins="30">+30m</button>
+                            <button type="button" class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10 w-auto" data-mins="45">+45m</button>
+                            <button type="button" class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10 w-auto" data-mins="60">+1h</button>
                         </div>
-                        <input type="time" id="timeEndInput" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full" required>
-                    </div>
 
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-sm font-semibold text-slate-400 ml-1">Date</label>
-                        <input type="date" id="timeDateInput" class="bg-[#0f0c29] border border-white/10 text-slate-200 p-3 rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full [color-scheme:dark]" required>
-                    </div>
-
-                    <div class="flex flex-col gap-1.5">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="text-sm font-semibold text-slate-400 ml-1 m-0">Short Notes <span class="text-[0.8em] opacity-60">(Describe what you did)</span></label>
-                            <button type="button" id="btnClearNotes" class="hidden bg-transparent border-none text-slate-400 cursor-pointer text-[0.85rem] px-2 py-1 rounded-md transition-all hover:text-slate-200">
-                                <i class="fa-solid fa-xmark"></i> Clear
-                            </button>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Date</label>
+                            <input type="date" id="timeDateInput" class="premium-input bg-slate-900/50 [color-scheme:dark]" required>
                         </div>
-                        <textarea id="timeNotesInput" class="bg-black/20 border border-white/10 text-slate-200 p-[0.875rem_1rem] rounded-xl focus:border-[#10b981] focus:outline-none focus:ring-1 focus:ring-[#10b981] transition-all w-full resize-y min-h-[60px] leading-relaxed placeholder-slate-500" placeholder="Describe what you worked on... (Optional)" autocomplete="off" rows="2"></textarea>
-                        <!-- Smart Note Suggestions -->
-                        <div id="smartNoteSuggestions" class="hidden mt-2 gap-1.5 flex-wrap justify-start"></div>
-                    </div>
-                    <button type="submit" class="mt-4 w-full bg-gradient-to-r from-emerald-500 to-[#10b981] hover:from-emerald-400 hover:to-[#34d399] text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-transform hover:-translate-y-1 shadow-[0_8px_20px_rgba(16,185,129,0.3)] text-[1.05rem]">
-                        Save Log <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </form>
-            </section>
 
-            <!-- History Feed Section -->
-            <section class="col-span-full">
-                <div class="glass-panel">
-                    <div class="flex justify-between items-center mb-5">
-                        <h2 class="mb-0 text-xl font-bold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-timeline text-indigo-400"></i> Activity History</h2>
-                        <input type="date" id="historyDateFilter" class="bg-black/30 border border-white/10 text-white rounded-2xl px-4 py-2 outline-none font-sans [color-scheme:dark]">
+                        <div class="flex flex-col gap-1.5">
+                            <div class="flex justify-between items-center mb-1 lg:hidden">
+                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Notes</label>
+                                <button type="button" id="btnClearNotes" class="hidden text-slate-500 hover:text-slate-300 transition-colors text-xs font-bold uppercase"><i class="fa-solid fa-xmark"></i> Clear</button>
+                            </div>
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider hidden lg:block">Notes</label>
+                            <textarea id="timeNotesInput" class="premium-input bg-slate-900/50 resize-y min-h-[60px]" placeholder="Brief description... (Optional)" autocomplete="off" rows="2"></textarea>
+                            <div id="smartNoteSuggestions" class="hidden mt-2 gap-1.5 flex-wrap justify-start"></div>
+                        </div>
+                        
+                        <button type="submit" class="premium-btn-primary bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20 mt-2">
+                            <i class="fa-solid fa-arrow-right"></i> Save Log
+                        </button>
+                    </form>
+                </section>
+
+                <!-- History Feed Section -->
+                <section class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="premium-card flex-1 border-indigo-500/10">
+                        <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
+                            <h2 class="mb-0 text-lg font-bold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-timeline text-indigo-400"></i> Activity History</h2>
+                            <input type="date" id="historyDateFilter" class="bg-black/30 border border-white/10 text-white rounded-lg px-3 py-1.5 outline-none font-sans [color-scheme:dark] text-[0.85rem]">
+                        </div>
+                        <div id="timeLogFeed" class="flex flex-col gap-4">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
-                    <div id="timeLogFeed" class="flex flex-col gap-4">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </main>
 
         <!-- AI Insights View -->
-        <main id="insightsView" class="view-section pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
+        <main id="insightsView" class="view-section flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" style="display:none;">
             <!-- Insights Header -->
-            <div class="col-span-full mb-4">
-                <h1 class="text-[2rem] font-extrabold text-slate-200 mb-1 tracking-tight">AI Insights</h1>
-                <p class="text-slate-400 text-[1rem]">Analyze your performance and get personalized study feedback.</p>
+            <div class="px-2">
+                <h1 class="premium-heading mb-1">AI Insights</h1>
+                <p class="premium-subtext">Analyze your performance and get personalized study feedback.</p>
             </div>
 
             <!-- API Key Configuration -->
-            <div class="glass-panel flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 border-amber-500/30 bg-gradient-to-r from-slate-900 to-amber-500/5">
+            <div class="premium-card flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-amber-500/20 bg-gradient-to-r from-slate-900 to-amber-500/5 hover:border-amber-500/30 md:mx-2">
                 <div class="flex-1">
-                    <h3 class="text-[1.1rem] font-bold text-amber-400 flex items-center gap-2 mb-1"><i class="fa-solid fa-key"></i> Groq API Key <span class="text-[0.75em] opacity-60 text-slate-400 font-normal">(Free)</span></h3>
-                    <p id="apiKeyStatus" class="text-[0.85rem] text-slate-400">No API key configured — <a href="https://console.groq.com/keys" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline transition-colors">Get free key here</a></p>
+                    <h3 class="text-[1rem] font-bold text-amber-400 flex items-center gap-2 mb-1 uppercase tracking-wide"><i class="fa-solid fa-key"></i> Groq API Key <span class="text-xs font-medium text-slate-500">(Free)</span></h3>
+                    <p id="apiKeyStatus" class="text-[0.85rem] text-slate-400">No API key configured — <a href="https://console.groq.com/keys" target="_blank" class="text-amber-500 opacity-80 hover:opacity-100 hover:underline transition-all">Get free key here</a></p>
                 </div>
-                <div class="flex gap-2 w-full lg:w-auto">
-                    <input type="password" id="geminiApiKeyInput" placeholder="Paste Groq key..." class="flex-1 lg:w-[280px] bg-black/40 border border-white/10 text-slate-200 px-4 py-2.5 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all outline-none" autocomplete="off">
-                    <button id="btnSaveApiKey" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold px-4 py-2.5 rounded-xl transition-transform hover:-translate-y-1 shadow-[0_4px_12px_rgba(245,158,11,0.3)] flex justify-center items-center gap-2 shrink-0"><i class="fa-solid fa-check"></i> Save</button>
-                </div>
-            </div>
-
-            <!-- Period Selector + Generate Button -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-between items-center mb-6">
-                <div class="flex p-1 bg-black/30 border border-white/10 rounded-xl" id="periodSelectorGroup">
-                    <button class="period-btn active px-4 py-2 rounded-lg text-[0.9rem] font-medium transition-all text-slate-400 hover:text-slate-200" data-period="today">Today</button>
-                    <button class="period-btn px-4 py-2 rounded-lg text-[0.9rem] font-medium transition-all text-slate-400 hover:text-slate-200" data-period="week">This Week</button>
-                    <button class="period-btn px-4 py-2 rounded-lg text-[0.9rem] font-medium transition-all text-slate-400 hover:text-slate-200" data-period="month">This Month</button>
-                </div>
-                <button id="btnGenerateInsights" class="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-indigo-500 hover:from-pink-400 hover:to-indigo-400 text-white font-bold px-6 py-3 rounded-xl transition-transform hover:-translate-y-1 shadow-[0_8px_20px_rgba(236,72,153,0.3)] flex justify-center items-center gap-2 text-[1.05rem]">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Insights
-                </button>
-            </div>
-
-            <!-- Insights History Browser -->
-            <div class="flex items-center justify-between glass-panel py-3 px-4 mb-6 relative">
-                <div class="flex items-center w-full justify-between lg:justify-start lg:gap-8">
-                    <button id="btnPrevDay" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-slate-300 transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-calendar-day text-indigo-400 text-lg"></i>
-                        <input type="date" id="insightsDatePicker" class="bg-transparent border-none text-white font-sans text-[1.1rem] md:text-[1.2rem] font-semibold cursor-pointer outline-none [color-scheme:dark] select-none">
-                    </div>
-                    <button id="btnNextDay" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-slate-300 transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
-                </div>
-                <span id="insightsHistoryStatus" class="hidden lg:block absolute right-6 text-[0.8rem] text-slate-400 font-medium"></span>
-            </div>
-
-            <!-- Charts Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <!-- Chart 1 -->
-                <div class="glass-panel flex flex-col p-6 border-indigo-500/20">
-                    <h3 class="text-[1.15rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-area text-indigo-400"></i> Study Hours Trend</h3>
-                    <p class="text-slate-400 text-[0.85rem] mb-4 leading-snug">Daily study hours over the selected period. <span id="chartRangeStudy" class="opacity-60 ml-1"></span></p>
-                    <div class="relative w-full h-[220px] md:h-[260px]">
-                        <canvas id="chartStudyHours"></canvas>
-                    </div>
-                </div>
-                <!-- Chart 2 -->
-                <div class="glass-panel flex flex-col p-6 border-pink-500/20">
-                    <h3 class="text-[1.15rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-pink-400"></i> Subject Distribution</h3>
-                    <p class="text-slate-400 text-[0.85rem] mb-4 leading-snug">Time per subject. <span id="chartRangeSubject" class="opacity-60 ml-1"></span></p>
-                    <div class="relative w-full h-[220px] md:h-[260px]">
-                        <canvas id="chartSubjectDist"></canvas>
-                    </div>
-                </div>
-                <!-- Chart 3 -->
-                <div class="glass-panel flex flex-col p-6 border-emerald-500/20">
-                    <h3 class="text-[1.15rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-bar text-emerald-400"></i> Peak Productivity Hours</h3>
-                    <p class="text-slate-400 text-[0.85rem] mb-4 leading-snug">Which hours you study most. <span id="chartRangePeak" class="opacity-60 ml-1"></span></p>
-                    <div class="relative w-full h-[220px] md:h-[260px]">
-                        <canvas id="chartPeakHours"></canvas>
-                    </div>
-                </div>
-                <!-- Chart 4 -->
-                <div class="glass-panel flex flex-col p-6 border-amber-500/20">
-                    <h3 class="text-[1.15rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-bullseye text-amber-400"></i> Revision Completion</h3>
-                    <p class="text-slate-400 text-[0.85rem] mb-4 leading-snug">2-4-7 spaced repetition progress. <span id="chartRangeRev" class="opacity-60 ml-1"></span></p>
-                    <div class="relative w-full h-[220px] md:h-[260px]">
-                        <canvas id="chartRevisionRate"></canvas>
-                    </div>
-                </div>
-                <!-- AI Rating Timeline (Full Row) -->
-                <div class="glass-panel flex flex-col p-6 border-amber-500/20 col-span-1 lg:col-span-2">
-                    <h3 class="text-[1.15rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-star text-amber-400"></i> AI Rating Trend</h3>
-                    <p class="text-slate-400 text-[0.85rem] mb-4 leading-snug">Your performance score history across analyzed periods.</p>
-                    <div class="relative w-full h-[200px] md:h-[240px]">
-                        <canvas id="chartAIRating"></canvas>
-                    </div>
+                <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto mt-2 lg:mt-0">
+                    <input type="password" id="geminiApiKeyInput" placeholder="Paste Groq key..." class="premium-input lg:w-[280px] bg-slate-900/50" autocomplete="off">
+                    <button id="btnSaveApiKey" class="premium-btn-primary bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-amber-500/20"><i class="fa-solid fa-check"></i> Save</button>
                 </div>
             </div>
 
-            <!-- AI Feedback Panel -->
-            <div class="glass-panel border-indigo-500/30 shadow-[0_0_40px_rgba(99,102,241,0.06)] relative overflow-hidden flex flex-col">
-                <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
-                    <h3 class="text-[1.25rem] font-bold flex items-center gap-2 text-indigo-300"><i class="fa-solid fa-robot"></i> AI Analysis & Feedback</h3>
-                    <div id="aiLoadingIndicator" class="flex gap-1.5" style="display: none;">
-                        <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                        <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                        <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce"></div>
+            <div class="md:px-2 flex flex-col gap-6">
+                <!-- Period Selector + Generate Button -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-between items-center relative z-10 w-full mb-1">
+                    <div class="flex p-1 bg-black/40 border border-white/10 rounded-xl w-full sm:w-auto" id="periodSelectorGroup">
+                        <button class="period-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg text-[0.85rem] font-bold tracking-wide uppercase transition-all text-slate-400 hover:text-slate-200" data-period="today">Today</button>
+                        <button class="period-btn flex-1 sm:flex-none px-4 py-2 rounded-lg text-[0.85rem] font-bold tracking-wide uppercase transition-all text-slate-400 hover:text-slate-200" data-period="week">Week</button>
+                        <button class="period-btn flex-1 sm:flex-none px-4 py-2 rounded-lg text-[0.85rem] font-bold tracking-wide uppercase transition-all text-slate-400 hover:text-slate-200" data-period="month">Month</button>
+                    </div>
+                    <button id="btnGenerateInsights" class="w-full sm:w-auto premium-btn-primary bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 shadow-[0_8px_20px_rgba(236,72,153,0.25)] border-none">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Insights
+                    </button>
+                </div>
+
+                <!-- Insights History Browser -->
+                <div class="premium-card flex items-center justify-between py-4 shadow-md bg-white/[0.02]">
+                    <div class="flex items-center w-full justify-between lg:justify-start lg:gap-8">
+                        <button id="btnPrevDay" class="w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div class="flex flex-1 justify-center lg:flex-none items-center gap-3">
+                            <i class="fa-solid fa-calendar-day text-indigo-400 text-lg"></i>
+                            <input type="date" id="insightsDatePicker" class="bg-transparent border-none text-white font-sans text-[1.1rem] md:text-[1.25rem] font-bold cursor-pointer outline-none [color-scheme:dark] select-none text-center">
+                        </div>
+                        <button id="btnNextDay" class="w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <span id="insightsHistoryStatus" class="hidden lg:block text-[0.85rem] text-slate-400 font-bold tracking-widest uppercase"></span>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Chart 1 -->
+                    <div class="premium-card flex flex-col border-indigo-500/10 hover:border-indigo-500/20 md:p-6">
+                        <h3 class="text-[1.05rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-area text-indigo-400"></i> Study Hours Trend</h3>
+                        <p class="text-slate-400 text-[0.8rem] mb-4 leading-snug font-medium">Daily study hours over the selected period. <span id="chartRangeStudy" class="opacity-60 ml-1"></span></p>
+                        <div class="relative w-full h-[220px] md:h-[260px]">
+                            <canvas id="chartStudyHours"></canvas>
+                        </div>
+                    </div>
+                    <!-- Chart 2 -->
+                    <div class="premium-card flex flex-col border-pink-500/10 hover:border-pink-500/20 md:p-6">
+                        <h3 class="text-[1.05rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-pink-400"></i> Subject Distribution</h3>
+                        <p class="text-slate-400 text-[0.8rem] mb-4 leading-snug font-medium">Time per subject. <span id="chartRangeSubject" class="opacity-60 ml-1"></span></p>
+                        <div class="relative w-full h-[220px] md:h-[260px]">
+                            <canvas id="chartSubjectDist"></canvas>
+                        </div>
+                    </div>
+                    <!-- Chart 3 -->
+                    <div class="premium-card flex flex-col border-emerald-500/10 hover:border-emerald-500/20 md:p-6">
+                        <h3 class="text-[1.05rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-bar text-emerald-400"></i> Peak Productivity</h3>
+                        <p class="text-slate-400 text-[0.8rem] mb-4 leading-snug font-medium">Which hours you study most. <span id="chartRangePeak" class="opacity-60 ml-1"></span></p>
+                        <div class="relative w-full h-[220px] md:h-[260px]">
+                            <canvas id="chartPeakHours"></canvas>
+                        </div>
+                    </div>
+                    <!-- Chart 4 -->
+                    <div class="premium-card flex flex-col border-amber-500/10 hover:border-amber-500/20 md:p-6">
+                        <h3 class="text-[1.05rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-bullseye text-amber-400"></i> Revision Completion</h3>
+                        <p class="text-slate-400 text-[0.8rem] mb-4 leading-snug font-medium">2-4-7 spaced repetition progress. <span id="chartRangeRev" class="opacity-60 ml-1"></span></p>
+                        <div class="relative w-full h-[220px] md:h-[260px]">
+                            <canvas id="chartRevisionRate"></canvas>
+                        </div>
+                    </div>
+                    <!-- AI Rating Timeline (Full Row) -->
+                    <div class="premium-card flex flex-col border-amber-500/10 hover:border-amber-500/20 col-span-1 lg:col-span-2 md:p-6">
+                        <h3 class="text-[1.05rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-star text-amber-400"></i> Score Trend</h3>
+                        <p class="text-slate-400 text-[0.8rem] mb-4 leading-snug font-medium">Your performance score history across analyzed periods.</p>
+                        <div class="relative w-full h-[200px] md:h-[240px]">
+                            <canvas id="chartAIRating"></canvas>
+                        </div>
                     </div>
                 </div>
 
-                <div id="aiRatingContainer" class="flex flex-col items-center justify-center p-6 bg-indigo-500/5 rounded-2xl border border-indigo-500/10 mb-6" style="display: none;">
-                    <div class="flex items-baseline gap-1 text-[3.5rem] font-bold text-slate-100 leading-none mb-3">
-                        <span id="aiRatingNumber">0</span><span class="text-[1.5rem] text-slate-400 opacity-60">/10</span>
+                <!-- AI Feedback Panel -->
+                <div class="premium-card border-indigo-500/20 shadow-[0_0_40px_rgba(99,102,241,0.06)] relative overflow-hidden flex flex-col mb-4">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
+                        <h3 class="text-[1.25rem] font-bold flex items-center gap-2 text-indigo-300"><i class="fa-solid fa-robot"></i> Analysis</h3>
+                        <div id="aiLoadingIndicator" class="flex gap-1.5" style="display: none;">
+                            <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                            <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                            <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce"></div>
+                        </div>
                     </div>
-                    <div id="aiRatingStars" class="flex gap-1.5 text-[1.4rem] text-slate-600 mb-2">
-                        <!-- Stars injected via JS -->
-                    </div>
-                    <div class="text-[0.9rem] font-semibold text-indigo-300 uppercase tracking-widest">Overall Performance</div>
-                </div>
 
-                <div id="aiFeedbackContent" class="text-[0.95rem] text-slate-300 leading-relaxed [&>p]:mb-4 [&>ul]:mb-4 [&>ul]:pl-5 [&>ul]:list-disc [&>ul>li]:mb-2 [&>ol]:mb-4 [&>ol]:pl-5 [&>ol]:list-decimal">
-                    <div class="flex flex-col items-center justify-center py-10 px-4 text-center text-slate-400">
-                        <i class="fa-solid fa-wand-magic-sparkles text-3xl text-indigo-500/50 mb-3"></i>
-                        <p class="max-w-md">Click <strong class="text-slate-300">"Generate AI Insights"</strong> to get personalized study feedback & analysis powered by Groq AI.</p>
+                    <div id="aiRatingContainer" class="flex flex-col items-center justify-center p-6 bg-indigo-500/5 rounded-2xl border border-indigo-500/10 mb-6" style="display: none;">
+                        <div class="flex items-baseline gap-1 text-[3.5rem] font-bold text-slate-100 leading-none mb-3">
+                            <span id="aiRatingNumber">0</span><span class="text-[1.5rem] text-slate-400 opacity-60">/10</span>
+                        </div>
+                        <div id="aiRatingStars" class="flex gap-1.5 text-[1.4rem] text-slate-600 mb-2">
+                            <!-- Stars injected via JS -->
+                        </div>
+                        <div class="text-[0.8rem] font-bold text-indigo-300 uppercase tracking-widest">Overall Score</div>
+                    </div>
+
+                    <div id="aiFeedbackContent" class="text-[0.95rem] text-slate-300 leading-relaxed [&>p]:mb-4 [&>ul]:mb-4 [&>ul]:pl-5 [&>ul]:list-disc [&>ul>li]:mb-2 [&>ol]:mb-4 [&>ol]:pl-5 [&>ol]:list-decimal">
+                        <div class="flex flex-col items-center justify-center py-10 px-4 text-center text-slate-400">
+                            <i class="fa-solid fa-wand-magic-sparkles text-3xl text-indigo-500/50 mb-3"></i>
+                            <p class="max-w-md font-medium">Click <strong class="text-slate-300">"Generate Insights"</strong> to receive personalized study feedback.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -519,24 +534,23 @@
 
     <!-- =================== SLIDE-UP PROFILE DRAWER =================== -->
     <div id="profileDrawerOverlay" class="bottom-sheet-overlay fixed inset-0 bg-black/60 z-[1000] opacity-0 invisible transition-all duration-300" style="display:none;"></div>
-    <div id="profileDrawer" class="bottom-sheet fixed bottom-0 left-0 right-0 bg-[#13112e] border-t border-white/10 rounded-t-3xl z-[1001] px-6 pt-4 pb-[calc(2rem+env(safe-area-inset-bottom))] translate-y-full transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.32,0.72,0,1)] max-h-[90vh] overflow-y-auto shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-        <div class="w-10 h-[5px] bg-white/20 rounded-full mx-auto mb-6"></div>
+    <div id="profileDrawer" class="bottom-sheet fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-xl border-t border-white/10 rounded-t-[2.5rem] z-[1001] px-6 pt-5 pb-[calc(2rem+env(safe-area-inset-bottom))] translate-y-full transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.32,0.72,0,1)] max-h-[90vh] overflow-y-auto shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
+        <div class="w-12 h-[6px] bg-white/20 rounded-full mx-auto mb-6"></div>
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-[1.35rem] font-bold flex items-center gap-2 m-0"><i class="fa-solid fa-user-graduate text-indigo-400"></i> My Study Profile</h2>
-            <button id="btnCloseProfile" class="w-9 h-9 rounded-full flex items-center justify-center bg-white/8 border-none text-slate-400 cursor-pointer transition-all hover:bg-white/15 hover:text-slate-200" title="Close"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-[1.5rem] font-black tracking-tight flex items-center gap-2 m-0 text-slate-100"><i class="fa-solid fa-user-graduate text-indigo-400"></i> My Study Profile</h2>
+            <button id="btnCloseProfile" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/10 border-none text-slate-400 cursor-pointer transition-all hover:bg-white/20 hover:text-slate-200" title="Close"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div>
-            <p class="text-slate-400 text-[0.9rem] mb-6 leading-relaxed">Set up your profile to personalize subjects, AI feedback, and exam tracking. Your profile syncs automatically.</p>
-            <form id="profileForm" class="profile-form flex flex-col gap-4">
+            <p class="text-slate-400 text-[0.95rem] mb-6 leading-relaxed font-medium">Set up your profile to personalize subjects, AI feedback, and exam tracking. Your profile syncs automatically.</p>
+            <form id="profileForm" class="profile-form flex flex-col gap-5">
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-semibold text-slate-400 ml-1" for="profileName">Your Name <span class="text-[0.8em] opacity-60">(optional)</span></label>
-                    <input type="text" id="profileName" placeholder="e.g. Susant" autocomplete="off"
-                        class="bg-black/25 border border-white/10 text-slate-200 px-5 py-4 rounded-xl text-[1rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
+                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider" for="profileName">Your Name <span class="font-medium opacity-60">(optional)</span></label>
+                    <input type="text" id="profileName" placeholder="e.g. Susant" autocomplete="off" class="premium-input bg-slate-950/50 py-3">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-sm font-semibold text-slate-400 ml-1" for="profileGrade">Class / Grade Level</label>
-                        <select id="profileGrade" class="bg-black/25 border border-white/10 text-slate-200 px-5 py-4 rounded-xl text-[1rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
+                        <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider" for="profileGrade">Grade Level</label>
+                        <select id="profileGrade" class="premium-input bg-slate-950/50 py-3">
                             <option value="">Select...</option>
                             <option value="Class 1">Class 1</option>
                             <option value="Class 2">Class 2</option>
@@ -555,8 +569,8 @@
                         </select>
                     </div>
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-sm font-semibold text-slate-400 ml-1" for="profileFaculty">Faculty</label>
-                        <select id="profileFaculty" class="bg-black/25 border border-white/10 text-slate-200 px-5 py-4 rounded-xl text-[1rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
+                        <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider" for="profileFaculty">Faculty</label>
+                        <select id="profileFaculty" class="premium-input bg-slate-950/50 py-3">
                             <option value="">Select...</option>
                             <option value="Science">Science</option>
                             <option value="Management">Management</option>
@@ -565,47 +579,43 @@
                             <option value="Law">Law</option>
                             <option value="Custom">Custom (pick your own)</option>
                         </select>
-                        <input type="text" id="profileCustomFaculty" placeholder="Type your faculty name..." style="display:none; margin-top:0.5rem;" autocomplete="off"
-                            class="bg-black/25 border border-white/10 text-slate-200 px-5 py-4 rounded-xl text-[1rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
+                        <input type="text" id="profileCustomFaculty" placeholder="Type your faculty name..." style="display:none; margin-top:0.5rem;" autocomplete="off" class="premium-input bg-slate-950/50 py-3">
                     </div>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-semibold text-slate-400 ml-1">Subjects <span class="text-[0.8em] opacity-60">(auto-filled from faculty)</span></label>
+                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Subjects <span class="font-medium opacity-60">(auto-filled from faculty)</span></label>
                     <div id="profileSubjectTags" class="profile-subject-tags flex flex-wrap gap-2 py-1"></div>
                     <div class="flex gap-2 mt-1">
-                        <input type="text" id="profileNewSubject" placeholder="Add a subject..." autocomplete="off"
-                            class="flex-1 bg-black/25 border border-white/10 text-slate-200 px-4 py-3 rounded-xl text-[1rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
-                        <button type="button" id="btnAddSubject" class="btn-add-subject w-11 h-11 flex items-center justify-center bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded-xl cursor-pointer transition-all hover:bg-indigo-500/30 text-[1rem]"><i class="fa-solid fa-plus"></i></button>
+                        <input type="text" id="profileNewSubject" placeholder="Add a subject..." autocomplete="off" class="premium-input flex-1 bg-slate-950/50 py-3">
+                        <button type="button" id="btnAddSubject" class="premium-btn-secondary px-4 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/10"><i class="fa-solid fa-plus text-lg"></i></button>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-3 pt-4 border-t border-white/10">
-                    <label class="text-sm font-semibold text-slate-400 ml-1">Exam Dates <span class="text-[0.8em] opacity-60">(optional)</span></label>
+                <div class="flex flex-col gap-4 mt-2">
+                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Exam Dates <span class="font-medium opacity-60">(optional)</span></label>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[0.8rem] text-slate-500 ml-1" for="profileExam1Label">Exam 1 Name</label>
-                            <input type="text" id="profileExam1Label" placeholder="e.g. Pre-Board"
-                                class="bg-black/25 border border-white/10 text-slate-200 px-4 py-3 rounded-xl text-[0.95rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[0.7rem] font-semibold text-slate-500 ml-1 uppercase tracking-wide" for="profileExam1Label">Exam 1 Name</label>
+                            <input type="text" id="profileExam1Label" placeholder="e.g. Pre-Board" class="premium-input bg-slate-950/50 py-2.5 text-[0.9rem]">
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[0.8rem] text-slate-500 ml-1" for="profileExam1Date">Exam 1 Date</label>
-                            <input type="date" id="profileExam1Date" class="bg-black/25 border border-white/10 text-slate-200 px-4 py-3 rounded-xl text-[0.95rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors [color-scheme:dark]">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[0.7rem] font-semibold text-slate-500 ml-1 uppercase tracking-wide" for="profileExam1Date">Exam 1 Date</label>
+                            <input type="date" id="profileExam1Date" class="premium-input bg-slate-950/50 py-2.5 text-[0.9rem] [color-scheme:dark]">
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[0.8rem] text-slate-500 ml-1" for="profileExam2Label">Exam 2 Name</label>
-                            <input type="text" id="profileExam2Label" placeholder="e.g. Final Board"
-                                class="bg-black/25 border border-white/10 text-slate-200 px-4 py-3 rounded-xl text-[0.95rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[0.7rem] font-semibold text-slate-500 ml-1 uppercase tracking-wide" for="profileExam2Label">Exam 2 Name</label>
+                            <input type="text" id="profileExam2Label" placeholder="e.g. Final Board" class="premium-input bg-slate-950/50 py-2.5 text-[0.9rem]">
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[0.8rem] text-slate-500 ml-1" for="profileExam2Date">Exam 2 Date</label>
-                            <input type="date" id="profileExam2Date" class="bg-black/25 border border-white/10 text-slate-200 px-4 py-3 rounded-xl text-[0.95rem] font-sans focus:outline-none focus:border-indigo-500/50 transition-colors [color-scheme:dark]">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[0.7rem] font-semibold text-slate-500 ml-1 uppercase tracking-wide" for="profileExam2Date">Exam 2 Date</label>
+                            <input type="date" id="profileExam2Date" class="premium-input bg-slate-950/50 py-2.5 text-[0.9rem] [color-scheme:dark]">
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="mt-2 w-full bg-indigo-500 hover:bg-indigo-400 text-white font-semibold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_15px_rgba(99,102,241,0.3)]">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Save &amp; Sync Profile
+                <button type="submit" class="premium-btn-primary bg-indigo-600 hover:bg-indigo-500 shadow-[0_8px_20px_rgba(79,70,229,0.3)] mt-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-lg"></i> Save &amp; Sync Profile
                 </button>
             </form>
         </div>
@@ -613,279 +623,204 @@
 
     <!-- =================== INFO MODAL =================== -->
     <div id="infoModal" class="modal-overlay" style="display:none;">
-        <div class="modal-box info-modal">
-            <div class="modal-header">
-                <h2><i class="fa-solid fa-circle-info" style="color:#6366f1;"></i> About HourForge</h2>
-                <button id="btnCloseInfo" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+        <div class="premium-card bg-slate-900 w-full max-w-2xl max-h-[85vh] overflow-y-auto m-4 flex flex-col gap-6 relative shadow-[0_20px_60px_rgba(0,0,0,0.6)] border border-indigo-500/20">
+            <div class="flex justify-between items-center sticky top-0 bg-slate-900/90 backdrop-blur-md z-10 py-5 px-6 border-b border-indigo-500/10 -mx-6 -mt-6 mb-2">
+                <h2 class="text-[1.3rem] font-bold tracking-tight text-white m-0 flex items-center gap-2"><i class="fa-solid fa-circle-info text-indigo-400"></i> About HourForge</h2>
+                <button id="btnCloseInfo" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/10 border-none text-slate-400 cursor-pointer transition-all hover:bg-white/20 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <!-- Section 1: What is this? -->
-            <div class="info-section">
-                <h3 class="info-section-title"><i class="fa-solid fa-bullseye"></i> What is HourForge?</h3>
-                <p class="info-text">HourForge is a <strong>personal academic productivity app</strong> built to help
+            <div class="flex flex-col gap-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-bullseye mr-2"></i> What is HourForge?</h3>
+                <p class="text-[0.95rem] text-slate-300 leading-relaxed bg-slate-950/40 p-5 rounded-2xl border border-white/5">HourForge is a <strong>personal academic productivity app</strong> built to help
                     students at every level study smarter, not harder. It combines <strong>spaced repetition
                         revision</strong>, <strong>time logging</strong>, and <strong>AI-powered feedback</strong> — all
                     in one place, completely offline-capable.</p>
             </div>
 
             <!-- Section 2: Features -->
-            <div class="info-section">
-                <h3 class="info-section-title"><i class="fa-solid fa-star"></i> Features</h3>
-                <div class="info-features-grid">
-                    <div class="info-feature-card">
-                        <div class="info-feature-icon" style="background: rgba(99,102,241,0.15); color:#818cf8;"><i
-                                class="fa-solid fa-brain"></i></div>
+            <div class="flex flex-col gap-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-star mr-2"></i> Core Features</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-indigo-500/15 text-indigo-400"><i class="fa-solid fa-brain"></i></div>
                         <div>
-                            <div class="info-feature-name">Spaced Repetition</div>
-                            <div class="info-feature-desc">Auto-scheduled 2-4-7 day revision reminders to beat
-                                forgetting</div>
+                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Spaced Repetition</div>
+                            <div class="text-[0.8rem] text-slate-500 leading-snug">Auto-scheduled 2-4-7 day revision reminders to beat forgetting</div>
                         </div>
                     </div>
-                    <div class="info-feature-card">
-                        <div class="info-feature-icon" style="background: rgba(16,185,129,0.15); color:#34d399;"><i
-                                class="fa-solid fa-clock"></i></div>
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-clock"></i></div>
                         <div>
-                            <div class="info-feature-name">Time Tracker</div>
-                            <div class="info-feature-desc">Log every study session with subject, start/end time and
-                                notes</div>
+                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Time Tracker</div>
+                            <div class="text-[0.8rem] text-slate-500 leading-snug">Log every study session with subject, start/end time and notes</div>
                         </div>
                     </div>
-                    <div class="info-feature-card">
-                        <div class="info-feature-icon" style="background: rgba(245,158,11,0.15); color:#fbbf24;"><i
-                                class="fa-solid fa-robot"></i></div>
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-amber-500/15 text-amber-400"><i class="fa-solid fa-robot"></i></div>
                         <div>
-                            <div class="info-feature-name">AI Insights</div>
-                            <div class="info-feature-desc">Get brutally honest, data-driven feedback from an AI study
-                                coach</div>
+                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">AI Insights</div>
+                            <div class="text-[0.8rem] text-slate-500 leading-snug">Get brutally honest, data-driven feedback from an AI study coach</div>
                         </div>
                     </div>
-                    <div class="info-feature-card">
-                        <div class="info-feature-icon" style="background: rgba(236,72,153,0.15); color:#f472b6;"><i
-                                class="fa-solid fa-chart-line"></i></div>
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-pink-500/15 text-pink-400"><i class="fa-solid fa-chart-line"></i></div>
                         <div>
-                            <div class="info-feature-name">Progress Charts</div>
-                            <div class="info-feature-desc">Visual breakdown of daily hours, subject distribution, and
-                                revision rate</div>
+                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Progress Charts</div>
+                            <div class="text-[0.8rem] text-slate-500 leading-snug">Visual breakdown of daily hours, subject distribution, and revision rate</div>
                         </div>
                     </div>
-                    <div class="info-feature-card">
-                        <div class="info-feature-icon" style="background: rgba(139,92,246,0.15); color:#c084fc;"><i
-                                class="fa-solid fa-user-graduate"></i></div>
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-red-500/15 text-red-400"><i class="fa-solid fa-hourglass-half"></i></div>
                         <div>
-                            <div class="info-feature-name">Student Profiles</div>
-                            <div class="info-feature-desc">Works for any student — configure your faculty, subjects and
-                                exam dates</div>
+                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Pomodoro Timer</div>
+                            <div class="text-[0.8rem] text-slate-500 leading-snug">Built-in focus timer with short and long break modes</div>
                         </div>
                     </div>
-                    <div class="info-feature-card">
-                        <div class="info-feature-icon" style="background: rgba(239,68,68,0.15); color:#f87171;"><i
-                                class="fa-solid fa-hourglass-half"></i></div>
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-sky-500/15 text-sky-400"><i class="fa-solid fa-floppy-disk"></i></div>
                         <div>
-                            <div class="info-feature-name">Pomodoro Timer</div>
-                            <div class="info-feature-desc">Built-in focus timer with short and long break modes</div>
-                        </div>
-                    </div>
-                    <div class="info-feature-card">
-                        <div class="info-feature-icon" style="background: rgba(14,165,233,0.15); color:#38bdf8;"><i
-                                class="fa-solid fa-floppy-disk"></i></div>
-                        <div>
-                            <div class="info-feature-name">Auto Backup</div>
-                            <div class="info-feature-desc">Link a local folder and auto-save your data — never lose
-                                progress</div>
-                        </div>
-                    </div>
-                    <div class="info-feature-card">
-                        <div class="info-feature-icon" style="background: rgba(251,191,36,0.15); color:#fcd34d;"><i
-                                class="fa-solid fa-fire"></i></div>
-                        <div>
-                            <div class="info-feature-name">Streak Tracking</div>
-                            <div class="info-feature-desc">Daily study streaks to keep you accountable and consistent
-                            </div>
+                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Auto Backup</div>
+                            <div class="text-[0.8rem] text-slate-500 leading-snug">Link a local folder and auto-save your data</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Section 3: How to use -->
-            <div class="info-section">
-                <h3 class="info-section-title"><i class="fa-solid fa-map"></i> How to Use</h3>
-                <div class="info-steps">
-                    <div class="info-step">
-                        <div class="info-step-num">1</div>
-                        <div class="info-step-content">
-                            <div class="info-step-title">Set Up Your Profile</div>
-                            <div class="info-step-desc">Tap the <strong>Profile</strong> icon → Choose your grade &
-                                faculty → Subjects auto-fill. Add exam dates for a countdown timer.</div>
+            <div class="flex flex-col gap-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-map mr-2"></i> How to Use</h3>
+                <div class="flex flex-col gap-3">
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-4 items-start hover:bg-white/5 transition-colors">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-indigo-500/20 text-indigo-400 font-black text-[0.8rem]">1</div>
+                        <div>
+                            <div class="font-bold text-[0.95rem] text-slate-200 mb-1">Set Up Your Profile</div>
+                            <div class="text-[0.85rem] text-slate-400 leading-snug">Tap the <strong>Profile</strong> icon → Choose your grade & faculty → Subjects auto-fill. Add exam dates for a countdown timer.</div>
                         </div>
                     </div>
-                    <div class="info-step">
-                        <div class="info-step-num">2</div>
-                        <div class="info-step-content">
-                            <div class="info-step-title">Log What You Study</div>
-                            <div class="info-step-desc">On the <strong>Dashboard</strong>, add a session with the
-                                subject, chapter/topic, and date. The app auto-schedules revision reminders.</div>
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-4 items-start hover:bg-white/5 transition-colors">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-indigo-500/20 text-indigo-400 font-black text-[0.8rem]">2</div>
+                        <div>
+                            <div class="font-bold text-[0.95rem] text-slate-200 mb-1">Log What You Study</div>
+                            <div class="text-[0.85rem] text-slate-400 leading-snug">On the <strong>Dashboard</strong>, add a session. The app auto-schedules revision reminders.</div>
                         </div>
                     </div>
-                    <div class="info-step">
-                        <div class="info-step-num">3</div>
-                        <div class="info-step-content">
-                            <div class="info-step-title">Do Your Revisions</div>
-                            <div class="info-step-desc">Check the <strong>Due Today</strong> list daily. Green circles =
-                                done. Orange hourglass = revision due. Red = overdue!</div>
-                        </div>
-                    </div>
-                    <div class="info-step">
-                        <div class="info-step-num">4</div>
-                        <div class="info-step-content">
-                            <div class="info-step-title">Track Your Hours</div>
-                            <div class="info-step-desc">Go to <strong>Time Tracker</strong> and log each activity with a
-                                start time, end time, and subject. This feeds the charts and AI.</div>
-                        </div>
-                    </div>
-                    <div class="info-step">
-                        <div class="info-step-num">5</div>
-                        <div class="info-step-content">
-                            <div class="info-step-title">Get AI Feedback</div>
-                            <div class="info-step-desc">Visit <strong>AI Insights</strong>, enter your Groq API key
-                                (free), and generate a daily/weekly/monthly mentor analysis of your habits.</div>
-                        </div>
-                    </div>
-                    <div class="info-step">
-                        <div class="info-step-num">6</div>
-                        <div class="info-step-content">
-                            <div class="info-step-title">Backup Your Data</div>
-                            <div class="info-step-desc">Use the <strong>Auto-Backup</strong> button to link a folder on
-                                your device. Data is saved automatically so you never lose it.</div>
-                        </div>
-                    </div>
-                    <div class="info-step">
-                        <div class="info-step-num">7</div>
-                        <div class="info-step-content">
-                            <div class="info-step-title">Add to Home Screen (as App)</div>
-                            <div class="info-step-desc">
-                                <strong>iPhone (Safari):</strong> Tap the Share icon
-                                <i class="fa-solid fa-arrow-up-from-bracket" style="color:#38bdf8;"></i>
-                                → <em class="info-action-text">"Add to Home Screen"</em> → Tap Add. HourForge will appear as an app
-                                icon!<br><br>
-                                <strong>Android (Chrome):</strong> Tap the 3-dot menu
-                                <i class="fa-solid fa-ellipsis-vertical" style="color:#34d399;"></i>
-                                → <em>"Add to Home screen"</em> or look for the install banner at the bottom of the
-                                screen.
-                            </div>
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-4 items-start hover:bg-white/5 transition-colors">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-indigo-500/20 text-indigo-400 font-black text-[0.8rem]">3</div>
+                        <div>
+                            <div class="font-bold text-[0.95rem] text-slate-200 mb-1">Do Your Revisions</div>
+                            <div class="text-[0.85rem] text-slate-400 leading-snug">Check the <strong>Due Today</strong> list daily. Green circles = done. Orange hourglass = revision due. Red = overdue!</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Section 4: Export / Import & Backup -->
-            <div class="info-section">
-                <h3 class="info-section-title"><i class="fa-solid fa-database"></i> Your Data — Safe &amp; Portable</h3>
-                <div class="info-callout info-callout-blue">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <div>All your data is stored <strong>only on your device</strong> — no account, no cloud, fully
-                        private.</div>
+            <div class="flex flex-col gap-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-database mr-2"></i> Your Data — Safe &amp; Portable</h3>
+                <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 flex gap-3 items-center text-indigo-200">
+                    <i class="fa-solid fa-shield-halved text-xl text-indigo-400 shrink-0"></i>
+                    <div class="text-[0.85rem] leading-snug">All your data is stored <strong>only on your device</strong> — no account, no cloud, fully private.</div>
                 </div>
-                <div class="info-data-actions">
-                    <div class="info-data-card">
-                        <div class="info-data-icon" style="background:rgba(14,165,233,0.15);color:#38bdf8;"><i
-                                class="fa-solid fa-download"></i></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-center hover:bg-white/5 transition-colors">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-sky-500/15 text-sky-400"><i class="fa-solid fa-download"></i></div>
                         <div>
-                            <div class="info-data-title">Export Data</div>
-                            <div class="info-data-desc">Download a backup JSON — use the <strong>Export</strong> button
-                                in the header backup controls.</div>
+                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Export Data</div>
+                            <div class="text-[0.8rem] text-slate-500 leading-snug">Download backup JSON.</div>
                         </div>
                     </div>
-                    <div class="info-data-card">
-                        <div class="info-data-icon" style="background:rgba(52,211,153,0.15);color:#34d399;"><i
-                                class="fa-solid fa-upload"></i></div>
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-center hover:bg-white/5 transition-colors">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-upload"></i></div>
                         <div>
-                            <div class="info-data-title">Import Data</div>
-                            <div class="info-data-desc">Switching device? Use <strong>Import</strong> to restore from a
-                                previously exported file instantly.</div>
+                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Import Data</div>
+                            <div class="text-[0.8rem] text-slate-500 leading-snug">Restore from backup.</div>
                         </div>
                     </div>
-                    <div class="info-data-card">
-                        <div class="info-data-icon" style="background:rgba(139,92,246,0.15);color:#c084fc;"><i
-                                class="fa-solid fa-folder-open"></i></div>
+                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-center hover:bg-white/5 transition-colors sm:col-span-2">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-purple-500/15 text-purple-400"><i class="fa-solid fa-folder-open"></i></div>
                         <div>
-                            <div class="info-data-title">Auto-Backup Folder</div>
-                            <div class="info-data-desc">Link a local folder and the app auto-saves in the background —
-                                great for peace of mind.</div>
+                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Auto-Backup Folder</div>
+                            <div class="text-[0.8rem] text-slate-500 leading-snug">Link a local directory inside settings for auto-saving.</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="info-footer">
-                <p>Built with ❤️ for students everywhere &nbsp;·&nbsp; <strong>HourForge v2.0</strong></p>
+            
+            <div class="mt-4 pt-6 border-t border-white/10 text-center text-slate-500 text-[0.85rem]">
+                <p>Built with <i class="fa-solid fa-heart text-red-500/80 mx-1"></i> for students everywhere &nbsp;·&nbsp; <strong>HourForge v2.0</strong></p>
             </div>
         </div>
     </div>
 
     <!-- =================== POMODORO MODAL (Converted to Tab) =================== -->
-    <main id="pomodoroView" class="view-section pomodoro-view pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
-        <div class="glass-panel flex flex-col items-center justify-center min-h-[80vh] relative pt-6 mb-4">
-            <div class="modal-header w-full justify-center mb-4 border-b-0 pb-0">
-                <h2 class="m-0 flex items-center gap-2 text-xl font-bold text-slate-200"><i class="fa-solid fa-hourglass-half text-red-500"></i> Pomodoro Timer</h2>
-            </div>
+    <main id="pomodoroView" class="view-section pomodoro-view flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" style="display:none;">
+        
+        <div class="px-2">
+            <h1 class="premium-heading mb-1"><i class="fa-solid fa-hourglass-half text-red-500 mr-2"></i> Pomodoro Timer</h1>
+            <p class="premium-subtext">Focus intensely, break effectively. Master your study rhythm.</p>
+        </div>
+
+        <div class="premium-card flex flex-col items-center justify-center min-h-[70vh] relative pt-6 md:mx-2 border-indigo-500/10">
 
             <!-- Mode selector -->
-            <div class="flex justify-center gap-1.5 mb-6 bg-black/20 px-1.5 py-1.5 rounded-full border border-white/10">
-                <button class="pomo-mode-btn active bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/10 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-[0_4px_12px_rgba(99,102,241,0.4)]" data-mode="focus">Focus</button>
-                <button class="pomo-mode-btn bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/10 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-[0_4px_12px_rgba(99,102,241,0.4)]" data-mode="short">Break</button>
+            <div class="flex justify-center gap-1.5 mb-6 bg-slate-900/50 px-1.5 py-1.5 rounded-full border border-white/5">
+                <button class="pomo-mode-btn active bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/5 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-lg" data-mode="focus">Focus</button>
+                <button class="pomo-mode-btn bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/5 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-lg" data-mode="short">Break</button>
                 <button class="bg-transparent border-none text-slate-400 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all hover:bg-white/10 hover:text-white" id="btnToggleRing" title="Toggle Ring"><i class="fa-solid fa-bullseye"></i></button>
             </div>
 
             <!-- Custom time settings (Collapsible) -->
-            <details class="pomo-settings-details w-full max-w-sm mb-6 bg-white/5 rounded-2xl px-4 py-2 border border-white/10">
-                <summary class="cursor-pointer text-slate-400 font-medium outline-none py-2 select-none">⚙️ Timer Settings</summary>
+            <details class="pomo-settings-details w-full max-w-sm mb-6 bg-slate-900/30 rounded-2xl px-4 py-2 border border-white/5">
+                <summary class="cursor-pointer text-slate-400 font-bold outline-none py-2 select-none uppercase tracking-wide text-[0.85rem] flex items-center gap-2"><i class="fa-solid fa-gear"></i> Timer Settings</summary>
                 <div class="flex justify-between gap-3 mt-4 mb-4">
                     <div class="flex flex-col items-center gap-1 flex-1">
-                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Focus <span class="font-normal opacity-60">min</span></label>
-                        <input type="number" id="pomoFocusMin" value="50" min="1" max="120" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
+                        <label class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Focus <span class="font-normal opacity-60">min</span></label>
+                        <input type="number" id="pomoFocusMin" value="50" min="1" max="120" class="premium-input bg-slate-800/80 text-center text-[1rem] p-1.5 py-2 w-full appearance-none">
                     </div>
                     <div class="flex flex-col items-center gap-1 flex-1">
-                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Break <span class="font-normal opacity-60">min</span></label>
-                        <input type="number" id="pomoShortMin" value="10" min="0" max="60" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
+                        <label class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Break <span class="font-normal opacity-60">min</span></label>
+                        <input type="number" id="pomoShortMin" value="10" min="0" max="60" class="premium-input bg-slate-800/80 text-center text-[1rem] p-1.5 py-2 w-full appearance-none">
                     </div>
                     <div class="flex flex-col items-center gap-1 flex-1">
-                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Total <span class="font-normal opacity-60">hrs</span></label>
-                        <input type="number" id="pomoTotalHours" value="4" min="0.1" step="0.1" max="24" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
+                        <label class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Total <span class="font-normal opacity-60">hrs</span></label>
+                        <input type="number" id="pomoTotalHours" value="4" min="0.1" step="0.1" max="24" class="premium-input bg-slate-800/80 text-center text-[1rem] p-1.5 py-2 w-full appearance-none">
                     </div>
                 </div>
             </details>
 
             <div class="pomo-fullscreen-btn-wrap flex gap-3 mb-6 flex-wrap justify-center">
-                <button id="btnPomoPrev" class="btn-fullscreen-inline flex items-center gap-2 bg-white/10 hover:bg-white/15 border-none text-white px-5 py-2.5 rounded-full cursor-pointer transition-all text-[0.95rem]" title="Reset Timer">
+                <button id="btnPomoPrev" class="premium-btn-secondary px-5 py-2 rounded-full cursor-pointer text-[0.95rem] font-semibold tracking-wide border-slate-700 hover:bg-slate-800" title="Reset Timer">
                     <i class="fa-solid fa-rotate-left"></i> Reset
                 </button>
-                <button id="btnPomoFullscreen" class="btn-fullscreen-inline flex items-center gap-2 bg-white/10 hover:bg-white/15 border-none text-white px-5 py-2.5 rounded-full cursor-pointer transition-all text-[0.95rem]" title="Full Screen">
+                <button id="btnPomoFullscreen" class="premium-btn-secondary px-5 py-2 rounded-full cursor-pointer text-[0.95rem] font-semibold tracking-wide border-slate-700 hover:bg-slate-800" title="Full Screen">
                     <i class="fa-solid fa-expand"></i> Full Screen
                 </button>
             </div>
 
             <!-- Timer ring -->
-            <div class="relative w-[220px] h-[220px] mx-auto mb-8 mt-2">
-                <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
-                    <circle class="fill-none stroke-white/[.06] stroke-[6]" cx="60" cy="60" r="56" />
-                    <circle class="fill-none stroke-[6] [stroke-linecap:round] [stroke-dasharray:351.86] [transition:stroke-dashoffset_1s_linear,stroke_0.4s_ease]"
-                        id="pomoRingFill" cx="60" cy="60" r="56" stroke="#ef4444" stroke-dashoffset="0" />
+            <div class="relative w-[240px] h-[240px] mx-auto mb-8 mt-2">
+                <svg class="w-full h-full -rotate-90 filter drop-shadow-[0_0_12px_rgba(239,68,68,0.3)]" viewBox="0 0 120 120">
+                    <circle class="fill-none stroke-white/[.04] stroke-[8]" cx="60" cy="60" r="54" />
+                    <circle class="fill-none stroke-[8] [stroke-linecap:round] [stroke-dasharray:339.29] [transition:stroke-dashoffset_1s_linear,stroke_0.4s_ease]"
+                        id="pomoRingFill" cx="60" cy="60" r="54" stroke="#ef4444" stroke-dashoffset="0" />
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center">
-                    <div id="pomoTime" class="text-[3.5rem] font-extrabold tracking-[-1.5px] leading-none bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent drop-shadow-md">50:00</div>
-                    <div id="pomoModeLabel" class="text-[0.9rem] text-slate-400 uppercase tracking-[1.5px] mt-2 font-semibold">Focus</div>
+                    <div id="pomoTime" class="text-[4rem] font-black tracking-tighter leading-none bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent drop-shadow-lg">50:00</div>
+                    <div id="pomoModeLabel" class="text-[0.95rem] text-slate-400 uppercase tracking-widest mt-2 font-bold">Focus</div>
                 </div>
             </div>
             
-            <div class="pomo-controls flex justify-center items-center gap-4 mb-6">
-                <button id="btnPomoBack" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center cursor-pointer transition-all bg-white/[.07] border border-white/10 text-slate-400 text-[0.95rem] hover:bg-white/[.12] hover:text-white hover:scale-105" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
-                <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn w-[60px] h-[60px] rounded-full flex items-center justify-center cursor-pointer transition-all bg-gradient-to-br from-red-500 to-red-600 border-none text-white text-[1.2rem] shadow-[0_6px_20px_rgba(239,68,68,0.35)] hover:scale-110 hover:shadow-[0_8px_28px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
-                <button id="btnPomoSkip" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center cursor-pointer transition-all bg-white/[.07] border border-white/10 text-slate-400 text-[0.95rem] hover:bg-white/[.12] hover:text-white hover:scale-105" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
+            <div class="pomo-controls flex justify-center items-center gap-6 mb-8">
+                <button id="btnPomoBack" class="pomo-ctrl-btn w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all bg-slate-800 border border-slate-700 text-slate-400 text-[1rem] hover:bg-slate-700 hover:text-white hover:-translate-y-1" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
+                <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn w-[72px] h-[72px] rounded-full flex items-center justify-center cursor-pointer transition-all bg-gradient-to-br from-red-500 to-red-600 border border-red-400/20 text-white text-[1.4rem] shadow-[0_8px_25px_rgba(239,68,68,0.4)] hover:scale-105 hover:shadow-[0_12px_35px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
+                <button id="btnPomoSkip" class="pomo-ctrl-btn w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all bg-slate-800 border border-slate-700 text-slate-400 text-[1rem] hover:bg-slate-700 hover:text-white hover:-translate-y-1" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
             </div>
 
             <!-- Session counter -->
-            <div class="pomo-sessions flex flex-col items-center gap-1 mb-4">
-                <div class="pomo-session-label text-[0.75rem] text-slate-400 uppercase tracking-[0.5px]">Current Cycle</div>
-                <div id="pomoSessionCount" class="pomo-session-count text-[1.2rem] font-semibold mt-1 text-indigo-400">1 of 4</div>
+            <div class="pomo-sessions flex flex-col items-center gap-1 mb-2 bg-indigo-500/10 border border-indigo-500/20 px-6 py-2.5 rounded-2xl">
+                <div class="pomo-session-label text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest">Current Cycle</div>
+                <div id="pomoSessionCount" class="pomo-session-count text-[1.2rem] font-black mt-0.5 text-indigo-400">1 of 4</div>
             </div>
 
 

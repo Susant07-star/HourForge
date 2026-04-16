@@ -1,5 +1,33 @@
 # 📜 Project Changelog
 
+## [2.3.0] - 2026-04-16
+
+### Changed — Premium SaaS UI Overhaul
+- **Global Design System**: Replaced the legacy "Deep Space" galaxy background with a disciplined `slate-950` dark theme. Added centralized `@layer components` in `src/input.css` defining `.premium-card`, `.premium-input`, `.premium-btn-primary`, and `.premium-btn-secondary`.
+- **Dashboard Tab**: Converted all stat widgets, the "Add Session" form, the AI Insight card, and the 5-Minute Anti-Procrastination timer to strict `.premium-card` grid containers using consistent `gap-6` rhythm.
+- **Table View Tab**: Standardized the log table filter bar and table header into a unified `.premium-card` layout with correct `rounded-2xl` and `shadow-lg` depth.
+- **Time Tracker Tab**: Refactored to a 1/3-to-2/3 responsive grid — log form on the left, history feed on the right — both using `.premium-card` constraints.
+- **AI Insights Tab**: Rebuilt the chart container and AI feedback section using premium typography (`premium-heading` + `premium-subtext`) and consistent visual hierarchy.
+- **Pomodoro Timer Tab**: Migrated from legacy `.glass-panel` to `.premium-card`. Added page heading/subtext, polished mode selector pill, upgraded settings collapsible with icon header. Enlarged timer ring (220px → 240px) with a glowing `drop-shadow`. Upgraded play/back/skip control buttons to slate-800 with `hover:-translate-y-1` interaction.
+
+### Fixed
+- **Pomodoro Ring Math Bug**: Replaced hardcoded `339.29` circumference constant with a dynamic calculation: `2 * Math.PI * r`, reading the `r` attribute from the DOM. This prevents ring offset failures if the SVG radius is ever changed.
+- **Pomodoro Break Color**: Updated break mode ring stroke to the correct `#10b981` (emerald-500) instead of the old `#34d399`.
+
+### UI — Modals & Overlays
+- **Profile Settings Drawer**: Redesigned with `bg-slate-900/95 backdrop-blur-xl`, `rounded-t-[2.5rem]`, `.premium-input` on all form controls, and `.premium-btn-primary` submit button.
+- **Info / About Modal**: Replaced legacy `.modal-box .info-modal` with a responsive `.premium-card` featuring a sticky header, feature grid cards with color-coded icons, numbered step cards, and a privacy callout.
+
+### JS — Dynamic Element Updates
+- **`timeTracker.js`**: History feed cards now render `.premium-card` structures with standardized action buttons.
+- **`dashboard.js`**: JS-injected revision/session cards inherit the new component token system.
+
+### Docs Updated
+- `docs/dev/CHANGELOG.md` — This entry.
+- `docs/ui/ux-flows.md` — Noted premium SaaS design overhaul under UI Design section.
+
+---
+
 ## [2.2.0] - 2026-04-14
 
 ### Added

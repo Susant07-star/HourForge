@@ -138,57 +138,83 @@ function deepMergeArrays(localArr, cloudArr) {
     if (!localArr) localArr = [];
     if (!cloudArr) cloudArr = [];
     const map = new Map();
+    const normalizeMergedItem = (item) => {
+        if (
+            typeof normalizeStudySession === 'function' &&
+            item &&
+            typeof item === 'object' &&
+            ('dateRead' in item || 'revisions' in item)
+        ) {
+            return normalizeStudySession(item);
+        }
+        return item;
+    };
+    const getLatestStamp = (obj) => {
+        if (!obj || typeof obj !== 'object') return 0;
+
+        let latest = 0;
+        const numericUpdatedAt = Number(obj.updated_at);
+        if (Number.isFinite(numericUpdatedAt) && numericUpdatedAt > 0) {
+            latest = Math.max(latest, numericUpdatedAt);
+        }
+
+        const parseDateValue = (value) => {
+            if (!value) return 0;
+            const parsed = new Date(value).getTime();
+            return Number.isFinite(parsed) ? parsed : 0;
+        };
+
+        latest = Math.max(
+            latest,
+            parseDateValue(obj.updatedAt),
+            parseDateValue(obj.createdAt),
+            parseDateValue(obj.created_at)
+        );
+
+        if (obj.revisions) {
+            for (const rev of Object.values(obj.revisions)) {
+                if (rev && typeof rev === 'object' && rev.completedAt) {
+                    latest = Math.max(latest, parseDateValue(rev.completedAt));
+                }
+            }
+        }
+
+        return latest;
+    };
+
     // Add all local items
     for (const item of localArr) {
-        if (item.id) map.set(item.id, item);
+        if (item.id) map.set(item.id, normalizeMergedItem(item));
     }
     // Merge cloud items
     for (const item of cloudArr) {
         if (item.id) {
+            const normalizedItem = normalizeMergedItem(item);
             const existing = map.get(item.id);
             if (!existing) {
-                map.set(item.id, item);
+                map.set(normalizedItem.id, normalizedItem);
             } else {
-                // If both exist, pick the newest one based on timestamps
-                const getLatestStamp = (obj) => {
-                    let latest = obj.createdAt ? new Date(obj.createdAt).getTime() : 0;
-                    if (obj.updatedAt) latest = Math.max(latest, new Date(obj.updatedAt).getTime());
-                    if (obj.revisions) {
-                        for (const rev of Object.values(obj.revisions)) {
-                            if (rev && typeof rev === 'object' && rev.completedAt) {
-                                latest = Math.max(latest, new Date(rev.completedAt).getTime());
-                            }
-                        }
-                    }
-                    return latest;
-                };
-                
                 const localStr = JSON.stringify(existing);
-                const cloudStr = JSON.stringify(item);
+                const cloudStr = JSON.stringify(normalizedItem);
                 
                 if (localStr === cloudStr) continue;
                 
                 const localDate = getLatestStamp(existing);
-                const cloudDate = getLatestStamp(item);
-                // #region agent log
-                if (existing && item && (existing.updated_at || item.updated_at) && !(existing.updatedAt || item.updatedAt)) {
-                    fetch('http://127.0.0.1:7317/ingest/ebb4b885-2dc8-4803-826d-97791a2423c5',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'130ae0'},body:JSON.stringify({sessionId:'130ae0',runId:'pre-fix',hypothesisId:'H2',location:'js/supabase.js:deepMergeArrays',message:'Merge comparing without camelCase timestamps',data:{id:item.id,localDate,cloudDate,localHasUpdatedAt:!!existing.updatedAt,cloudHasUpdatedAt:!!item.updatedAt,localHasUpdated_at:!!existing.updated_at,cloudHasUpdated_at:!!item.updated_at},timestamp:Date.now()})}).catch(()=>{});
-                }
-                // #endregion
-                
+                const cloudDate = getLatestStamp(normalizedItem);
+
                 if (cloudDate > localDate) {
-                    map.set(item.id, item);
+                    map.set(normalizedItem.id, normalizedItem);
                 } else if (cloudDate === localDate) {
                     if (cloudStr.length > localStr.length) {
-                        map.set(item.id, item);
+                        map.set(normalizedItem.id, normalizedItem);
                     }
                 }
             }
         }
     }
     return Array.from(map.values()).sort((a, b) => {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const dateA = getLatestStamp(a);
+        const dateB = getLatestStamp(b);
         return dateB - dateA; 
     });
 }
@@ -201,6 +227,9 @@ async function applyCloudData(cloudData) {
     
     // Deep Merge Arrays instead of overwriting
     studySessions = deepMergeArrays(studySessions, cloudData.studySessions);
+    if (typeof normalizeStudySessionsArray === 'function') {
+        studySessions = normalizeStudySessionsArray(studySessions);
+    }
     timeLogs = deepMergeArrays(timeLogs, cloudData.timeLogs);
     
     // Merge AI Ratings
@@ -241,13 +270,17 @@ async function applyCloudData(cloudData) {
 
     // Re-render UI aggressively if app is already initialized
     if (isAppInitialized) {
-        renderDynamicSubjects();
-        renderDashboard();
-        renderTableView();
-        if (typeof renderTimeLogs === 'function') renderTimeLogs();
-        if (typeof updateExamCountdowns === 'function') updateExamCountdowns();
-        if (typeof updateExamCountdown === 'function') updateExamCountdown(); // fallback
-        if (typeof updateStreakUI === 'function') updateStreakUI();
+        if (typeof scheduleAppRefresh === 'function') {
+            scheduleAppRefresh();
+        } else {
+            renderDynamicSubjects();
+            renderDashboard();
+            renderTableView();
+            if (typeof renderTimeLogs === 'function') renderTimeLogs();
+            if (typeof updateExamCountdowns === 'function') updateExamCountdowns();
+            if (typeof updateExamCountdown === 'function') updateExamCountdown(); // fallback
+            if (typeof updateStreakUI === 'function') updateStreakUI();
+        }
     }
 }
 
