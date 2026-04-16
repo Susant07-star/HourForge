@@ -49,9 +49,23 @@
  * @property {boolean} setupComplete
  */
 
-let studySessions = JSON.parse(localStorage.getItem('studySessions')) || [];
-let timeLogs = JSON.parse(localStorage.getItem('timeLogs')) || [];
-let aiRatingsHistory = JSON.parse(localStorage.getItem('aiRatingsHistory')) || [];
+function parseLocalArray(key) {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+        // #region agent log
+        fetch('http://127.0.0.1:7317/ingest/ebb4b885-2dc8-4803-826d-97791a2423c5',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'130ae0'},body:JSON.stringify({sessionId:'130ae0',runId:'pre-fix',hypothesisId:'H3',location:'js/store.js:parseLocalArray',message:'Failed to parse localStorage JSON',data:{key,rawLength:raw.length,error:String(err&&err.message||err)},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+        return [];
+    }
+}
+
+let studySessions = parseLocalArray('studySessions');
+let timeLogs = parseLocalArray('timeLogs');
+let aiRatingsHistory = parseLocalArray('aiRatingsHistory');
 
 // Migrate old dateLabel formats to YYYY-MM-DD, add period field, and deduplicate
 {

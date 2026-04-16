@@ -170,6 +170,11 @@ function deepMergeArrays(localArr, cloudArr) {
                 
                 const localDate = getLatestStamp(existing);
                 const cloudDate = getLatestStamp(item);
+                // #region agent log
+                if (existing && item && (existing.updated_at || item.updated_at) && !(existing.updatedAt || item.updatedAt)) {
+                    fetch('http://127.0.0.1:7317/ingest/ebb4b885-2dc8-4803-826d-97791a2423c5',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'130ae0'},body:JSON.stringify({sessionId:'130ae0',runId:'pre-fix',hypothesisId:'H2',location:'js/supabase.js:deepMergeArrays',message:'Merge comparing without camelCase timestamps',data:{id:item.id,localDate,cloudDate,localHasUpdatedAt:!!existing.updatedAt,cloudHasUpdatedAt:!!item.updatedAt,localHasUpdated_at:!!existing.updated_at,cloudHasUpdated_at:!!item.updated_at},timestamp:Date.now()})}).catch(()=>{});
+                }
+                // #endregion
                 
                 if (cloudDate > localDate) {
                     map.set(item.id, item);
