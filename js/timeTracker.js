@@ -231,7 +231,17 @@ function renderNoteSuggestions(currentTask = '') {
     suggestions.forEach(text => {
         const chip = document.createElement('button');
         chip.type = 'button';
-        chip.className = 'bg-white/5 border border-white/10 text-slate-400 px-3 py-1 rounded-full text-[0.75rem] cursor-pointer transition-all hover:bg-emerald-500/15 hover:border-emerald-500/30 hover:text-emerald-300';
+        chip.className = 'note-chip'; // New class for CSS
+        chip.style.cssText = `
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        `;
         chip.textContent = text;
         
         chip.addEventListener('click', () => {
@@ -548,10 +558,13 @@ function renderQuickActivityChips() {
 
     topTasks.forEach(({task, subject, note, isContinue}) => {
         const chip = document.createElement('div');
-        chip.className = 'inline-flex items-center gap-1 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[0.75rem] text-slate-400 cursor-pointer transition-all duration-200 select-none hover:bg-emerald-500/15 hover:border-emerald-500/30 hover:text-emerald-300 active:scale-95 [&.chip-selected]:bg-red-400/15 [&.chip-selected]:border-red-400/40 [&.chip-selected]:text-red-300';
+        chip.className = 'chip';
+        // Position relative for the delete button
+        chip.style.position = 'relative';
         
         if (isContinue) {
-            chip.classList.add('border-amber-400/40', 'bg-amber-400/10');
+            chip.style.border = '1px solid rgba(251, 191, 36, 0.4)';
+            chip.style.background = 'rgba(251, 191, 36, 0.1)';
         }
         
         chip.dataset.task = task;
@@ -563,6 +576,7 @@ function renderQuickActivityChips() {
         
         // Main content
         const contentSpan = document.createElement('span');
+        contentSpan.className = 'chip-content';
         contentSpan.innerHTML = `${icon} ${prefix}${task}`;
         chip.appendChild(contentSpan);
         
@@ -638,10 +652,7 @@ function renderQuickActivityChips() {
 
 // ------------------------------------------
 
-historyDateFilter.addEventListener('change', () => {
-    if (typeof scheduleRenderTimeLogs === 'function') scheduleRenderTimeLogs(20);
-    else renderTimeLogs();
-});
+historyDateFilter.addEventListener('change', renderTimeLogs);
 
 addTimeLogForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -744,8 +755,7 @@ addTimeLogForm.addEventListener('submit', (e) => {
     }
 
     saveToLocalStorage();
-    if (typeof scheduleRenderTimeLogs === 'function') scheduleRenderTimeLogs(20);
-    else renderTimeLogs();
+    renderTimeLogs();
 
     // Auto-backup trigger
     autoBackupSync();
@@ -825,8 +835,8 @@ function renderTimeLogs() {
 
     if (filteredLogs.length === 0) {
         timeLogFeed.innerHTML = `
-            <div class="text-center text-slate-500 p-8">
-                <i class="fa-solid fa-mug-hot text-[2rem] mb-4 opacity-50 block"></i>
+            <div style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                <i class="fa-solid fa-mug-hot" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i><br>
                 No activities logged for this date.
             </div>
         `;
@@ -846,33 +856,31 @@ function renderTimeLogs() {
         };
 
         const item = document.createElement('div');
-        item.className = 'premium-card p-4 flex flex-col md:flex-row justify-between md:items-center gap-4 transition-all duration-300 hover:border-emerald-500/20 hover:-translate-y-1 hover:shadow-lg animated-entry';
-        
-        let subjectColor = log.subject ? `var(--color-${log.subject.toLowerCase()})` : '#10b981';
+        item.className = 'time-log-card animated-entry';
 
         let notesHtml = '';
         if (log.notes) {
-            notesHtml = `<div class="text-[0.85rem] text-slate-400 mt-2 font-serif italic"><i class="fa-solid fa-quote-left opacity-30 mr-1.5"></i> ${log.notes}</div>`;
+            notesHtml = `<div class="tl-notes"><i class="fa-solid fa-quote-left" style="opacity:0.5; margin-right:5px;"></i> ${log.notes}</div>`;
         }
-        
-        // Use standard design system buttons
         let actionBtnsHtml = `
-            <div class="flex gap-2 w-full md:w-auto mt-2 md:mt-0 justify-end md:justify-start shrink-0">
-                <button class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/10 hover:border-indigo-500/40 w-auto flex-1 md:flex-none" title="Edit this log" onclick="editTimeLog('${log.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
-                <button class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-red-400 border-red-500/20 hover:bg-red-500/10 hover:border-red-500/40 w-auto flex-1 md:flex-none" title="Delete this log" onclick="deleteTimeLog('${log.id}')"><i class="fa-solid fa-trash-can"></i> Delete</button>
+            <div class="tl-action-btns" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                <button class="btn-edit" title="Edit this log" onclick="editTimeLog('${log.id}')" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                <button class="btn-delete" title="Delete this log" onclick="deleteTimeLog('${log.id}')" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fa-solid fa-trash-can"></i> Delete</button>
             </div>`;
 
-        const subjectBadge = log.subject ? `<span class="inline-flex items-center gap-1.5 border border-white/10 bg-black/20 text-slate-300 px-2 py-0.5 rounded-md text-[0.7rem] font-bold tracking-wider uppercase ml-2"><div class="w-1.5 h-1.5 rounded-full" style="background-color: ${subjectColor}"></div>${log.subject}</span>` : '';
+        const subjectBadge = log.subject ? `<span style="display: inline-block; background: rgba(99,102,241,0.15); color: #a5b4fc; padding: 0.15rem 0.5rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 500; margin-left: 0.5rem;">${log.subject}</span>` : '';
 
         item.innerHTML = `
-            <div class="flex-1 min-w-0">
-                <div class="text-[1.1rem] font-bold mb-1 text-slate-100 flex items-center leading-tight truncate">${log.task}${subjectBadge}</div>
-                <div class="text-[0.85rem] text-slate-400 flex items-center gap-1.5 font-medium"><i class="fa-regular fa-clock opacity-70"></i> ${formatTime(log.startTime)} - ${formatTime(log.endTime)}</div>
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="tl-task">${log.task}${subjectBadge}</div>
+                </div>
+                <div class="tl-time-window"><i class="fa-regular fa-clock"></i> ${formatTime(log.startTime)} - ${formatTime(log.endTime)}</div>
                 ${notesHtml}
-            </div>
-            <div class="flex flex-col items-end shrink-0 md:ml-4">
-                <div class="text-[1.5rem] font-black text-emerald-400 mb-1 leading-none tracking-tight">${log.duration.toFixed(1)}<span class="text-[0.85rem] font-bold text-emerald-500/50 uppercase tracking-[0.2em] ml-1">HRS</span></div>
                 ${actionBtnsHtml}
+            </div>
+            <div class="tl-duration">
+                ${log.duration} <span>hrs</span>
             </div>
         `;
         fragment.appendChild(item);

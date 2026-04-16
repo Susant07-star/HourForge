@@ -323,26 +323,19 @@ function renderRevisionChart() {
     studySessions.filter(s => !s.deleted).forEach(session => {
         const baseDate = new Date(session.dateRead);
         baseDate.setHours(0, 0, 0, 0);
-        const revisions = session.revisions || {};
-        if (!session.revisions) {
-            // #region agent log
-            fetch('http://127.0.0.1:7317/ingest/ebb4b885-2dc8-4803-826d-97791a2423c5',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'130ae0'},body:JSON.stringify({sessionId:'130ae0',runId:'pre-fix',hypothesisId:'H4',location:'js/charts.js:renderRevisionChart',message:'Session missing revisions object',data:{id:session.id||null,subject:session.subject||null,dateRead:session.dateRead||null},timestamp:Date.now()})}).catch(()=>{});
-            // #endregion
-        }
 
         ['rev2', 'rev4', 'rev7'].forEach(revType => {
-            const revRaw = revisions[revType];
-            const rev = typeof revRaw === 'boolean'
-                ? { done: revRaw, completedAt: null }
-                : (revRaw || { done: false, completedAt: null });
+            const rev = typeof session.revisions[revType] === 'boolean'
+                ? { done: session.revisions[revType], completedAt: null }
+                : session.revisions[revType];
 
             if (rev.done) {
                 completed++;
             } else {
                 // Check if overdue
                 let dueDate = null;
-                const rev2 = typeof revisions.rev2 === 'boolean' ? { done: revisions.rev2 } : (revisions.rev2 || { done: false });
-                const rev4 = typeof revisions.rev4 === 'boolean' ? { done: revisions.rev4 } : (revisions.rev4 || { done: false });
+                const rev2 = typeof session.revisions.rev2 === 'boolean' ? { done: session.revisions.rev2 } : session.revisions.rev2;
+                const rev4 = typeof session.revisions.rev4 === 'boolean' ? { done: session.revisions.rev4 } : session.revisions.rev4;
 
                 if (revType === 'rev2') dueDate = new Date(baseDate.getTime() + 2 * 86400000);
                 else if (revType === 'rev4' && rev2.done) dueDate = new Date(baseDate.getTime() + 6 * 86400000);

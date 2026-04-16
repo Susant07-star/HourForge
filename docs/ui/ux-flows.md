@@ -60,25 +60,5 @@ After every action, the student receives immediate visual or textual feedback:
 - **Critical**: "Subject Neglected! ⚠️" (AI Coach).
 - **Gamified**: Progress charts updating in real-time.
 
-## 7. Premium SaaS UI Design System (v2.3.0+)
-Goal: **Consistent, high-quality visual language across all views.**
-
-The app follows a strict component-based design system defined in `src/input.css`:
-
-| Token | Usage |
-|---|---|
-| `.premium-card` | All content containers — `rounded-2xl`, `bg-slate-900`, `shadow-lg`, `border border-white/5` |
-| `.premium-input` | All text/select/date/number inputs — consistent padding, border, focus ring |
-| `.premium-btn-primary` | Primary CTA buttons — indigo fill, glow shadow |
-| `.premium-btn-secondary` | Secondary/ghost buttons — opaque border, subtle hover state |
-| `.premium-heading` | Page-level headings — `text-2xl font-black tracking-tight` |
-| `.premium-subtext` | Descriptive subtitles — `text-sm text-slate-400` |
-
-**Layout Rules:**
-- `gap-6` is the standard spacing unit between cards and sections.
-- No raw `margin` or `padding` for inter-section spacing — use `gap` in flex/grid.
-- All interactive elements must have `hover:` and `transition-all` feedback.
-- Modal overlays use glassmorphism: `bg-slate-900/95 backdrop-blur-xl`.
-
 ---
 *UX flows should feel like a "Conversation" between the student's goals and the app's reminders.*

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -12,10 +12,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS (Next Gen Design System & Baselines) -->
-    <link rel="stylesheet" href="css/tailwind.css">
-    <!-- Modular Custom CSS Styles -->
+    <!-- Modular CSS Styles -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/insights.css">
+    <link rel="stylesheet" href="css/tablet.css">
+    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/pomodoro.css">
     <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/overrides.css">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -41,22 +49,34 @@
 
 <body>
     <!-- Auth Loading Overlay: shown until Supabase resolves session -->
-    <div id="authLoader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-6 bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] transition-opacity duration-300">
-        <i class="fa-solid fa-brain text-5xl text-indigo-500"></i>
-        <div class="w-10 h-10 border-[3px] border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-        <p class="text-white/50 text-sm font-sans tracking-wide">Loading HourForge...</p>
+    <div id="authLoader" style="
+        position: fixed; inset: 0; z-index: 9999;
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 1.5rem; transition: opacity 0.3s ease;
+    ">
+        <i class="fa-solid fa-brain" style="font-size: 3rem; color: #6366f1;"></i>
+        <div style="
+            width: 40px; height: 40px;
+            border: 3px solid rgba(99,102,241,0.3);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        "></div>
+        <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; font-family: Outfit, sans-serif;">Loading HourForge...</p>
     </div>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
     <!-- Full-Screen Login Gate: hidden until auth resolves to NOT LOGGED IN -->
-    <div id="loginGate" class="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0a0820] p-8" style="display: none;">
-        <div class="bg-[#141235] border border-white/10 rounded-3xl p-[3rem_2rem] max-w-[400px] w-full text-center shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
-            <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_10px_25px_rgba(99,102,241,0.4)]">
-                <i class="fa-solid fa-brain text-[2.5rem] text-white"></i>
+    <div id="loginGate" class="login-gate" style="display: none;">
+        <div class="login-gate-content">
+            <div class="login-gate-logo">
+                <i class="fa-solid fa-brain"></i>
             </div>
-            <h1 class="text-[2rem] font-bold mb-2 text-slate-200">HourForge</h1>
-            <p class="text-slate-400 mb-8 text-base leading-relaxed">Welcome back. Please sign in to sync your study data.</p>
-            <button id="btnGoogleSignIn" class="w-full flex items-center justify-center gap-3 bg-white text-gray-900 border-none px-6 py-[14px] rounded-xl text-[1.05rem] font-semibold cursor-pointer transition-all duration-200 shadow-sm hover:-translate-y-[2px] hover:shadow-md active:translate-y-0">
-                <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="w-5 h-5">
+            <h1>HourForge</h1>
+            <p>Welcome back. Please sign in to sync your study data.</p>
+            <button id="btnGoogleSignIn" class="google-signin-btn">
+                <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="google-logo">
                 Sign in with Google
             </button>
         </div>
@@ -65,93 +85,89 @@
     <div class="app-container" id="mainAppContainer" style="display: none;">
 
         <!-- ===================== SIDEBAR OVERLAY ===================== -->
-        <div id="sidebarOverlay" class="fixed inset-0 z-[299] bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto"></div>
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
         <!-- ===================== SIDEBAR DRAWER ===================== -->
-        <aside id="sidebarDrawer" class="fixed top-0 left-0 bottom-0 z-[300] w-[290px] max-w-[85vw] bg-gradient-to-b from-[#0f0c29]/98 to-[#161038]/98 border-r border-white/5 flex flex-col -translate-x-full transition-transform duration-300 shadow-[4px_0_40px_rgba(0,0,0,0.4)] overflow-hidden [&.open]:translate-x-0">
-            <div class="p-[1.25rem_1.25rem_0.75rem] border-b border-white/5">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-brain text-[1.6rem] text-indigo-400"></i>
+        <aside id="sidebarDrawer" class="sidebar-drawer">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="fa-solid fa-brain sidebar-brand-icon"></i>
                     <div>
-                        <div class="text-[1.15rem] font-bold text-slate-200">HourForge</div>
-                        <div class="text-[0.72rem] text-slate-400 mt-[1px]">2-4-7 Spaced Repetition</div>
+                        <div class="sidebar-brand-name">HourForge</div>
+                        <div class="sidebar-brand-tagline">2-4-7 Spaced Repetition</div>
                     </div>
+            </div>
+
+            <div class="sidebar-user-card">
+                <img id="sidebarAvatar" class="sidebar-avatar" src="" alt="Profile" onerror="this.src=''; this.style.display='none'; document.getElementById('sidebarAvatarFallback').style.display='flex';">
+                <div id="sidebarAvatarFallback" class="sidebar-avatar-fallback"><i class="fa-solid fa-user"></i></div>
+                <div class="sidebar-user-info">
+                    <div id="sidebarUserName" class="sidebar-user-name">Student</div>
+                    <div id="sidebarUserEmail" class="sidebar-user-email">Not signed in</div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3 p-[1rem_1.25rem] bg-indigo-400/5 border-b border-white/5">
-                <img id="sidebarAvatar" class="w-[44px] h-[44px] rounded-full object-cover border-2 border-indigo-400/40 shrink-0" src="" alt="Profile" onerror="this.src=''; this.style.display='none'; document.getElementById('sidebarAvatarFallback').style.display='flex';">
-                <div id="sidebarAvatarFallback" class="hidden items-center justify-center w-[44px] h-[44px] rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 text-white text-[1.1rem] shrink-0 border-2 border-indigo-400/40"><i class="fa-solid fa-user"></i></div>
-                <div class="flex flex-col">
-                    <div id="sidebarUserName" class="text-[0.95rem] font-semibold text-slate-200">Student</div>
-                    <div id="sidebarUserEmail" class="text-[0.75rem] text-slate-400 mt-[2px] overflow-hidden text-ellipsis whitespace-nowrap max-w-[180px]">Not signed in</div>
-                </div>
-            </div>
-
-            <nav class="flex-1 overflow-y-auto py-3">
-                <button class="sidebar-nav-item active-sidebar-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 [&.active-sidebar-item]:border-indigo-400 [&.active-sidebar-item]:bg-indigo-400/10 [&.active-sidebar-item]:text-indigo-400 group" onclick="switchTab('dashboardView'); closeSidebar();">
-                    <i class="fa-solid fa-layer-group w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> Dashboard
+            <nav class="sidebar-nav">
+                <button class="sidebar-nav-item active-sidebar-item" onclick="switchTab('dashboardView'); closeSidebar();">
+                    <i class="fa-solid fa-layer-group"></i> Dashboard
                 </button>
-                <button class="sidebar-nav-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 [&.active-sidebar-item]:border-indigo-400 [&.active-sidebar-item]:bg-indigo-400/10 [&.active-sidebar-item]:text-indigo-400 group" onclick="switchTab('tableView'); closeSidebar();">
-                    <i class="fa-solid fa-table w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> Log Table
+                <button class="sidebar-nav-item" onclick="switchTab('tableView'); closeSidebar();">
+                    <i class="fa-solid fa-table"></i> Log Table
                 </button>
-                <button class="sidebar-nav-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 [&.active-sidebar-item]:border-indigo-400 [&.active-sidebar-item]:bg-indigo-400/10 [&.active-sidebar-item]:text-indigo-400 group" onclick="switchTab('hourLogView'); closeSidebar();">
-                    <i class="fa-solid fa-clock w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> Time Tracker
+                <button class="sidebar-nav-item" onclick="switchTab('hourLogView'); closeSidebar();">
+                    <i class="fa-solid fa-clock"></i> Time Tracker
                 </button>
-                <button class="sidebar-nav-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 [&.active-sidebar-item]:border-indigo-400 [&.active-sidebar-item]:bg-indigo-400/10 [&.active-sidebar-item]:text-indigo-400 group" onclick="switchTab('insightsView'); closeSidebar();">
-                    <i class="fa-solid fa-wand-magic-sparkles w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> AI Insights
+                <button class="sidebar-nav-item" onclick="switchTab('insightsView'); closeSidebar();">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Insights
                 </button>
-                <button id="btnSidebarProfileOpen" class="sidebar-nav-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 [&.active-sidebar-item]:border-indigo-400 [&.active-sidebar-item]:bg-indigo-400/10 [&.active-sidebar-item]:text-indigo-400 group">
-                    <i class="fa-solid fa-user-graduate w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> My Profile
+                <button class="sidebar-nav-item" id="btnSidebarProfileOpen">
+                    <i class="fa-solid fa-user-graduate"></i> My Profile
                 </button>
-                
-                <div class="text-[0.7rem] font-semibold uppercase tracking-widest text-slate-400 px-5 pt-3 pb-1 opacity-50">More</div>
-                
-                <button id="btnInstallPWA" class="sidebar-nav-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 group" style="display: none;">
-                    <i class="fa-solid fa-download w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> Install App
+                <div class="sidebar-section-label">More</div>
+                <button class="sidebar-nav-item" id="btnInstallPWA" style="display: none;">
+                    <i class="fa-solid fa-download"></i> Install App
                 </button>
-                
-                <div id="sidebarInfoBlock" class="flex items-start gap-3 m-[0.5rem_1rem_0.5rem] p-[0.85rem] bg-indigo-400/5 rounded-[10px] border border-indigo-400/10">
-                    <i class="fa-solid fa-circle-info text-indigo-400 mt-[2px] shrink-0"></i>
+                <div class="sidebar-info-block" id="sidebarInfoBlock">
+                    <i class="fa-solid fa-circle-info"></i>
                     <div>
-                        <strong class="block text-[0.85rem] text-slate-200 mb-1">About HourForge</strong>
-                        <p class="text-[0.8rem] text-slate-400 leading-relaxed m-0">Study smarter using the scientifically proven 2-4-7 spaced repetition method. Your data syncs automatically across all your devices.</p>
+                        <strong>About HourForge</strong>
+                        <p>Study smarter using the scientifically proven 2-4-7 spaced repetition method. Your data syncs automatically across all your devices.</p>
                     </div>
                 </div>
             </nav>
 
-            <div class="p-[0.75rem_0_calc(0.75rem+env(safe-area-inset-bottom))] border-t border-white/5">
-                <div id="sidebarStreakArea" class="px-5 pb-2 min-h-[24px]">
-                    <span id="streakBadge" class="flex w-fit items-center gap-1 bg-orange-500/15 border border-orange-500/30 px-3 py-1 rounded-full text-[0.8rem] font-bold text-orange-500" style="display:none;">
-                        <i class="fa-solid fa-fire text-orange-500"></i> <span id="streakCount">0</span> Day Streak
+            <div class="sidebar-footer">
+                <div class="sidebar-streak" id="sidebarStreakArea">
+                    <span id="streakBadge" class="streak-badge" style="display:none;">
+                        <i class="fa-solid fa-fire"></i> <span id="streakCount">0</span> Day Streak
                     </span>
                 </div>
-                <button id="btnSignOutIcon" class="w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-none text-red-500 text-[0.95rem] font-medium cursor-pointer transition-colors hover:bg-red-500/10 group">
-                    <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center text-[1rem]"></i> Sign Out
+                <button id="btnSignOutIcon" class="sidebar-logout-btn">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
                 </button>
             </div>
         </aside>
 
         <!-- ===================== TOP BAR ===================== -->
-        <header class="fixed top-0 left-0 right-0 z-[200] h-14 flex items-center justify-between px-3 bg-[#0a0820]/95 border-b border-white/5">
-            <button id="btnHamburger" class="text-slate-200 p-2 flex flex-col items-center justify-center gap-[5px] rounded-[10px] hover:bg-white/5 transition-colors min-w-[44px] min-h-[44px]" aria-label="Menu">
-                <span class="block w-[22px] h-[2px] bg-slate-200 rounded-sm transition-all duration-300 [:is(body.sidebar-open)_&]:translate-y-[7px] [:is(body.sidebar-open)_&]:rotate-45"></span>
-                <span class="block w-[22px] h-[2px] bg-slate-200 rounded-sm transition-all duration-300 [:is(body.sidebar-open)_&]:opacity-0"></span>
-                <span class="block w-[22px] h-[2px] bg-slate-200 rounded-sm transition-all duration-300 [:is(body.sidebar-open)_&]:-translate-y-[7px] [:is(body.sidebar-open)_&]:-rotate-45"></span>
+        <header class="top-bar">
+            <button id="btnHamburger" class="top-bar-btn hamburger-btn" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
             </button>
 
-            <div class="flex items-center gap-2 text-[1.15rem] font-bold text-slate-200 tracking-wide">
-                <i class="fa-solid fa-brain text-indigo-400 text-[1.1rem]"></i>
-                <span class="max-sm:text-base">HourForge</span>
-                <span id="topBarStreak" class="flex items-center gap-1 bg-orange-500/15 border border-orange-500/30 px-2 py-[0.15rem] rounded-full text-xs font-bold text-orange-500 ml-1" style="display:none;">
-                    <i class="fa-solid fa-fire text-orange-500 text-xs"></i> <span id="topBarStreakCount">0</span>
+            <div class="top-bar-title">
+                <i class="fa-solid fa-brain"></i>
+                <span>HourForge</span>
+                <span id="topBarStreak" class="topbar-streak" style="display:none;">
+                    <i class="fa-solid fa-fire"></i> <span id="topBarStreakCount">0</span>
                 </span>
             </div>
 
-            <div class="flex items-center gap-2">
-                <button id="btnProfileIcon" class="w-[38px] h-[38px] border-2 border-indigo-400/40 rounded-full overflow-hidden flex items-center justify-center transition-all duration-200 hover:border-indigo-400 hover:scale-105 p-0 bg-transparent" title="My Profile" aria-label="Profile">
-                    <img id="topAvatarImg" src="" alt="" class="w-full h-full object-cover rounded-full" onerror="this.style.display='none'; document.getElementById('topAvatarFallback').style.display='flex';" style="display:none;">
-                    <div id="topAvatarFallback" class="w-full h-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-sm rounded-full"><i class="fa-solid fa-user-graduate"></i></div>
+            <div class="top-bar-right">
+                <button id="btnProfileIcon" class="top-bar-avatar-btn" title="My Profile" aria-label="Profile">
+                    <img id="topAvatarImg" src="" alt="" onerror="this.style.display='none'; document.getElementById('topAvatarFallback').style.display='flex';" style="display:none;">
+                    <div id="topAvatarFallback" class="avatar-fallback"><i class="fa-solid fa-user-graduate"></i></div>
                 </button>
             </div>
         </header>
@@ -166,200 +182,158 @@
 
 
         <!-- Dashboard View -->
-        <main id="dashboardView" class="view-section active flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="false">
-            <div class="dashboard-shell md:px-2">
-                <section class="premium-card dashboard-hero">
-                    <div class="dashboard-hero-grid">
-                        <div>
-                            <div class="hero-chip w-fit mb-4"><i class="fa-solid fa-crown text-amber-300"></i> Premium Study Command Center</div>
-                            <h1 class="premium-heading mb-3">Study with clarity, not chaos.</h1>
-                            <p class="premium-subtext max-w-2xl">Your dashboard should feel like mission control: calm, sharp, and ready to tell you what matters now. Start focus sessions, catch upcoming exams, and keep your revision chain alive without hunting through tabs.</p>
-                            <div class="hero-action-row">
-                                <button class="premium-btn-primary sm:w-auto" onclick="switchTab('hourLogView')"><i class="fa-solid fa-bolt"></i> Log Time Fast</button>
-                                <button class="premium-btn-secondary sm:w-auto" onclick="switchTab('pomodoroView')"><i class="fa-solid fa-hourglass-half"></i> Open Focus Timer</button>
-                            </div>
-                            <div class="dashboard-kpi-grid">
-                                <div class="dashboard-kpi">
-                                    <div class="dashboard-kpi-label">Today's Focus</div>
-                                    <div class="dashboard-kpi-value" id="dashboardFocusHours">Deep Work</div>
-                                    <div class="dashboard-kpi-note">Log sessions and protect momentum.</div>
-                                </div>
-                                <div class="dashboard-kpi">
-                                    <div class="dashboard-kpi-label">Revision Rhythm</div>
-                                    <div class="dashboard-kpi-value">2-4-7</div>
-                                    <div class="dashboard-kpi-note">Stay on schedule and reduce forgetfulness.</div>
-                                </div>
-                                <div class="dashboard-kpi">
-                                    <div class="dashboard-kpi-label">Mode</div>
-                                    <div class="dashboard-kpi-value">Offline-First</div>
-                                    <div class="dashboard-kpi-note">Your system keeps working anywhere.</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="countdown-premium">
-                            <div class="countdown-tile">
-                                <span id="exam1Label" class="block text-[0.72rem] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Exam 1 in</span>
-                                <span id="preBoardCountdown" class="block text-[2.6rem] md:text-[3rem] font-extrabold text-slate-100 tracking-tight leading-none">--</span>
-                                <span class="text-[0.72rem] text-amber-400 font-bold tracking-[0.16em] mt-2 block uppercase">days remaining</span>
-                            </div>
-                            <div class="countdown-tile">
-                                <span id="exam2Label" class="block text-[0.72rem] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Exam 2 in</span>
-                                <span id="boardCountdown" class="block text-[2.6rem] md:text-[3rem] font-extrabold text-slate-100 tracking-tight leading-none">--</span>
-                                <span class="text-[0.72rem] text-emerald-400 font-bold tracking-[0.16em] mt-2 block uppercase">days remaining</span>
-                            </div>
-                            <div class="countdown-tile col-span-full flex flex-col justify-between">
-                                <div>
-                                    <div class="section-eyebrow mb-2">Today at a glance</div>
-                                    <p class="text-slate-300 text-[0.95rem] leading-relaxed">Use this tab as your daily reset point. Check what’s due, start a five-minute session, and then move into logs or focused study with one tap.</p>
-                                </div>
-                                <div id="currentDateDisplay" class="mt-4 text-[0.85rem] font-semibold text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl w-fit"></div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- AI Psychology Insight -->
-                <div class="premium-card flex flex-col justify-center border-pink-500/20 bg-gradient-to-br from-slate-900 to-pink-500/5 hover:border-pink-500/40">
-                    <div class="section-header">
-                        <div>
-                            <div class="section-eyebrow mb-2">Mindset Signal</div>
-                            <h3 class="text-[1rem] font-bold flex items-center gap-2 uppercase tracking-wide text-pink-400">
-                        <i class="fa-solid fa-lightbulb"></i> AI Insight
-                    </h3>
-                        </div>
-                    </div>
-                    <p id="dailyInsightText" class="text-[1rem] text-slate-300 leading-relaxed font-serif italic">"Loading insight..."</p>
-                </div>
-                
-                <!-- 5-Minute Timer -->
-                <div class="premium-card flex flex-col items-center text-center border-emerald-500/20 hover:border-emerald-500/40 bg-gradient-to-br from-slate-900 to-emerald-500/5">
-                    <div class="section-header w-full mb-0">
-                        <div class="w-full">
-                            <div class="section-eyebrow mb-2 text-center">Start Without Resistance</div>
-                            <h3 class="text-[0.95rem] font-bold flex items-center justify-center gap-2 text-emerald-400 uppercase tracking-wide">
-                        <i class="fa-solid fa-stopwatch"></i> 5-Min Rule
-                    </h3>
-                        </div>
-                    </div>
-                    <p class="text-[0.85rem] text-slate-400 mb-4 max-w-sm">Commit to just 5 minutes. Force your brain to start.</p>
-                    <div id="countdownDisplay" class="text-[3.5rem] font-extrabold mb-5 tabular-nums tracking-tighter leading-none text-slate-100">05:00</div>
-                    <div class="flex justify-center gap-3 w-full sm:w-auto">
-                        <button id="btnStartTimer" class="premium-btn-primary bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20">
-                            <i class="fa-solid fa-play"></i> Start
-                        </button>
-                        <button id="btnResetTimer" class="premium-btn-secondary">
-                            <i class="fa-solid fa-rotate-right"></i> Reset
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Slot: JS moves Today's Revisions here when due -->
-                <div id="todayRevisionsSlot" class="col-span-1 lg:col-span-2"></div>
+        <main id="dashboardView" class="main-content view-section active">
+            <!-- Dashboard Header -->
+            <div class="view-header" style="grid-column: 1 / -1; margin-top: -0.5rem; margin-bottom: 0.5rem; padding: 0;">
+                <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; letter-spacing: -0.5px;">Dashboard</h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Jump right in. Let's conquer today's goals without overthinking it.</p>
             </div>
 
-            <!-- Lower Analytics & Forms Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <!-- Left Column: Add New Study Session Form -->
-                <section class="premium-card lg:col-span-1 border-indigo-500/10 flex flex-col gap-2">
-                    <div class="section-header">
-                        <div>
-                            <div class="section-eyebrow mb-2">Capture New Material</div>
-                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200">
-                        <i class="fa-solid fa-plus text-indigo-400"></i> Log Session
-                    </h2>
-                        </div>
+            <!-- Exam Countdown Headers -->
+            <div class="exam-countdown-container" style="grid-column: 1 / -1;">
+                <div class="glass-panel countdown-panel"
+                    style="display: flex; justify-content: space-around; align-items: center; padding: 1.5rem; background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(245, 158, 11, 0.05)); border-color: rgba(245, 158, 11, 0.3);">
+                    <div class="countdown-item" style="text-align: center;">
+                        <span class="countdown-label"
+                            style="display: block; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;"
+                            id="exam1Label">Exam 1
+                            in</span>
+                        <span id="preBoardCountdown" class="countdown-days"
+                            style="display: block; font-size: 2.5rem; font-weight: 800; color: #f59e0b; text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);">--</span>
+                        <span class="countdown-unit"
+                            style="font-size: 0.9rem; color: #f59e0b; font-weight: 600;">DAYS</span>
                     </div>
-                    <form id="addSessionForm" class="flex flex-col gap-5">
-                        <div class="flex flex-col gap-1.5">
-                            <label for="subject" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Subject</label>
-                            <select id="subject" class="premium-input bg-slate-900/50" required>
-                                <option value="" disabled selected>Select Subject...</option>
-                                <!-- Subjects populated dynamically -->
-                            </select>
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label for="topic" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Topic</label>
-                            <input type="text" id="topic" class="premium-input bg-slate-900/50" placeholder="e.g. Thermodynamics" required>
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label for="dateRead" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Date Read</label>
-                            <input type="date" id="dateRead" class="premium-input bg-slate-900/50 [color-scheme:dark]" required>
-                        </div>
-                        <button type="submit" class="premium-btn-primary mt-2">
-                            <i class="fa-solid fa-arrow-right"></i> Add to Tracker
-                        </button>
-                    </form>
-                </section>
+                    <div class="countdown-divider" style="width: 1px; height: 50px; background: rgba(255,255,255,0.1);">
+                    </div>
+                    <div class="countdown-item" style="text-align: center;">
+                        <span class="countdown-label"
+                            style="display: block; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;"
+                            id="exam2Label">Exam 2
+                            in</span>
+                        <span id="boardCountdown" class="countdown-days"
+                            style="display: block; font-size: 2.5rem; font-weight: 800; color: #f59e0b; text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);">--</span>
+                        <span class="countdown-unit"
+                            style="font-size: 0.9rem; color: #f59e0b; font-weight: 600;">DAYS</span>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Right Column: Revisions Dashboard -->
-                <section class="lg:col-span-2 flex flex-col gap-4">
-                    <div class="premium-card flex-1 border-pink-500/10" id="todayRevisionsPanel">
-                        <div class="section-header mb-6 pb-4 border-b border-white/5">
-                            <div>
-                                <div class="section-eyebrow mb-2">Immediate Action Queue</div>
-                                <h2 class="text-lg font-bold flex items-center gap-2 text-slate-200 m-0">
-                                <i class="fa-solid fa-fire text-pink-500"></i> Today's Revisions
-                            </h2>
-                            </div>
-                        </div>
-                        <div id="todayRevisionList" class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <!-- Revision Cards dynamically injected -->
+            <!-- Dashboard Top: AI Insight + Timer in a 2-col row on desktop, stacked on mobile -->
+            <div class="dashboard-top-widgets"
+                style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: var(--card-gap, 1rem);">
+                <!-- AI Psychology Insight -->
+                <div class="glass-panel ai-insight-widget"
+                    style="border-color: rgba(236, 72, 153, 0.3); background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(236, 72, 153, 0.05));">
+                    <h3
+                        style="margin-bottom: 0.5rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #fbcfe8;">
+                        <i class="fa-solid fa-brain"></i> <span
+                            style="background: linear-gradient(to right, #6366f1, #ec4899); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">AI
+                            Psychology Insight</span>
+                    </h3>
+                    <p id="dailyInsightText"
+                        style="font-size: 0.95rem; color: var(--text-primary); line-height: 1.5; font-style: italic;">
+                        "Loading insight..."</p>
+                </div>
+                <!-- 5-Minute Timer -->
+                <div class="glass-panel timer-widget"
+                    style="text-align: center; border-color: rgba(16, 185, 129, 0.3);">
+                    <h3
+                        style="margin-bottom: 0.4rem; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: #34d399;">
+                        <i class="fa-solid fa-stopwatch"></i> 5-Min Anti-Procrastination Rule
+                    </h3>
+                    <p
+                        style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.3;">
+                        Commit to just 5 minutes. The Zeigarnik effect forces your brain to finish what it starts.</p>
+                    <div id="countdownDisplay"
+                        style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.75rem; font-variant-numeric: tabular-nums;">
+                        05:00</div>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                        <button id="btnStartTimer" class="btn-primary"
+                            style="width: auto; padding: 0.5rem 1.25rem; font-size: 0.9rem; background: var(--color-computer);"><i
+                                class="fa-solid fa-play"></i> Start</button>
+                        <button id="btnResetTimer" class="btn-utility"
+                            style="width: auto; padding: 0.5rem 0.75rem; font-size: 0.9rem; border-radius: 0.75rem;"><i
+                                class="fa-solid fa-rotate-right"></i> Reset</button>
+                    </div>
+                </div>
+                <!-- Slot: JS moves Today's Revisions here when due — spans full width -->
+                <div id="todayRevisionsSlot" style="grid-column: 1 / -1;"></div>
+            </div>
+
+            <!-- Left Column: Add New Study Session Form -->
+            <section class="add-session-section glass-panel">
+                <h2><i class="fa-solid fa-plus-circle"></i> Log New Session</h2>
+                <form id="addSessionForm">
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <select id="subject" required>
+                            <option value="" disabled selected>Select Subject...</option>
+                            <!-- Subjects populated dynamically from profile -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="topic">Topic / Chapter</label>
+                        <input type="text" id="topic" placeholder="e.g. Thermodynamics, Calculus..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateRead">Date Read</label>
+                        <input type="date" id="dateRead" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Add to Tracker <i
+                            class="fa-solid fa-arrow-right"></i></button>
+                </form>
+            </section>
+
+            <!-- Right Column: Dashboard & Topic List -->
+            <section class="dashboard-section">
+                <!-- Today's Revisions (default home — JS moves to todayRevisionsSlot when revisions exist) -->
+                <div class="today-revisions glass-panel highlight-panel" id="todayRevisionsPanel">
+                    <div class="panel-header">
+                        <h2><i class="fa-solid fa-fire"></i> Today's Revisions</h2>
+                        <span id="currentDateDisplay" class="date-badge"></span>
+                    </div>
+                    <div id="todayRevisionList" class="revision-cards">
+                        <!-- Revision Cards dynamically injected via JavaScript -->
                     </div>
                 </div>
 
                 <!-- All Tracked Topics & Filters -->
-                <div class="premium-card border-indigo-500/10">
-                    <div class="section-header">
-                        <div>
-                            <div class="section-eyebrow mb-2">Revision Inventory</div>
-                            <h2 class="text-lg font-bold mb-0 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-book-open text-indigo-400"></i> Ongoing Revisions</h2>
-                        </div>
+                <div class="all-topics glass-panel">
+                    <h2><i class="fa-solid fa-book-open"></i> Ongoing Revisions</h2>
+                    <div class="filter-group" id="subjectFilterGroup">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <!-- Subject filters populated dynamically from profile -->
                     </div>
-                    <div class="flex flex-wrap gap-2 mb-6" id="subjectFilterGroup">
-                        <button class="filter-btn active bg-indigo-500 text-white font-medium px-4 py-2 rounded-xl transition-colors hover:-translate-y-0.5 shadow-md shadow-indigo-500/20 text-[0.9rem]" data-filter="all">All</button>
-                        <!-- Subject filters populated dynamically -->
-                    </div>
-                    <div id="allTopicsList" class="flex flex-col gap-3">
-                        <!-- Listed Items dynamically injected -->
+                    <div id="allTopicsList" class="topics-list">
+                        <!-- Listed Items dynamically injected via JavaScript -->
                     </div>
                 </div>
             </section>
-            </div>
-            </div>
         </main>
 
-
         <!-- Table View -->
-        <main id="tableView" class="view-section flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="true">
-            <!-- Table View Header -->
-            <div class="px-2">
-                <h1 class="premium-heading mb-1">Study Logs Map</h1>
-                <p class="premium-subtext">Track your chapter completion status and revision drops across all subjects.</p>
-            </div>
-
-            <div class="premium-card p-0 overflow-hidden md:mx-2 border-indigo-500/10 flex flex-col">
-                <div class="p-6 pb-4 border-b border-white/5 bg-gradient-to-r from-slate-900/50 to-transparent">
-                    <h2 class="text-lg font-bold mb-0 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-table-list text-indigo-400"></i> Subject Status Board</h2>
+        <main id="tableView" class="table-content view-section">
+            <div class="glass-panel table-panel">
+                <div class="table-header-section">
+                    <h2><i class="fa-solid fa-table-list"></i> Subject Logs & Status</h2>
                 </div>
 
-                <div class="flex overflow-x-auto bg-black/20 border-b border-white/5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" id="subjectTabsGroup">
-                    <!-- Subject tabs dynamically populated -->
+                <div class="subject-tabs" id="subjectTabsGroup">
+                    <!-- Subject tabs populated dynamically from profile -->
                 </div>
 
-                <div class="overflow-x-auto p-0">
-                    <table class="w-full border-collapse min-w-[600px] text-left">
+                <div class="table-container">
+                    <table class="revision-table">
                         <thead>
                             <tr>
-                                <th class="p-[1rem_1.5rem] bg-black/30 border-b border-white/10 text-slate-400 font-medium text-[0.9rem] uppercase tracking-[1px]">Chapter / Topic</th>
-                                <th class="p-[1rem_1.5rem] bg-black/30 border-b border-white/10 text-slate-400 font-medium text-[0.9rem] uppercase tracking-[1px]">Date Read</th>
-                                <th class="p-[1rem_1.5rem] bg-black/30 border-b border-white/10 text-slate-400 font-medium text-[0.9rem] uppercase tracking-[1px] text-center">2-Day Rev</th>
-                                <th class="p-[1rem_1.5rem] bg-black/30 border-b border-white/10 text-slate-400 font-medium text-[0.9rem] uppercase tracking-[1px] text-center">4-Day Rev</th>
-                                <th class="p-[1rem_1.5rem] bg-black/30 border-b border-white/10 text-slate-400 font-medium text-[0.9rem] uppercase tracking-[1px] text-center">7-Day Rev</th>
+                                <th>Chapter / Topic</th>
+                                <th>Date Read</th>
+                                <th class="center-col">2-Day Rev</th>
+                                <th class="center-col">4-Day Rev</th>
+                                <th class="center-col">7-Day Rev</th>
                             </tr>
                         </thead>
-                        <tbody id="revisionTableBody" class="[&>tr]:transition-colors [&>tr]:duration-200 [&>tr:hover]:bg-white/5 [&>tr:last-child>td]:border-b-0">
+                        <tbody id="revisionTableBody">
                             <!-- Table rows injected via JS -->
                         </tbody>
                     </table>
@@ -368,242 +342,250 @@
         </main>
 
         <!-- Time Tracker View -->
-        <main id="hourLogView" class="view-section flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="true">
+        <main id="hourLogView" class="main-content view-section">
             <!-- Time Tracker Header -->
-            <div class="px-2">
-                <h1 class="premium-heading mb-1">Log Activity</h1>
-                <p class="premium-subtext">Every minute counts. Log your progress instantly and build momentum.</p>
+            <div class="view-header" style="grid-column: 1 / -1; margin-top: -0.5rem; margin-bottom: 0.5rem; padding: 0;">
+                <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; letter-spacing: -0.5px;">Log Activity</h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Every minute counts. Let's log your progress instantly and build that momentum.</p>
             </div>
 
-            <!-- Analytics Summary -->
-            <div class="premium-card text-center border-emerald-500/10 bg-gradient-to-br from-emerald-500/5 to-transparent flex flex-col justify-center items-center py-10 md:mx-2">
-                <div class="text-[3.5rem] md:text-[4.5rem] font-extrabold leading-none mb-2 bg-gradient-to-r from-emerald-400 to-emerald-600 text-transparent bg-clip-text drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]" id="totalHoursToday">0.0</div>
-                <div class="text-emerald-500/60 text-[0.85rem] font-bold tracking-[0.2em] uppercase">Hours Logged Today</div>
+            <!-- Analytics Summary - MOVED TO TOP -->
+            <div class="time-tracker-analytics glass-panel highlight-panel"
+                style="grid-column: 1 / -1; padding: 1.5rem;">
+                <div class="analytics-value" id="totalHoursToday" style="font-size: 2.8rem;">0.0</div>
+                <div class="analytics-label" style="font-size: 0.9rem;">Hours Logged Today</div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:px-2">
-                <!-- Input Section -->
-                <section class="premium-card lg:col-span-1 border-indigo-500/10 flex flex-col gap-2">
-                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200"><i class="fa-solid fa-stopwatch text-emerald-400"></i> New Log</h2>
+            <!-- Input Section -->
+            <section class="add-session-section glass-panel">
+                <h2><i class="fa-solid fa-stopwatch" style="color: var(--color-computer);"></i> Log Activity</h2>
 
-                    <form id="addTimeLogForm" class="flex flex-col gap-5">
+                <form id="addTimeLogForm">
 
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Task / Activity Name</label>
-                            <input type="text" id="timeTaskInput" class="premium-input bg-slate-900/50" required placeholder="e.g. Math homework" autocomplete="off">
-                        </div>
-
-                        <!-- Quick Activity Chips -->
-                        <div id="quickActivityChips" class="hidden mb-1 gap-1.5 flex-wrap justify-start">
-                            <!-- Chips injected here -->
-                        </div>
-
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Subject</label>
-                            <select id="timeSubjectInput" class="premium-input bg-slate-900/50 text-[0.95rem]">
-                                <option value="">General / Other</option>
-                                <!-- Subjects populated dynamically -->
-                                <option value="Sleep">Sleep</option>
-                            </select>
-                        </div>
-
-                        <!-- Time block -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="flex flex-col gap-1.5">
-                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Start</label>
-                                <input type="time" id="timeStartInput" class="premium-input bg-slate-900/50" required>
-                            </div>
-                            <div class="flex flex-col gap-1.5">
-                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">End</label>
-                                <input type="time" id="timeEndInput" class="premium-input bg-slate-900/50" required>
-                            </div>
-                        </div>
-
-                        <!-- Intelligent Quick Duration Buttons -->
-                        <div id="quickDurationContainer" class="flex gap-2 flex-wrap justify-start">
-                            <button type="button" class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10 w-auto" data-mins="15">+15m</button>
-                            <button type="button" class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10 w-auto" data-mins="30">+30m</button>
-                            <button type="button" class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10 w-auto" data-mins="45">+45m</button>
-                            <button type="button" class="premium-btn-secondary px-3 py-1.5 text-[0.8rem] text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10 w-auto" data-mins="60">+1h</button>
-                        </div>
-
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Date</label>
-                            <input type="date" id="timeDateInput" class="premium-input bg-slate-900/50 [color-scheme:dark]" required>
-                        </div>
-
-                        <div class="flex flex-col gap-1.5">
-                            <div class="flex justify-between items-center mb-1 lg:hidden">
-                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Notes</label>
-                                <button type="button" id="btnClearNotes" class="hidden text-slate-500 hover:text-slate-300 transition-colors text-xs font-bold uppercase"><i class="fa-solid fa-xmark"></i> Clear</button>
-                            </div>
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider hidden lg:block">Notes</label>
-                            <textarea id="timeNotesInput" class="premium-input bg-slate-900/50 resize-y min-h-[60px]" placeholder="Brief description... (Optional)" autocomplete="off" rows="2"></textarea>
-                            <div id="smartNoteSuggestions" class="hidden mt-2 gap-1.5 flex-wrap justify-start"></div>
-                        </div>
-                        
-                        <button type="submit" class="premium-btn-primary bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20 mt-2">
-                            <i class="fa-solid fa-arrow-right"></i> Save Log
-                        </button>
-                    </form>
-                </section>
-
-                <!-- History Feed Section -->
-                <section class="lg:col-span-2 flex flex-col gap-4">
-                    <div class="premium-card flex-1 border-indigo-500/10">
-                        <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
-                            <h2 class="mb-0 text-lg font-bold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-timeline text-indigo-400"></i> Activity History</h2>
-                            <input type="date" id="historyDateFilter" class="bg-black/30 border border-white/10 text-white rounded-lg px-3 py-1.5 outline-none font-sans [color-scheme:dark] text-[0.85rem]">
-                        </div>
-                        <div id="timeLogFeed" class="flex flex-col gap-4">
-                            <!-- Populated by JS -->
-                        </div>
+                    <div class="form-group">
+                        <label>Task / Activity Name</label>
+                        <input type="text" id="timeTaskInput" required
+                            placeholder="e.g. Math homework, Coding side-project" autocomplete="off">
                     </div>
-                </section>
-            </div>
+
+                    <!-- Quick Activity Chips (shown below task input as smart suggestions) -->
+                    <div id="quickActivityChips" class="quick-activity-chips" style="display: none; margin-bottom: 0.8rem; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-start;">
+                        <!-- Chips injected here -->
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subject <span style="font-size: 0.8em; opacity: 0.6;">(for accurate
+                                analytics)</span></label>
+                        <select id="timeSubjectInput">
+                            <option value="">General / Other</option>
+                            <!-- Subjects populated dynamically from profile -->
+                            <option value="Sleep">Sleep</option>
+                        </select>
+                    </div>
+
+                    <!-- Start Time: its own full row -->
+                    <div class="form-group">
+                        <label>Start Time</label>
+                        <input type="time" id="timeStartInput" required style="width: 100%; box-sizing: border-box;">
+                    </div>
+
+                    <!-- End Time: its own row, with smart duration buttons above -->
+                    <div class="form-group">
+                        <label>End Time</label>
+                        <!-- Intelligent Quick Duration Buttons -->
+                        <div id="quickDurationContainer" class="quick-duration-container" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; justify-content: flex-start;">
+                            <button type="button" class="btn-duration" data-mins="15">+15m</button>
+                            <button type="button" class="btn-duration" data-mins="30">+30m</button>
+                            <button type="button" class="btn-duration" data-mins="45">+45m</button>
+                            <button type="button" class="btn-duration" data-mins="60">+1h</button>
+                        </div>
+                        <input type="time" id="timeEndInput" required style="width: 100%; box-sizing: border-box;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="timeDateInput" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <label style="margin-bottom: 0;">Short Notes <span style="font-size: 0.8em; opacity: 0.6;">(Describe what you did)</span></label>
+                            <button type="button" id="btnClearNotes" class="btn-clear-notes" title="Clear Notes" style="display: none; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem; transition: all 0.2s;">
+                                <i class="fa-solid fa-xmark"></i> Clear
+                            </button>
+                        </div>
+                        <textarea id="timeNotesInput"
+                            placeholder="Describe what you worked on... (Optional)"
+                            autocomplete="off" rows="2"></textarea>
+                        <!-- Smart Note Suggestions -->
+                        <div id="smartNoteSuggestions" class="smart-note-suggestions" style="display: none; margin-top: 0.5rem; gap: 0.4rem; flex-wrap: wrap;"></div>
+                    </div>
+                    <button type="submit" class="btn-primary"
+                        style="background: var(--color-computer); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                        Save Log <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </section>
+
+            <!-- History Feed Section -->
+            <section class="dashboard-section">
+                <div class="glass-panel">
+                    <div class="panel-header">
+                        <h2><i class="fa-solid fa-timeline"></i> Activity History</h2>
+                        <!-- simple date filter via native date picker to see other days -->
+                        <input type="date" id="historyDateFilter"
+                            style="background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: white; border-radius: 1rem; padding: 0.5rem 1rem; outline: none; font-family: inherit;">
+                    </div>
+                    <div id="timeLogFeed" class="time-log-feed">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
         </main>
 
         <!-- AI Insights View -->
-        <main id="insightsView" class="view-section flex flex-col gap-6 pt-2 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] lg:pb-12 px-0" aria-hidden="true">
-            <!-- Insights Header -->
-            <div class="px-2">
-                <h1 class="premium-heading mb-1">AI Insights</h1>
-                <p class="premium-subtext">Analyze your performance and get personalized study feedback.</p>
-            </div>
-
+        <main id="insightsView" class="view-section insights-view">
             <!-- API Key Configuration -->
-            <div class="premium-card flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-amber-500/20 bg-gradient-to-r from-slate-900 to-amber-500/5 hover:border-amber-500/30 md:mx-2">
-                <div class="flex-1">
-                    <h3 class="text-[1rem] font-bold text-amber-400 flex items-center gap-2 mb-1 uppercase tracking-wide"><i class="fa-solid fa-key"></i> Groq API Key <span class="text-xs font-medium text-slate-500">(Free)</span></h3>
-                    <p id="apiKeyStatus" class="text-[0.85rem] text-slate-400">No API key configured — <a href="https://console.groq.com/keys" target="_blank" class="text-amber-500 opacity-80 hover:opacity-100 hover:underline transition-all">Get free key here</a></p>
-                </div>
-                <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto mt-2 lg:mt-0">
-                    <input type="password" id="geminiApiKeyInput" placeholder="Paste Groq key..." class="premium-input lg:w-[280px] bg-slate-900/50" autocomplete="off">
-                    <button id="btnSaveApiKey" class="premium-btn-primary bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-amber-500/20"><i class="fa-solid fa-check"></i> Save</button>
+            <div class="glass-panel insights-api-config">
+                <div class="api-config-row">
+                    <div class="api-config-info">
+                        <h3><i class="fa-solid fa-key" style="color: #fbbf24;"></i> Groq API Key <span
+                                style="font-size: 0.75em; opacity: 0.6;">(Free)</span></h3>
+                        <p id="apiKeyStatus">No API key configured — <a href="https://console.groq.com/keys"
+                                target="_blank" style="color: #a5b4fc; text-decoration: underline;">Get free key
+                                here</a></p>
+                    </div>
+                    <div class="api-config-actions">
+                        <input type="password" id="geminiApiKeyInput" placeholder="Paste your Groq API key..."
+                            autocomplete="off">
+                        <button id="btnSaveApiKey" class="btn-save-key"><i class="fa-solid fa-check"></i> Save</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="md:px-2 flex flex-col gap-6">
-                <!-- Period Selector + Generate Button -->
-                <div class="flex flex-col sm:flex-row gap-4 justify-between items-center relative z-10 w-full mb-1">
-                    <div class="flex p-1 bg-black/40 border border-white/10 rounded-xl w-full sm:w-auto" id="periodSelectorGroup">
-                        <button class="period-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg text-[0.85rem] font-bold tracking-wide uppercase transition-all text-slate-400 hover:text-slate-200" data-period="today">Today</button>
-                        <button class="period-btn flex-1 sm:flex-none px-4 py-2 rounded-lg text-[0.85rem] font-bold tracking-wide uppercase transition-all text-slate-400 hover:text-slate-200" data-period="week">Week</button>
-                        <button class="period-btn flex-1 sm:flex-none px-4 py-2 rounded-lg text-[0.85rem] font-bold tracking-wide uppercase transition-all text-slate-400 hover:text-slate-200" data-period="month">Month</button>
-                    </div>
-                    <button id="btnGenerateInsights" class="w-full sm:w-auto premium-btn-primary bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 shadow-[0_8px_20px_rgba(236,72,153,0.25)] border-none">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Insights
-                    </button>
+            <!-- Period Selector + Generate Button -->
+            <div class="insights-controls">
+                <div class="period-selector">
+                    <button class="period-btn active" data-period="today">Today</button>
+                    <button class="period-btn" data-period="week">This Week</button>
+                    <button class="period-btn" data-period="month">This Month</button>
                 </div>
+                <button id="btnGenerateInsights" class="btn-generate">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Insights
+                </button>
+            </div>
 
-                <!-- Insights History Browser -->
-                <div class="premium-card flex items-center justify-between py-4 shadow-md bg-white/[0.02]">
-                    <div class="flex items-center w-full justify-between lg:justify-start lg:gap-8">
-                        <button id="btnPrevDay" class="w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
-                        <div class="flex flex-1 justify-center lg:flex-none items-center gap-3">
-                            <i class="fa-solid fa-calendar-day text-indigo-400 text-lg"></i>
-                            <input type="date" id="insightsDatePicker" class="bg-transparent border-none text-white font-sans text-[1.1rem] md:text-[1.25rem] font-bold cursor-pointer outline-none [color-scheme:dark] select-none text-center">
-                        </div>
-                        <button id="btnNextDay" class="w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
+            <!-- Insights History Browser -->
+            <div class="insights-history-bar glass-panel">
+                <div class="history-nav">
+                    <button id="btnPrevDay" class="history-arrow" title="Previous Day"><i
+                            class="fa-solid fa-chevron-left"></i></button>
+                    <div class="history-date-display">
+                        <i class="fa-solid fa-calendar-day" style="color: #6366f1;"></i>
+                        <input type="date" id="insightsDatePicker"
+                            style="background: transparent; border: none; color: white; font-family: inherit; font-size: 0.95rem; cursor: pointer; outline: none;">
                     </div>
-                    <span id="insightsHistoryStatus" class="hidden lg:block text-[0.85rem] text-slate-400 font-bold tracking-widest uppercase"></span>
+                    <button id="btnNextDay" class="history-arrow" title="Next Day"><i
+                            class="fa-solid fa-chevron-right"></i></button>
                 </div>
+                <span id="insightsHistoryStatus"
+                    style="font-size: 0.8rem; color: var(--text-secondary); opacity: 0.7;"></span>
+            </div>
 
-                <!-- Charts Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Chart 1 -->
-                    <div class="premium-card flex flex-col border-indigo-500/10 hover:border-indigo-500/20 md:p-6">
-                        <h3 class="text-[1.05rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-area text-indigo-400"></i> Study Hours Trend</h3>
-                        <p class="text-slate-400 text-[0.8rem] mb-4 leading-snug font-medium">Daily study hours over the selected period. <span id="chartRangeStudy" class="opacity-60 ml-1"></span></p>
-                        <div class="relative w-full h-[220px] md:h-[260px]">
-                            <canvas id="chartStudyHours"></canvas>
-                        </div>
-                    </div>
-                    <!-- Chart 2 -->
-                    <div class="premium-card flex flex-col border-pink-500/10 hover:border-pink-500/20 md:p-6">
-                        <h3 class="text-[1.05rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-pink-400"></i> Subject Distribution</h3>
-                        <p class="text-slate-400 text-[0.8rem] mb-4 leading-snug font-medium">Time per subject. <span id="chartRangeSubject" class="opacity-60 ml-1"></span></p>
-                        <div class="relative w-full h-[220px] md:h-[260px]">
-                            <canvas id="chartSubjectDist"></canvas>
-                        </div>
-                    </div>
-                    <!-- Chart 3 -->
-                    <div class="premium-card flex flex-col border-emerald-500/10 hover:border-emerald-500/20 md:p-6">
-                        <h3 class="text-[1.05rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-bar text-emerald-400"></i> Peak Productivity</h3>
-                        <p class="text-slate-400 text-[0.8rem] mb-4 leading-snug font-medium">Which hours you study most. <span id="chartRangePeak" class="opacity-60 ml-1"></span></p>
-                        <div class="relative w-full h-[220px] md:h-[260px]">
-                            <canvas id="chartPeakHours"></canvas>
-                        </div>
-                    </div>
-                    <!-- Chart 4 -->
-                    <div class="premium-card flex flex-col border-amber-500/10 hover:border-amber-500/20 md:p-6">
-                        <h3 class="text-[1.05rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-bullseye text-amber-400"></i> Revision Completion</h3>
-                        <p class="text-slate-400 text-[0.8rem] mb-4 leading-snug font-medium">2-4-7 spaced repetition progress. <span id="chartRangeRev" class="opacity-60 ml-1"></span></p>
-                        <div class="relative w-full h-[220px] md:h-[260px]">
-                            <canvas id="chartRevisionRate"></canvas>
-                        </div>
-                    </div>
-                    <!-- AI Rating Timeline (Full Row) -->
-                    <div class="premium-card flex flex-col border-amber-500/10 hover:border-amber-500/20 col-span-1 lg:col-span-2 md:p-6">
-                        <h3 class="text-[1.05rem] font-bold text-slate-200 mb-1 flex items-center gap-2"><i class="fa-solid fa-star text-amber-400"></i> Score Trend</h3>
-                        <p class="text-slate-400 text-[0.8rem] mb-4 leading-snug font-medium">Your performance score history across analyzed periods.</p>
-                        <div class="relative w-full h-[200px] md:h-[240px]">
-                            <canvas id="chartAIRating"></canvas>
-                        </div>
+            <!-- Charts Grid -->
+            <div class="insights-grid">
+                <div class="chart-panel glass-panel">
+                    <h3><i class="fa-solid fa-chart-area" style="color: #6366f1;"></i> Study Hours Trend</h3>
+                    <p class="chart-description">Daily study hours over the selected period. <span id="chartRangeStudy"
+                            style="opacity:0.6;"></span></p>
+                    <div class="chart-container">
+                        <canvas id="chartStudyHours"></canvas>
                     </div>
                 </div>
-
-                <!-- AI Feedback Panel -->
-                <div class="premium-card border-indigo-500/20 shadow-[0_0_40px_rgba(99,102,241,0.06)] relative overflow-hidden flex flex-col mb-4">
-                    <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
-                        <h3 class="text-[1.25rem] font-bold flex items-center gap-2 text-indigo-300"><i class="fa-solid fa-robot"></i> Analysis</h3>
-                        <div id="aiLoadingIndicator" class="flex gap-1.5" style="display: none;">
-                            <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                            <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                            <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce"></div>
-                        </div>
+                <div class="chart-panel glass-panel">
+                    <h3><i class="fa-solid fa-chart-pie" style="color: #ec4899;"></i> Subject Distribution</h3>
+                    <p class="chart-description">Time per subject. <span id="chartRangeSubject"
+                            style="opacity:0.6;"></span></p>
+                    <div class="chart-container">
+                        <canvas id="chartSubjectDist"></canvas>
                     </div>
-
-                    <div id="aiRatingContainer" class="flex flex-col items-center justify-center p-6 bg-indigo-500/5 rounded-2xl border border-indigo-500/10 mb-6" style="display: none;">
-                        <div class="flex items-baseline gap-1 text-[3.5rem] font-bold text-slate-100 leading-none mb-3">
-                            <span id="aiRatingNumber">0</span><span class="text-[1.5rem] text-slate-400 opacity-60">/10</span>
-                        </div>
-                        <div id="aiRatingStars" class="flex gap-1.5 text-[1.4rem] text-slate-600 mb-2">
-                            <!-- Stars injected via JS -->
-                        </div>
-                        <div class="text-[0.8rem] font-bold text-indigo-300 uppercase tracking-widest">Overall Score</div>
+                </div>
+                <div class="chart-panel glass-panel">
+                    <h3><i class="fa-solid fa-chart-bar" style="color: #10b981;"></i> Peak Productivity Hours</h3>
+                    <p class="chart-description">Which hours you study most. <span id="chartRangePeak"
+                            style="opacity:0.6;"></span></p>
+                    <div class="chart-container">
+                        <canvas id="chartPeakHours"></canvas>
                     </div>
+                </div>
+                <div class="chart-panel glass-panel">
+                    <h3><i class="fa-solid fa-bullseye" style="color: #f59e0b;"></i> Revision Completion</h3>
+                    <p class="chart-description">2-4-7 spaced repetition progress. <span id="chartRangeRev"
+                            style="opacity:0.6;"></span></p>
+                    <div class="chart-container">
+                        <canvas id="chartRevisionRate"></canvas>
+                    </div>
+                </div>
+                <div class="chart-panel glass-panel" style="grid-column: 1 / -1; min-height: 280px;">
+                    <h3><i class="fa-solid fa-star" style="color: #fbbf24;"></i> AI Rating Trend</h3>
+                    <p class="chart-description">Your performance score history across analyzed periods.</p>
+                    <div class="chart-container" style="height: 220px;">
+                        <canvas id="chartAIRating"></canvas>
+                    </div>
+                </div>
+            </div>
 
-                    <div id="aiFeedbackContent" class="text-[0.95rem] text-slate-300 leading-relaxed [&>p]:mb-4 [&>ul]:mb-4 [&>ul]:pl-5 [&>ul]:list-disc [&>ul>li]:mb-2 [&>ol]:mb-4 [&>ol]:pl-5 [&>ol]:list-decimal">
-                        <div class="flex flex-col items-center justify-center py-10 px-4 text-center text-slate-400">
-                            <i class="fa-solid fa-wand-magic-sparkles text-3xl text-indigo-500/50 mb-3"></i>
-                            <p class="max-w-md font-medium">Click <strong class="text-slate-300">"Generate Insights"</strong> to receive personalized study feedback.</p>
-                        </div>
+            <!-- AI Feedback Panel -->
+            <div class="ai-feedback-panel glass-panel">
+                <div class="ai-feedback-header">
+                    <h3><i class="fa-solid fa-robot" style="color: #6366f1;"></i> AI Analysis & Feedback</h3>
+                    <div id="aiLoadingIndicator" class="ai-loading" style="display: none;">
+                        <div class="ai-loading-dot"></div>
+                        <div class="ai-loading-dot"></div>
+                        <div class="ai-loading-dot"></div>
+                    </div>
+                </div>
+
+                <div id="aiRatingContainer" class="ai-rating-container" style="display: none;">
+                    <div class="ai-rating-score">
+                        <span id="aiRatingNumber">0</span><span class="ai-rating-total">/10</span>
+                    </div>
+                    <div id="aiRatingStars" class="ai-rating-stars">
+                        <!-- Stars injected via JS -->
+                    </div>
+                    <div class="ai-rating-label">Overall Performance</div>
+                </div>
+
+                <div id="aiFeedbackContent" class="ai-feedback-content">
+                    <div class="ai-placeholder">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <p>Click <strong>"Generate AI Insights"</strong> to get personalized study feedback & analysis
+                            powered by Groq AI.</p>
                     </div>
                 </div>
             </div>
         </main>
-    </div><!-- end .app-container -->
+    </div>
 
     <!-- =================== SLIDE-UP PROFILE DRAWER =================== -->
-    <div id="profileDrawerOverlay" class="bottom-sheet-overlay fixed inset-0 bg-black/60 z-[1000] opacity-0 invisible transition-all duration-300" style="display:none;"></div>
-    <div id="profileDrawer" class="bottom-sheet fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-xl border-t border-white/10 rounded-t-[2.5rem] z-[1001] px-6 pt-5 pb-[calc(2rem+env(safe-area-inset-bottom))] translate-y-full transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.32,0.72,0,1)] max-h-[90vh] overflow-y-auto shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
-        <div class="w-12 h-[6px] bg-white/20 rounded-full mx-auto mb-6"></div>
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-[1.5rem] font-black tracking-tight flex items-center gap-2 m-0 text-slate-100"><i class="fa-solid fa-user-graduate text-indigo-400"></i> My Study Profile</h2>
-            <button id="btnCloseProfile" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/10 border-none text-slate-400 cursor-pointer transition-all hover:bg-white/20 hover:text-slate-200" title="Close"><i class="fa-solid fa-xmark"></i></button>
+    <div id="profileDrawerOverlay" class="bottom-sheet-overlay" style="display: none;"></div>
+    <div id="profileDrawer" class="bottom-sheet">
+        <div class="bottom-sheet-handle"></div>
+        <div class="bottom-sheet-header">
+            <h2><i class="fa-solid fa-user-graduate" style="color: #6366f1;"></i> My Study Profile</h2>
+            <button id="btnCloseProfile" class="sheet-close-btn" title="Close"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div>
-            <p class="text-slate-400 text-[0.95rem] mb-6 leading-relaxed font-medium">Set up your profile to personalize subjects, AI feedback, and exam tracking. Your profile syncs automatically.</p>
-            <form id="profileForm" class="profile-form flex flex-col gap-5">
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider" for="profileName">Your Name <span class="font-medium opacity-60">(optional)</span></label>
-                    <input type="text" id="profileName" placeholder="e.g. Susant" autocomplete="off" class="premium-input bg-slate-950/50 py-3">
+        <div class="bottom-sheet-content">
+            <p class="profile-desc">Set up your profile to personalize subjects, AI feedback, and exam tracking. Your profile syncs automatically.</p>
+            <form id="profileForm" class="profile-form">
+                <div class="form-group">
+                    <label for="profileName">Your Name <span style="font-size: 0.8em; opacity: 0.6;">(optional)</span></label>
+                    <input type="text" id="profileName" placeholder="e.g. Susant" autocomplete="off">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider" for="profileGrade">Grade Level</label>
-                        <select id="profileGrade" class="premium-input bg-slate-950/50 py-3">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="profileGrade">Class / Grade Level</label>
+                        <select id="profileGrade">
                             <option value="">Select...</option>
                             <option value="Class 1">Class 1</option>
                             <option value="Class 2">Class 2</option>
@@ -621,316 +603,400 @@
                             <option value="Master">Master</option>
                         </select>
                     </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider" for="profileFaculty">Faculty</label>
-                        <select id="profileFaculty" class="premium-input bg-slate-950/50 py-3">
-                            <option value="">Select...</option>
-                            <option value="Science">Science</option>
-                            <option value="Management">Management</option>
-                            <option value="Humanities">Humanities</option>
-                            <option value="Education">Education</option>
-                            <option value="Law">Law</option>
-                            <option value="Custom">Custom (pick your own)</option>
-                        </select>
-                        <input type="text" id="profileCustomFaculty" placeholder="Type your faculty name..." style="display:none; margin-top:0.5rem;" autocomplete="off" class="premium-input bg-slate-950/50 py-3">
+                </div>
+                
+                <div class="form-group">
+                    <label for="profileFaculty">Faculty</label>
+                    <select id="profileFaculty">
+                        <option value="">Select...</option>
+                        <option value="Science">Science</option>
+                        <option value="Management">Management</option>
+                        <option value="Humanities">Humanities</option>
+                        <option value="Education">Education</option>
+                        <option value="Law">Law</option>
+                        <option value="Custom">Custom (pick your own)</option>
+                    </select>
+                    <input type="text" id="profileCustomFaculty" placeholder="Type your faculty name..."
+                        style="display: none; margin-top: 0.5rem;" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label>Subjects <span style="font-size: 0.8em; opacity: 0.6;">(auto-filled from faculty)</span></label>
+                    <div id="profileSubjectTags" class="profile-subject-tags">
+                        <!-- Tags rendered dynamically -->
+                    </div>
+                    <div class="profile-add-subject-row">
+                        <input type="text" id="profileNewSubject" placeholder="Add a subject..." autocomplete="off">
+                        <button type="button" id="btnAddSubject" class="btn-add-subject"><i class="fa-solid fa-plus"></i></button>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Subjects <span class="font-medium opacity-60">(auto-filled from faculty)</span></label>
-                    <div id="profileSubjectTags" class="profile-subject-tags flex flex-wrap gap-2 py-1"></div>
-                    <div class="flex gap-2 mt-1">
-                        <input type="text" id="profileNewSubject" placeholder="Add a subject..." autocomplete="off" class="premium-input flex-1 bg-slate-950/50 py-3">
-                        <button type="button" id="btnAddSubject" class="premium-btn-secondary px-4 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/10"><i class="fa-solid fa-plus text-lg"></i></button>
+                <div class="form-group" style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <label>Exam Dates <span style="font-size: 0.8em; opacity: 0.6;">(optional)</span></label>
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="profileExam1Label" style="font-size: 0.8rem;">Exam 1 Name</label>
+                            <input type="text" id="profileExam1Label" placeholder="e.g. Pre-Board">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="profileExam1Date" style="font-size: 0.8rem;">Exam 1 Date</label>
+                            <input type="date" id="profileExam1Date">
+                        </div>
                     </div>
-                </div>
-
-                <div class="flex flex-col gap-4 mt-2">
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Exam Dates <span class="font-medium opacity-60">(optional)</span></label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[0.7rem] font-semibold text-slate-500 ml-1 uppercase tracking-wide" for="profileExam1Label">Exam 1 Name</label>
-                            <input type="text" id="profileExam1Label" placeholder="e.g. Pre-Board" class="premium-input bg-slate-950/50 py-2.5 text-[0.9rem]">
+                    <div class="form-row" style="margin-top: 0.5rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="profileExam2Label" style="font-size: 0.8rem;">Exam 2 Name</label>
+                            <input type="text" id="profileExam2Label" placeholder="e.g. Final Board">
                         </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[0.7rem] font-semibold text-slate-500 ml-1 uppercase tracking-wide" for="profileExam1Date">Exam 1 Date</label>
-                            <input type="date" id="profileExam1Date" class="premium-input bg-slate-950/50 py-2.5 text-[0.9rem] [color-scheme:dark]">
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[0.7rem] font-semibold text-slate-500 ml-1 uppercase tracking-wide" for="profileExam2Label">Exam 2 Name</label>
-                            <input type="text" id="profileExam2Label" placeholder="e.g. Final Board" class="premium-input bg-slate-950/50 py-2.5 text-[0.9rem]">
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[0.7rem] font-semibold text-slate-500 ml-1 uppercase tracking-wide" for="profileExam2Date">Exam 2 Date</label>
-                            <input type="date" id="profileExam2Date" class="premium-input bg-slate-950/50 py-2.5 text-[0.9rem] [color-scheme:dark]">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="profileExam2Date" style="font-size: 0.8rem;">Exam 2 Date</label>
+                            <input type="date" id="profileExam2Date">
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="premium-btn-primary bg-indigo-600 hover:bg-indigo-500 shadow-[0_8px_20px_rgba(79,70,229,0.3)] mt-2">
-                    <i class="fa-solid fa-cloud-arrow-up text-lg"></i> Save &amp; Sync Profile
+                <button type="submit" class="btn-primary profile-save-btn" style="margin-top: 1.5rem; width: 100%; border-radius: 1rem; padding: 1rem;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Save & Sync Profile
                 </button>
             </form>
         </div>
-    </div></div>
+    </div>
 
     <!-- =================== INFO MODAL =================== -->
     <div id="infoModal" class="modal-overlay" style="display:none;">
-        <div class="premium-card bg-slate-900 w-full max-w-2xl max-h-[85vh] overflow-y-auto m-4 flex flex-col gap-6 relative shadow-[0_20px_60px_rgba(0,0,0,0.6)] border border-indigo-500/20">
-            <div class="flex justify-between items-center sticky top-0 bg-slate-900/90 backdrop-blur-md z-10 py-5 px-6 border-b border-indigo-500/10 -mx-6 -mt-6 mb-2">
-                <h2 class="text-[1.3rem] font-bold tracking-tight text-white m-0 flex items-center gap-2"><i class="fa-solid fa-circle-info text-indigo-400"></i> About HourForge</h2>
-                <button id="btnCloseInfo" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/10 border-none text-slate-400 cursor-pointer transition-all hover:bg-white/20 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+        <div class="modal-box info-modal">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-circle-info" style="color:#6366f1;"></i> About HourForge</h2>
+                <button id="btnCloseInfo" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <!-- Section 1: What is this? -->
-            <div class="flex flex-col gap-3">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-bullseye mr-2"></i> What is HourForge?</h3>
-                <p class="text-[0.95rem] text-slate-300 leading-relaxed bg-slate-950/40 p-5 rounded-2xl border border-white/5">HourForge is a <strong>personal academic productivity app</strong> built to help
+            <div class="info-section">
+                <h3 class="info-section-title"><i class="fa-solid fa-bullseye"></i> What is HourForge?</h3>
+                <p class="info-text">HourForge is a <strong>personal academic productivity app</strong> built to help
                     students at every level study smarter, not harder. It combines <strong>spaced repetition
                         revision</strong>, <strong>time logging</strong>, and <strong>AI-powered feedback</strong> — all
                     in one place, completely offline-capable.</p>
             </div>
 
             <!-- Section 2: Features -->
-            <div class="flex flex-col gap-3">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-star mr-2"></i> Core Features</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-indigo-500/15 text-indigo-400"><i class="fa-solid fa-brain"></i></div>
+            <div class="info-section">
+                <h3 class="info-section-title"><i class="fa-solid fa-star"></i> Features</h3>
+                <div class="info-features-grid">
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(99,102,241,0.15); color:#818cf8;"><i
+                                class="fa-solid fa-brain"></i></div>
                         <div>
-                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Spaced Repetition</div>
-                            <div class="text-[0.8rem] text-slate-500 leading-snug">Auto-scheduled 2-4-7 day revision reminders to beat forgetting</div>
+                            <div class="info-feature-name">Spaced Repetition</div>
+                            <div class="info-feature-desc">Auto-scheduled 2-4-7 day revision reminders to beat
+                                forgetting</div>
                         </div>
                     </div>
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-clock"></i></div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(16,185,129,0.15); color:#34d399;"><i
+                                class="fa-solid fa-clock"></i></div>
                         <div>
-                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Time Tracker</div>
-                            <div class="text-[0.8rem] text-slate-500 leading-snug">Log every study session with subject, start/end time and notes</div>
+                            <div class="info-feature-name">Time Tracker</div>
+                            <div class="info-feature-desc">Log every study session with subject, start/end time and
+                                notes</div>
                         </div>
                     </div>
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-amber-500/15 text-amber-400"><i class="fa-solid fa-robot"></i></div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(245,158,11,0.15); color:#fbbf24;"><i
+                                class="fa-solid fa-robot"></i></div>
                         <div>
-                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">AI Insights</div>
-                            <div class="text-[0.8rem] text-slate-500 leading-snug">Get brutally honest, data-driven feedback from an AI study coach</div>
+                            <div class="info-feature-name">AI Insights</div>
+                            <div class="info-feature-desc">Get brutally honest, data-driven feedback from an AI study
+                                coach</div>
                         </div>
                     </div>
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-pink-500/15 text-pink-400"><i class="fa-solid fa-chart-line"></i></div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(236,72,153,0.15); color:#f472b6;"><i
+                                class="fa-solid fa-chart-line"></i></div>
                         <div>
-                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Progress Charts</div>
-                            <div class="text-[0.8rem] text-slate-500 leading-snug">Visual breakdown of daily hours, subject distribution, and revision rate</div>
+                            <div class="info-feature-name">Progress Charts</div>
+                            <div class="info-feature-desc">Visual breakdown of daily hours, subject distribution, and
+                                revision rate</div>
                         </div>
                     </div>
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-red-500/15 text-red-400"><i class="fa-solid fa-hourglass-half"></i></div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(139,92,246,0.15); color:#c084fc;"><i
+                                class="fa-solid fa-user-graduate"></i></div>
                         <div>
-                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Pomodoro Timer</div>
-                            <div class="text-[0.8rem] text-slate-500 leading-snug">Built-in focus timer with short and long break modes</div>
+                            <div class="info-feature-name">Student Profiles</div>
+                            <div class="info-feature-desc">Works for any student — configure your faculty, subjects and
+                                exam dates</div>
                         </div>
                     </div>
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-start hover:bg-white/5 transition-colors">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-sky-500/15 text-sky-400"><i class="fa-solid fa-floppy-disk"></i></div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(239,68,68,0.15); color:#f87171;"><i
+                                class="fa-solid fa-hourglass-half"></i></div>
                         <div>
-                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Auto Backup</div>
-                            <div class="text-[0.8rem] text-slate-500 leading-snug">Link a local folder and auto-save your data</div>
+                            <div class="info-feature-name">Pomodoro Timer</div>
+                            <div class="info-feature-desc">Built-in focus timer with short and long break modes</div>
+                        </div>
+                    </div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(14,165,233,0.15); color:#38bdf8;"><i
+                                class="fa-solid fa-floppy-disk"></i></div>
+                        <div>
+                            <div class="info-feature-name">Auto Backup</div>
+                            <div class="info-feature-desc">Link a local folder and auto-save your data — never lose
+                                progress</div>
+                        </div>
+                    </div>
+                    <div class="info-feature-card">
+                        <div class="info-feature-icon" style="background: rgba(251,191,36,0.15); color:#fcd34d;"><i
+                                class="fa-solid fa-fire"></i></div>
+                        <div>
+                            <div class="info-feature-name">Streak Tracking</div>
+                            <div class="info-feature-desc">Daily study streaks to keep you accountable and consistent
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Section 3: How to use -->
-            <div class="flex flex-col gap-3">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-map mr-2"></i> How to Use</h3>
-                <div class="flex flex-col gap-3">
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-4 items-start hover:bg-white/5 transition-colors">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-indigo-500/20 text-indigo-400 font-black text-[0.8rem]">1</div>
-                        <div>
-                            <div class="font-bold text-[0.95rem] text-slate-200 mb-1">Set Up Your Profile</div>
-                            <div class="text-[0.85rem] text-slate-400 leading-snug">Tap the <strong>Profile</strong> icon → Choose your grade & faculty → Subjects auto-fill. Add exam dates for a countdown timer.</div>
+            <div class="info-section">
+                <h3 class="info-section-title"><i class="fa-solid fa-map"></i> How to Use</h3>
+                <div class="info-steps">
+                    <div class="info-step">
+                        <div class="info-step-num">1</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Set Up Your Profile</div>
+                            <div class="info-step-desc">Tap the <strong>Profile</strong> icon → Choose your grade &
+                                faculty → Subjects auto-fill. Add exam dates for a countdown timer.</div>
                         </div>
                     </div>
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-4 items-start hover:bg-white/5 transition-colors">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-indigo-500/20 text-indigo-400 font-black text-[0.8rem]">2</div>
-                        <div>
-                            <div class="font-bold text-[0.95rem] text-slate-200 mb-1">Log What You Study</div>
-                            <div class="text-[0.85rem] text-slate-400 leading-snug">On the <strong>Dashboard</strong>, add a session. The app auto-schedules revision reminders.</div>
+                    <div class="info-step">
+                        <div class="info-step-num">2</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Log What You Study</div>
+                            <div class="info-step-desc">On the <strong>Dashboard</strong>, add a session with the
+                                subject, chapter/topic, and date. The app auto-schedules revision reminders.</div>
                         </div>
                     </div>
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-4 items-start hover:bg-white/5 transition-colors">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-indigo-500/20 text-indigo-400 font-black text-[0.8rem]">3</div>
-                        <div>
-                            <div class="font-bold text-[0.95rem] text-slate-200 mb-1">Do Your Revisions</div>
-                            <div class="text-[0.85rem] text-slate-400 leading-snug">Check the <strong>Due Today</strong> list daily. Green circles = done. Orange hourglass = revision due. Red = overdue!</div>
+                    <div class="info-step">
+                        <div class="info-step-num">3</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Do Your Revisions</div>
+                            <div class="info-step-desc">Check the <strong>Due Today</strong> list daily. Green circles =
+                                done. Orange hourglass = revision due. Red = overdue!</div>
+                        </div>
+                    </div>
+                    <div class="info-step">
+                        <div class="info-step-num">4</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Track Your Hours</div>
+                            <div class="info-step-desc">Go to <strong>Time Tracker</strong> and log each activity with a
+                                start time, end time, and subject. This feeds the charts and AI.</div>
+                        </div>
+                    </div>
+                    <div class="info-step">
+                        <div class="info-step-num">5</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Get AI Feedback</div>
+                            <div class="info-step-desc">Visit <strong>AI Insights</strong>, enter your Groq API key
+                                (free), and generate a daily/weekly/monthly mentor analysis of your habits.</div>
+                        </div>
+                    </div>
+                    <div class="info-step">
+                        <div class="info-step-num">6</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Backup Your Data</div>
+                            <div class="info-step-desc">Use the <strong>Auto-Backup</strong> button to link a folder on
+                                your device. Data is saved automatically so you never lose it.</div>
+                        </div>
+                    </div>
+                    <div class="info-step">
+                        <div class="info-step-num">7</div>
+                        <div class="info-step-content">
+                            <div class="info-step-title">Add to Home Screen (as App)</div>
+                            <div class="info-step-desc">
+                                <strong>iPhone (Safari):</strong> Tap the Share icon
+                                <i class="fa-solid fa-arrow-up-from-bracket" style="color:#38bdf8;"></i>
+                                → <em class="info-action-text">"Add to Home Screen"</em> → Tap Add. HourForge will appear as an app
+                                icon!<br><br>
+                                <strong>Android (Chrome):</strong> Tap the 3-dot menu
+                                <i class="fa-solid fa-ellipsis-vertical" style="color:#34d399;"></i>
+                                → <em>"Add to Home screen"</em> or look for the install banner at the bottom of the
+                                screen.
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Section 4: Export / Import & Backup -->
-            <div class="flex flex-col gap-3">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-database mr-2"></i> Your Data — Safe &amp; Portable</h3>
-                <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 flex gap-3 items-center text-indigo-200">
-                    <i class="fa-solid fa-shield-halved text-xl text-indigo-400 shrink-0"></i>
-                    <div class="text-[0.85rem] leading-snug">All your data is stored <strong>only on your device</strong> — no account, no cloud, fully private.</div>
+            <div class="info-section">
+                <h3 class="info-section-title"><i class="fa-solid fa-database"></i> Your Data — Safe &amp; Portable</h3>
+                <div class="info-callout info-callout-blue">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <div>All your data is stored <strong>only on your device</strong> — no account, no cloud, fully
+                        private.</div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-center hover:bg-white/5 transition-colors">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-sky-500/15 text-sky-400"><i class="fa-solid fa-download"></i></div>
+                <div class="info-data-actions">
+                    <div class="info-data-card">
+                        <div class="info-data-icon" style="background:rgba(14,165,233,0.15);color:#38bdf8;"><i
+                                class="fa-solid fa-download"></i></div>
                         <div>
-                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Export Data</div>
-                            <div class="text-[0.8rem] text-slate-500 leading-snug">Download backup JSON.</div>
+                            <div class="info-data-title">Export Data</div>
+                            <div class="info-data-desc">Download a backup JSON — use the <strong>Export</strong> button
+                                in the header backup controls.</div>
                         </div>
                     </div>
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-center hover:bg-white/5 transition-colors">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-upload"></i></div>
+                    <div class="info-data-card">
+                        <div class="info-data-icon" style="background:rgba(52,211,153,0.15);color:#34d399;"><i
+                                class="fa-solid fa-upload"></i></div>
                         <div>
-                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Import Data</div>
-                            <div class="text-[0.8rem] text-slate-500 leading-snug">Restore from backup.</div>
+                            <div class="info-data-title">Import Data</div>
+                            <div class="info-data-desc">Switching device? Use <strong>Import</strong> to restore from a
+                                previously exported file instantly.</div>
                         </div>
                     </div>
-                    <div class="bg-slate-950/40 border border-white/5 rounded-xl p-4 flex gap-3 items-center hover:bg-white/5 transition-colors sm:col-span-2">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-purple-500/15 text-purple-400"><i class="fa-solid fa-folder-open"></i></div>
+                    <div class="info-data-card">
+                        <div class="info-data-icon" style="background:rgba(139,92,246,0.15);color:#c084fc;"><i
+                                class="fa-solid fa-folder-open"></i></div>
                         <div>
-                            <div class="font-bold text-[0.9rem] text-slate-200 mb-0.5">Auto-Backup Folder</div>
-                            <div class="text-[0.8rem] text-slate-500 leading-snug">Link a local directory inside settings for auto-saving.</div>
+                            <div class="info-data-title">Auto-Backup Folder</div>
+                            <div class="info-data-desc">Link a local folder and the app auto-saves in the background —
+                                great for peace of mind.</div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="mt-4 pt-6 border-t border-white/10 text-center text-slate-500 text-[0.85rem]">
-                <p>Built with <i class="fa-solid fa-heart text-red-500/80 mx-1"></i> for students everywhere &nbsp;·&nbsp; <strong>HourForge v2.0</strong></p>
+            <div class="info-footer">
+                <p>Built with ❤️ for students everywhere &nbsp;·&nbsp; <strong>HourForge v2.0</strong></p>
             </div>
         </div>
     </div>
 
     <!-- =================== POMODORO MODAL (Converted to Tab) =================== -->
-    <main id="pomodoroView" class="view-section pomodoro-view pt-3 pb-[calc(80px+1.5rem+env(safe-area-inset-bottom))] max-[768px]:pb-[7.5rem] px-2 max-[768px]:px-2">
-        <div class="glass-panel flex flex-col items-center justify-center min-h-[80vh] relative pt-6 mb-4">
-            <div class="modal-header w-full justify-center mb-4 border-b-0 pb-0">
-                <h2 class="m-0 flex items-center gap-2 text-xl font-bold text-slate-200"><i class="fa-solid fa-hourglass-half text-red-500"></i> Pomodoro Timer</h2>
+    <main id="pomodoroView" class="view-section pomodoro-view">
+        <div class="glass-panel pomodoro-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; position: relative; padding-top: 1.5rem;">
+            <div class="modal-header" style="width: 100%; justify-content: center; margin-bottom: 1rem; border-bottom: none; padding-bottom: 0;">
+                <h2 style="margin: 0;"><i class="fa-solid fa-hourglass-half" style="color:#ef4444;"></i> Pomodoro Timer</h2>
             </div>
 
             <!-- Mode selector -->
-            <div class="flex justify-center gap-1.5 mb-6 bg-black/20 px-1.5 py-1.5 rounded-full border border-white/10">
-                <button class="pomo-mode-btn active bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/10 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-[0_4px_12px_rgba(99,102,241,0.4)]" data-mode="focus">Focus</button>
-                <button class="pomo-mode-btn bg-transparent border-none text-slate-400 px-5 py-2 rounded-full font-sans text-[0.85rem] font-bold cursor-pointer transition-all hover:bg-white/10 [&.active]:bg-indigo-500 [&.active]:text-white [&.active]:shadow-[0_4px_12px_rgba(99,102,241,0.4)]" data-mode="short">Break</button>
-                <button class="bg-transparent border-none text-slate-400 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all hover:bg-white/10 hover:text-white" id="btnToggleRing" title="Toggle Ring"><i class="fa-solid fa-bullseye"></i></button>
+            <div class="pomo-mode-bar">
+                <button class="pomo-mode-btn active" data-mode="focus" data-duration="3000">Focus</button>
+                <button class="pomo-mode-btn" data-mode="short" data-duration="600">Break</button>
+                <button class="pomo-mode-btn" id="btnToggleRing" title="Toggle Ring Style"><i class="fa-solid fa-bullseye"></i></button>
             </div>
 
             <!-- Custom time settings (Collapsible) -->
-            <details class="pomo-settings-details w-full max-w-sm mb-6 bg-white/5 rounded-2xl px-4 py-2 border border-white/10">
-                <summary class="cursor-pointer text-slate-400 font-medium outline-none py-2 select-none">ΓÜÖ∩╕Å Timer Settings</summary>
-                <div class="flex justify-between gap-3 mt-4 mb-4">
-                    <div class="flex flex-col items-center gap-1 flex-1">
-                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Focus <span class="font-normal opacity-60">min</span></label>
-                        <input type="number" id="pomoFocusMin" value="50" min="1" max="120" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
+            <details class="pomo-settings-details" style="width: 100%; max-width: 400px; margin-top: 1rem; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 0.5rem 1rem;">
+                <summary style="cursor: pointer; color: var(--text-secondary); font-weight: 500; outline: none; padding: 0.5rem 0;">⚙️ Timer Settings</summary>
+                <div class="pomo-settings-row" style="margin-top: 1rem; display: flex; justify-content: space-between;">
+                    <div class="pomo-setting" style="text-align: center;">
+                        <label>Focus <span class="pomo-setting-unit">min</span></label>
+                        <input type="number" id="pomoFocusMin" class="pomo-setting-input" value="50" min="1" max="120" style="width: 60px;">
                     </div>
-                    <div class="flex flex-col items-center gap-1 flex-1">
-                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Break <span class="font-normal opacity-60">min</span></label>
-                        <input type="number" id="pomoShortMin" value="10" min="0" max="60" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
+                    <div class="pomo-setting" style="text-align: center;">
+                        <label>Break <span class="pomo-setting-unit">min</span></label>
+                        <input type="number" id="pomoShortMin" class="pomo-setting-input" value="10" min="0" max="60" style="width: 60px;">
                     </div>
-                    <div class="flex flex-col items-center gap-1 flex-1">
-                        <label class="text-[0.68rem] font-semibold text-slate-400 uppercase tracking-[0.4px] whitespace-nowrap">Total <span class="font-normal opacity-60">hrs</span></label>
-                        <input type="number" id="pomoTotalHours" value="4" min="0.1" step="0.1" max="24" class="pomo-setting-input w-full bg-white/5 border border-white/10 rounded-lg text-slate-200 font-bold text-center text-[0.95rem] px-1 py-1.5 appearance-none focus:outline-none focus:border-indigo-500/50">
+                    <div class="pomo-setting" style="text-align: center;">
+                        <label>Duration <span class="pomo-setting-unit">hrs</span></label>
+                        <input type="number" id="pomoTotalHours" class="pomo-setting-input" value="4" min="0.1" step="0.1" max="24" style="width: 60px;">
                     </div>
                 </div>
             </details>
 
-            <div class="pomo-fullscreen-btn-wrap flex gap-3 mb-6 flex-wrap justify-center">
-                <button id="btnPomoPrev" class="btn-fullscreen-inline flex items-center gap-2 bg-white/10 hover:bg-white/15 border-none text-white px-5 py-2.5 rounded-full cursor-pointer transition-all text-[0.95rem]" title="Reset Timer">
+            <div class="pomo-fullscreen-btn-wrap" style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; justify-content: center;">
+                <button id="btnPomoPrev" class="btn-fullscreen-inline" title="Reset Timer" style="background: rgba(255,255,255,0.1); border:none; padding: 0.6rem 1.2rem; border-radius: 2rem; color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
                     <i class="fa-solid fa-rotate-left"></i> Reset
                 </button>
-                <button id="btnPomoFullscreen" class="btn-fullscreen-inline flex items-center gap-2 bg-white/10 hover:bg-white/15 border-none text-white px-5 py-2.5 rounded-full cursor-pointer transition-all text-[0.95rem]" title="Full Screen">
-                    <i class="fa-solid fa-expand"></i> Full Screen
+                <button id="btnPomoFullscreen" class="btn-fullscreen-inline" title="Full Screen" style="background: rgba(255,255,255,0.1); border:none; padding: 0.6rem 1.2rem; border-radius: 2rem; color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+                    <i class="fa-solid fa-expand"></i> Enter Full Screen
                 </button>
             </div>
 
             <!-- Timer ring -->
-            <div class="relative w-[220px] h-[220px] mx-auto mb-8 mt-2">
-                <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
-                    <circle class="fill-none stroke-white/[.06] stroke-[6]" cx="60" cy="60" r="56" />
-                    <circle class="fill-none stroke-[6] [stroke-linecap:round] [stroke-dasharray:351.86] [transition:stroke-dashoffset_1s_linear,stroke_0.4s_ease]"
-                        id="pomoRingFill" cx="60" cy="60" r="56" stroke="#ef4444" stroke-dashoffset="0" />
+            <div class="pomo-ring-wrap" style="margin: 1.5rem 0;">
+                <svg class="pomo-ring" viewBox="0 0 120 120">
+                    <circle class="pomo-ring-bg" cx="60" cy="60" r="54" />
+                    <circle class="pomo-ring-fill" id="pomoRingFill" cx="60" cy="60" r="54" stroke-dasharray="339.29"
+                        stroke-dashoffset="0" />
                 </svg>
-                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                    <div id="pomoTime" class="text-[3.5rem] font-extrabold tracking-[-1.5px] leading-none bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent drop-shadow-md">50:00</div>
-                    <div id="pomoModeLabel" class="text-[0.9rem] text-slate-400 uppercase tracking-[1.5px] mt-2 font-semibold">Focus</div>
+                <div class="pomo-timer-display">
+                    <div id="pomoTime">50:00</div>
+                    <div id="pomoModeLabel" class="pomo-mode-label">Focus</div>
                 </div>
             </div>
             
-            <div class="pomo-controls flex justify-center items-center gap-4 mb-6">
-                <button id="btnPomoBack" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center cursor-pointer transition-all bg-white/[.07] border border-white/10 text-slate-400 text-[0.95rem] hover:bg-white/[.12] hover:text-white hover:scale-105" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
-                <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn w-[60px] h-[60px] rounded-full flex items-center justify-center cursor-pointer transition-all bg-gradient-to-br from-red-500 to-red-600 border-none text-white text-[1.2rem] shadow-[0_6px_20px_rgba(239,68,68,0.35)] hover:scale-110 hover:shadow-[0_8px_28px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
-                <button id="btnPomoSkip" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center cursor-pointer transition-all bg-white/[.07] border border-white/10 text-slate-400 text-[0.95rem] hover:bg-white/[.12] hover:text-white hover:scale-105" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
+            <div class="pomo-controls">
+                <button id="btnPomoBack" class="pomo-ctrl-btn" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
+                <button id="btnPomoStartPause" class="pomo-ctrl-btn pomo-main-btn"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
+                <button id="btnPomoSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
             </div>
 
-            <!-- Session counter -->
-            <div class="pomo-sessions flex flex-col items-center gap-1 mb-4">
-                <div class="pomo-session-label text-[0.75rem] text-slate-400 uppercase tracking-[0.5px]">Current Cycle</div>
-                <div id="pomoSessionCount" class="pomo-session-count text-[1.2rem] font-semibold mt-1 text-indigo-400">1 of 4</div>
+            <!-- Session dots -->
+            <div class="pomo-sessions" style="margin-top: 1rem;">
+                <div class="pomo-session-label">Current Cycle</div>
+                <div id="pomoSessionCount" class="pomo-session-count" style="font-size: 1.2rem; margin-top: 0.3rem; color: var(--accent-primary);">1 of 4</div>
             </div>
 
 
-            <!-- ====== FULLSCREEN FLOATING CONTROLS (shown only in fullscreen via overrides.css) ====== -->
+            <!-- ========= FULLSCREEN FLOATING CONTROLS ========= -->
             <div id="pomoFullscreenControls" class="fs-visible" style="flex-direction: column; align-items: center; gap: 1rem;">
-                <div class="flex gap-4 items-center">
-                    <div class="fs-cycle-text text-indigo-400 text-[1.1rem] font-bold bg-[rgba(10,8,32,0.7)] backdrop-blur-md px-5 py-1.5 rounded-[20px] border border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.5)]" id="fsCycleText">1 of 4</div>
-                    <button id="btnFsToggleRing" class="pomo-ctrl-btn w-10 h-10 text-[1.1rem] rounded-full flex items-center justify-center bg-white/[.07] border border-white/10 text-slate-400 cursor-pointer transition-all hover:bg-white/[.12] hover:text-white" title="Toggle Ring"><i class="fa-solid fa-bullseye"></i></button>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="fs-cycle-text" id="fsCycleText" style="margin: 0;">1 of 4</div>
+                    <button id="btnFsToggleRing" class="pomo-ctrl-btn" title="Toggle Ring Style" style="width: 40px; height: 40px; font-size: 1.1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-bullseye"></i></button>
                 </div>
-                <div class="flex gap-4 items-center">
-                    <button id="btnFsPrev" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center bg-white/[.07] border border-white/10 text-slate-400 cursor-pointer transition-all hover:bg-white/[.12] hover:text-white text-[0.95rem]" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
-                    <button id="btnFsBack" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center bg-white/[.07] border border-white/10 text-slate-400 cursor-pointer transition-all hover:bg-white/[.12] hover:text-white text-[0.95rem]" title="Previous"><i class="fa-solid fa-backward-step"></i></button>
-                    <button id="btnFsPlayPause" class="pomo-ctrl-btn pomo-main-btn w-[60px] h-[60px] rounded-full flex items-center justify-center bg-gradient-to-br from-red-500 to-red-600 border-none text-white text-[1.2rem] shadow-[0_6px_20px_rgba(239,68,68,0.35)] cursor-pointer transition-all hover:scale-110"><i class="fa-solid fa-play" id="pomoFsPlayIcon"></i></button>
-                    <button id="btnFsSkip" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center bg-white/[.07] border border-white/10 text-slate-400 cursor-pointer transition-all hover:bg-white/[.12] hover:text-white text-[0.95rem]" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
-                    <button id="btnFsExit" class="pomo-ctrl-btn w-11 h-11 rounded-full flex items-center justify-center bg-white/[.07] border border-white/10 text-slate-400 cursor-pointer transition-all hover:bg-white/[.12] hover:text-white text-[0.95rem] ml-2" title="Exit Fullscreen"><i class="fa-solid fa-compress"></i></button>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button id="btnFsPrev" class="pomo-ctrl-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
+                    <button id="btnFsBack" class="pomo-ctrl-btn" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>
+                    <button id="btnFsPlayPause" class="pomo-ctrl-btn pomo-main-btn"><i class="fa-solid fa-play" id="pomoFsPlayIcon"></i></button>
+                    <button id="btnFsSkip" class="pomo-ctrl-btn" title="Skip"><i class="fa-solid fa-forward-step"></i></button>
+                    <button id="btnFsExit" class="pomo-ctrl-btn" title="Exit Full Screen" style="margin-left: 0.5rem;"><i class="fa-solid fa-compress"></i></button>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- =================== FLOATING MINI TIMER =================== -->
-    <div id="pomoMiniTimer" class="pomo-mini-timer fixed bottom-5 right-5 z-[8888] items-center gap-2.5 bg-[rgba(15,23,42,0.92)] border border-white/10 border-l-[3px] border-l-red-500 rounded-2xl px-3.5 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.45),0_0_20px_rgba(239,68,68,0.1)]" style="display:none;">
-        <button id="pomoMiniPlay" class="pomo-mini-play w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all shrink-0 bg-red-500/15 border border-red-500/30 text-red-400 text-[0.8rem] hover:bg-red-500/30 hover:scale-110">
+    <div id="pomoMiniTimer" class="pomo-mini-timer" style="display:none;">
+        <button id="pomoMiniPlay" class="pomo-mini-play">
             <i class="fa-solid fa-play" id="pomoMiniPlayIcon"></i>
         </button>
-        <div class="pomo-mini-info flex flex-col items-center min-w-[52px]">
-            <div id="pomoMiniTime" class="pomo-mini-time text-[1.05rem] font-extrabold tracking-[-0.5px] text-slate-100 leading-none">50:00</div>
-            <div id="pomoMiniLabel" class="pomo-mini-label text-[0.6rem] text-slate-400 uppercase tracking-[0.5px] mt-[3px]">Focus</div>
+        <div class="pomo-mini-info">
+            <div id="pomoMiniTime" class="pomo-mini-time">50:00</div>
+            <div id="pomoMiniLabel" class="pomo-mini-label">Focus</div>
         </div>
-        <button id="pomoMiniOpen" class="pomo-mini-open w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all shrink-0 bg-white/[.07] border border-white/10 text-slate-400 text-[0.8rem] hover:bg-white/[.12] hover:text-white" title="Open Timer">
+        <button id="pomoMiniOpen" class="pomo-mini-open" title="Open Timer">
             <i class="fa-solid fa-up-right-from-square"></i>
         </button>
     </div>
 
     <!-- ===================== BOTTOM NAV BAR ===================== -->
-    <nav class="fixed bottom-0 left-0 right-0 z-[250] h-[calc(70px+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] flex items-stretch justify-around bg-[#0a0820]/96 border-t border-white/5 shadow-[0_-4px_24px_rgba(0,0,0,0.4)] pointer-events-auto" id="bottomNav">
-        <button class="bottom-nav-item flex-1 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none text-slate-400/60 text-[1.25rem] max-[480px]:text-[1.1rem] max-[480px]:gap-[2px] min-h-[62px] p-[0.4rem_0.25rem_0.5rem] relative transition-colors cursor-pointer active:bg-white/5 [&.active]:text-indigo-400 group active" data-view="dashboardView" aria-label="Dashboard">
-            <span class="absolute top-[6px] w-[4px] h-[4px] rounded-full bg-indigo-400 opacity-0 scale-0 transition-all group-[.active]:opacity-100 group-[.active]:scale-100"></span>
-            <i class="fa-solid fa-layer-group group-[.active]:drop-shadow-[0_0_8px_rgba(129,140,248,0.7)]"></i>
-            <span class="text-[0.62rem] max-[480px]:text-[0.58rem] font-semibold tracking-[0.02em] opacity-80 mt-[1px] group-[.active]:text-indigo-400">Home</span>
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="bottom-nav-item active" data-view="dashboardView" aria-label="Dashboard">
+            <span class="bottom-nav-dot"></span>
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="bottom-nav-label">Home</span>
         </button>
-        <button class="bottom-nav-item flex-1 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none text-slate-400/60 text-[1.25rem] max-[480px]:text-[1.1rem] max-[480px]:gap-[2px] min-h-[62px] p-[0.4rem_0.25rem_0.5rem] relative transition-colors cursor-pointer active:bg-white/5 [&.active]:text-indigo-400 group" data-view="tableView" aria-label="Log Table">
-            <span class="absolute top-[6px] w-[4px] h-[4px] rounded-full bg-indigo-400 opacity-0 scale-0 transition-all group-[.active]:opacity-100 group-[.active]:scale-100"></span>
-            <i class="fa-solid fa-table group-[.active]:drop-shadow-[0_0_8px_rgba(129,140,248,0.7)]"></i>
-            <span class="text-[0.62rem] max-[480px]:text-[0.58rem] font-semibold tracking-[0.02em] opacity-80 mt-[1px] group-[.active]:text-indigo-400">Log</span>
+        <button class="bottom-nav-item" data-view="tableView" aria-label="Log Table">
+            <span class="bottom-nav-dot"></span>
+            <i class="fa-solid fa-table"></i>
+            <span class="bottom-nav-label">Log</span>
         </button>
-        <button class="bottom-nav-item flex-1 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none text-slate-400/60 text-[1.25rem] max-[480px]:text-[1.1rem] max-[480px]:gap-[2px] min-h-[62px] p-[0.4rem_0.25rem_0.5rem] relative transition-colors cursor-pointer active:bg-white/5 [&.active]:text-indigo-400 group" data-view="hourLogView" aria-label="Time Tracker">
-            <span class="absolute top-[6px] w-[4px] h-[4px] rounded-full bg-indigo-400 opacity-0 scale-0 transition-all group-[.active]:opacity-100 group-[.active]:scale-100"></span>
-            <i class="fa-solid fa-clock group-[.active]:drop-shadow-[0_0_8px_rgba(129,140,248,0.7)]"></i>
-            <span class="text-[0.62rem] max-[480px]:text-[0.58rem] font-semibold tracking-[0.02em] opacity-80 mt-[1px] group-[.active]:text-indigo-400">Hours</span>
+        <button class="bottom-nav-item" data-view="hourLogView" aria-label="Time Tracker">
+            <span class="bottom-nav-dot"></span>
+            <i class="fa-solid fa-clock"></i>
+            <span class="bottom-nav-label">Hours</span>
         </button>
-        <button class="bottom-nav-item flex-1 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none text-slate-400/60 text-[1.25rem] max-[480px]:text-[1.1rem] max-[480px]:gap-[2px] min-h-[62px] p-[0.4rem_0.25rem_0.5rem] relative transition-colors cursor-pointer active:bg-white/5 [&.active]:text-indigo-400 group" data-view="insightsView" aria-label="AI Insights">
-            <span class="absolute top-[6px] w-[4px] h-[4px] rounded-full bg-indigo-400 opacity-0 scale-0 transition-all group-[.active]:opacity-100 group-[.active]:scale-100"></span>
-            <i class="fa-solid fa-wand-magic-sparkles group-[.active]:drop-shadow-[0_0_8px_rgba(129,140,248,0.7)]"></i>
-            <span class="text-[0.62rem] max-[480px]:text-[0.58rem] font-semibold tracking-[0.02em] opacity-80 mt-[1px] group-[.active]:text-indigo-400">Insights</span>
+        <button class="bottom-nav-item" data-view="insightsView" aria-label="AI Insights">
+            <span class="bottom-nav-dot"></span>
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span class="bottom-nav-label">Insights</span>
         </button>
-        <button class="bottom-nav-item flex-1 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none text-slate-400/60 text-[1.25rem] max-[480px]:text-[1.1rem] max-[480px]:gap-[2px] min-h-[62px] p-[0.4rem_0.25rem_0.5rem] relative transition-colors cursor-pointer active:bg-white/5 [&.active]:text-indigo-400 group" data-view="pomodoroView" id="bottomNavPomodoro" aria-label="Pomodoro Timer">
-            <span class="absolute top-[6px] w-[4px] h-[4px] rounded-full bg-indigo-400 opacity-0 scale-0 transition-all group-[.active]:opacity-100 group-[.active]:scale-100"></span>
-            <i class="fa-solid fa-hourglass-half group-[.active]:drop-shadow-[0_0_8px_rgba(129,140,248,0.7)]"></i>
-            <span class="text-[0.62rem] max-[480px]:text-[0.58rem] font-semibold tracking-[0.02em] opacity-80 mt-[1px] group-[.active]:text-indigo-400">Focus</span>
+        <button class="bottom-nav-item" data-view="pomodoroView" id="bottomNavPomodoro" aria-label="Pomodoro Timer">
+            <span class="bottom-nav-dot"></span>
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span class="bottom-nav-label">Focus</span>
         </button>
     </nav>
     
@@ -995,7 +1061,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v36';
+            const CURRENT_SW_VERSION = 'v33';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh

@@ -1,9 +1,18 @@
-const CACHE_NAME = 'hourforge-v36';
+const CACHE_NAME = 'hourforge-v33';
 const ASSETS = [
     './',
     './index.html',
-    './css/tailwind.css',
+    './css/variables.css',
+    './css/base.css',
+    './css/dashboard.css',
+    './css/components.css',
+    './css/insights.css',
+    './css/tablet.css',
+    './css/profile.css',
+    './css/modals.css',
+    './css/pomodoro.css',
     './css/auth.css',
+    './css/layout.css',
     './css/overrides.css',
     './js/config.js',
     './js/utils.js',
@@ -28,19 +37,8 @@ self.addEventListener('install', (e) => {
     // Force the new service worker to take over immediately
     self.skipWaiting();
     e.waitUntil(
-        caches.open(CACHE_NAME).then(async (cache) => {
-            const results = await Promise.allSettled(
-                ASSETS.map((asset) => cache.add(asset))
-            );
-            const failures = results
-                .map((result, index) => ({ result, asset: ASSETS[index] }))
-                .filter(({ result }) => result.status === 'rejected');
-
-            if (failures.length) {
-                // #region agent log
-                fetch('http://127.0.0.1:7317/ingest/ebb4b885-2dc8-4803-826d-97791a2423c5',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'130ae0'},body:JSON.stringify({sessionId:'130ae0',runId:'fix-sw',hypothesisId:'H1',location:'sw.js:install',message:'Service worker precache partially failed',data:{cacheName:CACHE_NAME,assetCount:ASSETS.length,failedAssets:failures.map(({ asset, result }) => ({ asset, error:String(result.reason&&result.reason.message||result.reason) }))},timestamp:Date.now()})}).catch(()=>{});
-                // #endregion
-            }
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(ASSETS);
         })
     );
 });
