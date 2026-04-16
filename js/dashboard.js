@@ -855,9 +855,9 @@ function renderTodayRevisions() {
 function renderAllTopics() {
     allTopicsList.innerHTML = '';
 
-    let filteredSessions = studySessions;
+    let filteredSessions = studySessions.filter(s => !s.deleted);
     if (currentFilter !== 'all') {
-        filteredSessions = studySessions.filter(s => s.subject === currentFilter);
+        filteredSessions = filteredSessions.filter(s => s.subject === currentFilter);
     }
 
     if (filteredSessions.length === 0) {
