@@ -3854,6 +3854,10 @@ main#hourLogView.active {
     height: 100vh !important;
     margin: 0 !important;
     padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 #pomodoroView:fullscreen .pomo-ring-wrap {
     width: 320px;
@@ -3896,6 +3900,10 @@ main#hourLogView.active {
     height: 100vh !important;
     margin: 0 !important;
     padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 #pomodoroView:-webkit-full-screen .pomo-ring-wrap {
     width: 320px;
