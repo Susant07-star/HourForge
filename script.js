@@ -3809,6 +3809,7 @@ const pomoSessionCount = document.getElementById('pomoSessionCount');
 const btnPomoStartPause = document.getElementById('btnPomoStartPause');
 const pomoPlayIcon = document.getElementById('pomoPlayIcon');
 const btnPomoPrev = document.getElementById('btnPomoPrev');
+const btnPomoBack = document.getElementById('btnPomoBack');
 const btnPomoSkip = document.getElementById('btnPomoSkip');
 const btnPomoFullscreen = document.getElementById('btnPomoFullscreen');
 const btnToggleRing = document.getElementById('btnToggleRing');
@@ -3824,6 +3825,7 @@ const pomoTotalHours = document.getElementById('pomoTotalHours');
 const btnFsPrev = document.getElementById('btnFsPrev');
 const btnFsPlayPause = document.getElementById('btnFsPlayPause');
 const pomoFsPlayIcon = document.getElementById('pomoFsPlayIcon');
+const btnFsBack = document.getElementById('btnFsBack');
 const btnFsSkip = document.getElementById('btnFsSkip');
 const fsCycleText = document.getElementById('fsCycleText');
 const pomoFullscreenControls = document.getElementById('pomoFullscreenControls');
@@ -4156,6 +4158,21 @@ if (btnFsSkip) {
         }
     });
 }
+if (btnFsBack) {
+    btnFsBack.addEventListener('click', () => {
+        if (pomoMode === 'short' || pomoMode === 'long') {
+            setPomoMode('focus', isPomoRunning);
+        } else {
+            pomoCurrentCycle--;
+            if (pomoCurrentCycle < 1) {
+                pomoCurrentCycle = 1;
+                setPomoMode('focus', false);
+            } else {
+                setPomoMode('short', isPomoRunning);
+            }
+        }
+    });
+}
 
 if (pomoMiniPlay) pomoMiniPlay.addEventListener('click', toggleTimerGlobal);
 
@@ -4174,6 +4191,21 @@ if (btnPomoSkip) {
                 setPomoMode('focus', false);
             } else {
                 setPomoMode('focus', isPomoRunning);
+            }
+        }
+    });
+}
+if (btnPomoBack) {
+    btnPomoBack.addEventListener('click', () => {
+        if (pomoMode === 'short' || pomoMode === 'long') {
+            setPomoMode('focus', isPomoRunning);
+        } else {
+            pomoCurrentCycle--;
+            if (pomoCurrentCycle < 1) {
+                pomoCurrentCycle = 1;
+                setPomoMode('focus', false);
+            } else {
+                setPomoMode('short', isPomoRunning);
             }
         }
     });
