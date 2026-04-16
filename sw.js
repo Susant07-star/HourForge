@@ -39,7 +39,12 @@ self.addEventListener('install', (e) => {
     self.skipWaiting();
     e.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS);
+            return cache.addAll(ASSETS).catch((err) => {
+                // #region agent log
+                fetch('http://127.0.0.1:7317/ingest/ebb4b885-2dc8-4803-826d-97791a2423c5',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'130ae0'},body:JSON.stringify({sessionId:'130ae0',runId:'pre-fix',hypothesisId:'H1',location:'sw.js:install',message:'Service worker precache addAll failed',data:{cacheName:CACHE_NAME,assetCount:ASSETS.length,error:String(err&&err.message||err)},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
+                throw err;
+            });
         })
     );
 });
