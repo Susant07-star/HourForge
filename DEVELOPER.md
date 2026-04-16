@@ -13,9 +13,18 @@ HourForge is a **Vanilla JS Single Page Application (SPA)** with Progressive Web
 **Core Files:**
 - `index.html`: The monolithic view layer containing all markup, dialogs, and the PWA loading sequence. Views are toggled via CSS `.active` classes.
 - `style.css`: All styling. Uses CSS variables for theming and standard glassmorphism UI.
-- `script.js`: The central "brain". Handles state management, local database wrappers, Supabase auth/sync, and DOM event wiring.
-- `js/charts.js`: Extracted logic for all `Chart.js` rendering and Groq AI API calls.
-- `sw.js`: The Service Worker handling offline caching.
+- `js/`: Directory containing logically split JS files instead of a single monolith.
+  - `config.js`: Profile and dynamic theme config.
+  - `utils.js`: Toast notifications and utilities.
+  - `store.js`: Offline IndexedDB wrapper, local arrays.
+  - `supabase.js`: Cloud DB Sync and Realtime functionality.
+  - `ui.js`: Touch swipe navigator and mobile features.
+  - `timeTracker.js`: Time logging logic.
+  - `dashboard.js`: Examboards, subject rendering, revision lists.
+  - `insights.js`: AI-powered performance analysis.
+  - `pomodoro.js`: Core visual timer engine and fullscreen web-locks.
+  - `charts.js`: Extracted logic for all `Chart.js` rendering and Groq AI API calls.
+- `sw.js`: The Service Worker handling offline caching with the v32 cache.
 
 ---
 
@@ -36,19 +45,19 @@ We use a function called `deepMergeArrays()` in `script.js`.
 
 ---
 
-## 🧭 Code Map (`script.js`)
+## 🧭 Code Map (`js/` Directory)
 
-`script.js` is large. Navigate it using these distinct regions:
+Instead of a monolithic `script.js`, logic is distributed chronologically evaluated chunks:
 
-1. **Setup & Initialization**: Sentry error tracking, Profile defaults, dynamic color generation.
-2. **Global State**: Retrieving `studySessions`, `timeLogs`, `aiRatingsHistory`.
-3. **Storage Wrappers**: IndexedDB helper (`idb`).
-4. **Supabase Auth & Sync**: `onAuthStateChange` listeners, `syncDataWithCloud()`, Realtime subscriptions. Note: Auth relies *only* on `onAuthStateChange(INITIAL_SESSION)`, never `getSession()` (to prevent race conditions).
-5. **App Initialization (`init`)**: Sets UI dates, updates dashboard, calculates streaks.
-6. **Mobile Navigation (Swipe Logic)**: Custom Instagram-style horizontal swipe. **Swipe is completely disabled when `document.fullscreenElement` is set** — this prevents accidental tab changes during Pomodoro fullscreen.
-7. **Core Logic (CRUD)**: Adding sessions, logging time, Pomodoro timer management.
-8. **Render Functions**: `renderAllTopics()`, `renderTimeLogs()`, etc.
-9. **Pomodoro Timer Engine** (`~line 3900+`): `setPomoMode()`, `getTotalCycles()`, `updatePomoDisplay()`, tick loop, audio synthesizers, Wake Lock, and fullscreen idle-fade state machine.
+1. **`js/config.js`**: Setup & Initialization: Sentry error tracking, Profile defaults, color generation.
+2. **`js/utils.js` & `js/store.js`**: Global Helper Functions, Data Retrievals, IndexedDB helper (`idb`).
+3. **`js/supabase.js`**: Supabase Auth & Sync: `onAuthStateChange` listeners, `syncDataWithCloud()`.
+4. **`js/ui.js`**: Mobile Navigation (Swipe Logic): Custom Instagram-style horizontal swipe.
+5. **`js/dashboard.js`**: Core Logic (CRUD) for dashboard view rendering, exam dates.
+6. **`js/timeTracker.js`**: `renderTimeLogs()`, input chips handling.
+7. **`js/insights.js`**: AI processing layout state.
+8. **`js/pomodoro.js`**: Timer Engine (`setPomoMode()`, audio synthesizers, etc.)
+9. **`js/charts.js`**: Native Chart APIs.
 
 ---
 

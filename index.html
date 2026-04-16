@@ -1032,8 +1032,16 @@
     <!-- Background MediaSession Anchor -->
     <audio id="bgSessionAudio" src="silent.wav" loop playsinline preload="auto" style="display:none;"></audio>
 
-    <!-- Main Logic Script -->
-    <script src="script.js"></script>
+    <!-- Main Logic Scripts (Modularized) -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/timeTracker.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/insights.js"></script>
+    <script src="js/pomodoro.js"></script>
     <script src="js/charts.js"></script>
     
     <!-- PWA Service Worker: Force-clear old caches, then register fresh -->
@@ -1041,7 +1049,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v31';
+            const CURRENT_SW_VERSION = 'v32';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh
