@@ -51,34 +51,22 @@
 
 <body>
     <!-- Auth Loading Overlay: shown until Supabase resolves session -->
-    <div id="authLoader" style="
-        position: fixed; inset: 0; z-index: 9999;
-        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 1.5rem; transition: opacity 0.3s ease;
-    ">
-        <i class="fa-solid fa-brain" style="font-size: 3rem; color: #6366f1;"></i>
-        <div style="
-            width: 40px; height: 40px;
-            border: 3px solid rgba(99,102,241,0.3);
-            border-top-color: #6366f1;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        "></div>
-        <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; font-family: Outfit, sans-serif;">Loading HourForge...</p>
+    <div id="authLoader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-6 bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] transition-opacity duration-300">
+        <i class="fa-solid fa-brain text-5xl text-indigo-500"></i>
+        <div class="w-10 h-10 border-[3px] border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+        <p class="text-white/50 text-sm font-sans tracking-wide">Loading HourForge...</p>
     </div>
-    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
     <!-- Full-Screen Login Gate: hidden until auth resolves to NOT LOGGED IN -->
-    <div id="loginGate" class="login-gate" style="display: none;">
-        <div class="login-gate-content">
-            <div class="login-gate-logo">
-                <i class="fa-solid fa-brain"></i>
+    <div id="loginGate" class="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0a0820] p-8" style="display: none;">
+        <div class="bg-[#141235] border border-white/10 rounded-3xl p-[3rem_2rem] max-w-[400px] w-full text-center shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+            <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_10px_25px_rgba(99,102,241,0.4)]">
+                <i class="fa-solid fa-brain text-[2.5rem] text-white"></i>
             </div>
-            <h1>HourForge</h1>
-            <p>Welcome back. Please sign in to sync your study data.</p>
-            <button id="btnGoogleSignIn" class="google-signin-btn">
-                <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="google-logo">
+            <h1 class="text-[2rem] font-bold mb-2 text-slate-200">HourForge</h1>
+            <p class="text-slate-400 mb-8 text-base leading-relaxed">Welcome back. Please sign in to sync your study data.</p>
+            <button id="btnGoogleSignIn" class="w-full flex items-center justify-center gap-3 bg-white text-gray-900 border-none px-6 py-[14px] rounded-xl text-[1.05rem] font-semibold cursor-pointer transition-all duration-200 shadow-sm hover:-translate-y-[2px] hover:shadow-md active:translate-y-0">
+                <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="w-5 h-5">
                 Sign in with Google
             </button>
         </div>
