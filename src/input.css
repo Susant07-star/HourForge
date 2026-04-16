@@ -1,44 +1,213 @@
 @import "tailwindcss";
 
-/* We can put custom tailwind directives here if needed */
-/* Disable the glassy backdrop blur for performance! */
+/* ============================================================
+   TAILWIND THEME TOKENS
+   ============================================================ */
 @theme {
     --color-panel-dark: #13112e;
 }
 
-body {
-    @apply bg-[#0a0820] text-slate-200 overflow-x-hidden;
-    font-family: 'Outfit', sans-serif;
+/* ============================================================
+   GLOBAL BASE
+   ============================================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-/* Static Flat-Dark background instead of the laggy 60fps glass orbs */
+body {
+    @apply bg-[#0a0820] text-slate-200 overflow-x-hidden min-h-screen;
+    font-family: 'Outfit', sans-serif;
+    background:
+        radial-gradient(ellipse at 10% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 88% 85%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+        #0a0820;
+    background-attachment: fixed;
+}
+
+/* Kill the animated orbs from older CSS — kept for safety */
 body::before, body::after {
     display: none !important;
 }
 
-/* Overriding the performance killing glass panels incrementally */
-.glass-panel {
-    @apply bg-[#141235] border border-white/5 shadow-2xl;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+/* Browser date/color picker — invert for dark mode */
+::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.7;
+    cursor: pointer;
 }
 
+/* Select option dropdown background */
+option {
+    background: #1e293b;
+    color: #f8fafc;
+}
+
+/* ============================================================
+   CSS VARIABLES (kept for JS & overrides.css compatibility)
+   ============================================================ */
+:root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --accent-primary: #6366f1;
+    --accent-hover: #4f46e5;
+    --accent-glow: rgba(99, 102, 241, 0.4);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --card-gap: 1.25rem;
+
+    /* Subject Colors — used by JS for dynamic border/bg */
+    --color-physics:   #ef4444;
+    --color-chemistry: #3b82f6;
+    --color-maths:     #f59e0b;
+    --color-computer:  #10b981;
+    --color-english:   #ec4899;
+    --color-nepali:    #8b5cf6;
+}
+
+/* ============================================================
+   GLASS PANEL
+   ============================================================ */
+.glass-panel {
+    @apply bg-[#141235] border border-white/5 rounded-3xl p-8 shadow-2xl;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    contain: layout style;
+}
+
+/* ============================================================
+   APP CONTAINER
+   ============================================================ */
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 64px 1.5rem 1.5rem;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================================
+   VIEW SECTIONS (tab switching)
+   ============================================================ */
+.view-section {
+    display: none;
+    touch-action: pan-y;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.view-section.active {
+    display: grid;
+    gap: var(--card-gap, 1.25rem);
+    align-content: start;
+    opacity: 1;
+    animation: fadeIn 0.35s ease-out forwards;
+}
+
+/* Table view is block, not grid */
+main#tableView.active  { display: block; }
+
+/* Hour log view is grid */
+main#hourLogView.active { display: grid; }
+
+/* Insights view is flex column */
+main#insightsView.active {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Pomodoro full page */
+.pomodoro-view {
+    min-height: 80vh;
+    width: 100%;
+}
+
+/* ============================================================
+   MAIN CONTENT GRID (dashboard, hourlog)
+   ============================================================ */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--card-gap, 1.25rem);
+}
+
+@media (max-width: 1100px) {
+    .main-content { grid-template-columns: 1fr; }
+}
+
+/* Prevent grid blowout from overflowing children */
+.main-content > *, .view-section > * { min-width: 0; }
+
+/* ============================================================
+   BOTTOM NAV
+   ============================================================ */
 .bottom-nav {
     @apply bg-[#0d0b26] border-t border-white/5;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 }
 
-/* Pomodoro mode button — active state toggled by JS */
+/* ============================================================
+   FORMS (global — used across multiple views)
+   ============================================================ */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-primary {
+    @apply w-full py-4 px-4 bg-indigo-500 hover:bg-indigo-400 text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer border-none font-sans text-[1.1rem];
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:hover  { transform: translateY(-2px); }
+.btn-primary:active { transform: translateY(0); }
+
+/* ============================================================
+   POMODORO — JS-toggled active states & animations
+   ============================================================ */
 .pomo-mode-btn.active {
     @apply bg-indigo-500 text-white;
     box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
-}
-
-/* Insights period button — active state toggled by JS */
-.period-btn.active {
-    @apply bg-indigo-500 text-white;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
 }
 
 /* Mini timer slide-in animation */
@@ -50,8 +219,299 @@ body::before, body::after {
     animation: miniTimerSlideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+/* Small-phone ring resize */
+@media (max-width: 480px) {
+    .pomo-ring-wrap { width: 170px !important; height: 170px !important; }
+    .pomo-ring      { width: 170px !important; height: 170px !important; }
+    #pomoTime        { font-size: 2.5rem !important; }
+}
+
+/* ============================================================
+   INSIGHTS — JS-toggled active states & animations
+   ============================================================ */
+.period-btn.active {
+    @apply bg-indigo-500 text-white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
 /* AI loading dots animation */
 @keyframes aiPulse {
     0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
     40%           { opacity: 1;   transform: scale(1.2); }
 }
+
+/* AI star rating — filled stars */
+.ai-rating-stars .fa-star.filled {
+    color: #fbbf24;
+    filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.5));
+}
+
+/* ============================================================
+   PROFILE — Subject tags & add-subject button
+   ============================================================ */
+.profile-subject-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.btn-add-subject {
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add-subject:hover {
+    background: rgba(99, 102, 241, 0.3);
+}
+
+/* ============================================================
+   SKELETON LOADERS (AI content loading state)
+   ============================================================ */
+@keyframes shimmer {
+    0%   { background-position: -1000px 0; }
+    100% { background-position:  1000px 0; }
+}
+
+.skeleton-block {
+    height: 1.5rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(90deg,
+        rgba(255,255,255,0.03) 25%,
+        rgba(255,255,255,0.08) 50%,
+        rgba(255,255,255,0.03) 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+}
+
+.skeleton-block.title { width: 40%; height: 2rem; margin-bottom: 0.5rem; }
+.skeleton-block.p1 { width: 90%; }
+.skeleton-block.p2 { width: 80%; }
+.skeleton-block.p3 { width: 95%; height: 4rem; margin-top: 0.5rem; }
+
+/* ============================================================
+   GLOBAL KEYFRAMES
+   ============================================================ */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   MOBILE LAYOUT ADJUSTMENTS
+   ============================================================ */
+@media (max-width: 768px) {
+    .main-content.view-section,
+    .table-content.view-section {
+        padding-top: 0.8rem !important;
+        padding-bottom: 7.5rem !important;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .pomodoro-panel { margin-bottom: 5rem !important; }
+
+    #pomoFullscreenControls {
+        gap: 0.5rem !important;
+        padding: 0.6rem 1rem !important;
+        width: 95%;
+        max-width: 380px;
+        justify-content: space-between;
+    }
+
+    .fs-cycle-text {
+        margin-right: 0 !important;
+        font-size: 0.95rem;
+    }
+
+    #btnFsExit { margin-left: 0 !important; }
+}
+
+/* ============================================================
+   STREAK BADGE (top bar)
+   ============================================================ */
+.streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: linear-gradient(135deg, rgba(249,115,22,0.2), rgba(239,68,68,0.2));
+    border: 1px solid rgba(249, 115, 22, 0.4);
+    color: #fdba74;
+    padding: 0.3rem 0.8rem;
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.streak-badge i { color: #f97316; }
+
+/* ============================================================
+   DOUBLE INPUT ROW LAYOUT
+   ============================================================ */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* ============================================================
+   EDIT BUTTON (time log cards)
+   ============================================================ */
+.btn-edit {
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.btn-edit:hover {
+    background: rgba(99, 102, 241, 0.3);
+    color: #e0e7ff;
+}
+
+/* ============================================================
+   TABLE VIEW — Subject Tabs
+   ============================================================ */
+.subject-tabs {
+    display: flex;
+    overflow-x: auto;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--glass-border);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.subject-tabs::-webkit-scrollbar { display: none; }
+
+.sub-tab {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    padding: 1rem 1.5rem;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+}
+
+.sub-tab:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sub-tab.active {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Per-subject active tab underline colors */
+.sub-tab[data-subject="Physics"].active   { border-color: var(--color-physics);   color: var(--color-physics); }
+.sub-tab[data-subject="Chemistry"].active { border-color: var(--color-chemistry); color: var(--color-chemistry); }
+.sub-tab[data-subject="Maths"].active     { border-color: var(--color-maths);     color: var(--color-maths); }
+.sub-tab[data-subject="Computer"].active  { border-color: var(--color-computer);  color: var(--color-computer); }
+.sub-tab[data-subject="English"].active   { border-color: var(--color-english);   color: var(--color-english); }
+.sub-tab[data-subject="Nepali"].active    { border-color: var(--color-nepali);    color: var(--color-nepali); }
+
+/* ============================================================
+   TABLE VIEW — Revision Table
+   ============================================================ */
+.table-container {
+    overflow-x: auto;
+    padding: 0;
+}
+
+.revision-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.revision-table th,
+.revision-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.revision-table th {
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.revision-table tbody tr { transition: background 0.2s; }
+.revision-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+.revision-table tbody tr:last-child td { border-bottom: none; }
+.center-col { text-align: center !important; }
+
+/* ============================================================
+   TABLE VIEW — Status Cells (revision day circles)
+   ============================================================ */
+.status-cell {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.status-cell.done {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+}
+
+.status-cell.pending {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    border: 1px dashed var(--glass-border);
+}
+
+.status-date {
+    font-size: 0.65rem;
+    font-weight: 500;
+    margin-top: 0.2rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.status-cell-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+}
+
+/* ============================================================
+   TIME TRACKER — Chip scrollbar hide
+   ============================================================ */
+.quick-activity-chips::-webkit-scrollbar,
+.quick-duration-container::-webkit-scrollbar { display: none; }
+
