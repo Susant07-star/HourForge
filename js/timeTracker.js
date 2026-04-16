@@ -450,15 +450,14 @@ function renderQuickActivityChips() {
         const latestNotes = {};
         
         // Sort logs by date descending to find the very last activity for "Continue" feature
-        // (Create a copy to avoid mutating the original timeLogs if it's not already sorted)
-        const sortedLogs = [...timeLogs].sort((a, b) => {
+        const sortedLogs = timeLogs.filter(l => !l.deleted).sort((a, b) => {
             const dateA = new Date(a.date + (a.startTime ? 'T' + a.startTime : ''));
             const dateB = new Date(b.date + (b.startTime ? 'T' + b.startTime : ''));
             return dateB - dateA;
         });
         const lastLog = sortedLogs[0];
 
-        timeLogs.forEach(log => {
+        timeLogs.filter(l => !l.deleted).forEach(log => {
             if (!log.task) return;
             const key = `${log.task}|${log.subject}`;
             

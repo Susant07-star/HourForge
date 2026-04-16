@@ -320,7 +320,7 @@ function renderRevisionChart() {
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
 
-    studySessions.forEach(session => {
+    studySessions.filter(s => !s.deleted).forEach(session => {
         const baseDate = new Date(session.dateRead);
         baseDate.setHours(0, 0, 0, 0);
 
@@ -1194,10 +1194,10 @@ async function renderDailyInsight() {
 function calculateAndRenderStreak() {
     const uniqueDates = new Set();
 
-    studySessions.forEach(s => {
+    studySessions.filter(s => !s.deleted).forEach(s => {
         if (s.createdAt) uniqueDates.add(s.createdAt.split('T')[0]);
     });
-    timeLogs.forEach(t => {
+    timeLogs.filter(t => !t.deleted).forEach(t => {
         if (t.date) uniqueDates.add(t.date);
         if (t.createdAt) uniqueDates.add(t.createdAt.split('T')[0]);
     });
