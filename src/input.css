@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/* We can put custom tailwind directives here if needed */
+/* Disable the glassy backdrop blur for performance! */
+@theme {
+    --color-panel-dark: #13112e;
+}
+
+body {
+    @apply bg-[#0a0820] text-slate-200 overflow-x-hidden;
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Static Flat-Dark background instead of the laggy 60fps glass orbs */
+body::before, body::after {
+    display: none !important;
+}
+
+/* Overriding the performance killing glass panels incrementally */
+.glass-panel {
+    @apply bg-[#141235] border border-white/5 shadow-2xl;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.bottom-nav {
+    @apply bg-[#0d0b26] border-t border-white/5;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
