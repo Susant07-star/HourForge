@@ -930,7 +930,10 @@
 
             <!-- ========= FULLSCREEN FLOATING CONTROLS ========= -->
             <div id="pomoFullscreenControls" class="fs-visible" style="flex-direction: column; align-items: center; gap: 1rem;">
-                <div class="fs-cycle-text" id="fsCycleText" style="margin: 0;">1 of 4</div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="fs-cycle-text" id="fsCycleText" style="margin: 0;">1 of 4</div>
+                    <button id="btnFsToggleRing" class="pomo-ctrl-btn" title="Toggle Ring Style" style="width: 40px; height: 40px; font-size: 1.1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-bullseye"></i></button>
+                </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <button id="btnFsPrev" class="pomo-ctrl-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
                     <button id="btnFsBack" class="pomo-ctrl-btn" title="Previous Session"><i class="fa-solid fa-backward-step"></i></button>

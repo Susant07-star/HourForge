@@ -3823,6 +3823,7 @@ const pomoShortMin = document.getElementById('pomoShortMin');
 const pomoTotalHours = document.getElementById('pomoTotalHours');
 
 const btnFsPrev = document.getElementById('btnFsPrev');
+const btnFsToggleRing = document.getElementById('btnFsToggleRing');
 const btnFsPlayPause = document.getElementById('btnFsPlayPause');
 const pomoFsPlayIcon = document.getElementById('pomoFsPlayIcon');
 const btnFsBack = document.getElementById('btnFsBack');
@@ -4123,16 +4124,18 @@ document.querySelectorAll('.pomo-mode-btn[data-mode]').forEach(btn => {
     btn.addEventListener('click', () => setPomoMode(btn.dataset.mode, false));
 });
 
-if (btnToggleRing) {
-    btnToggleRing.addEventListener('click', () => {
-        isRingVisible = !isRingVisible;
-        const ring = document.querySelector('.pomo-ring');
-        if (ring) ring.style.display = isRingVisible ? '' : 'none';
-        btnToggleRing.innerHTML = isRingVisible
-            ? '<i class="fa-solid fa-bullseye"></i>'
-            : '<i class="fa-regular fa-circle"></i>';
-    });
+function handleToggleRing() {
+    isRingVisible = !isRingVisible;
+    const ring = document.querySelector('.pomo-ring');
+    if (ring) ring.style.display = isRingVisible ? '' : 'none';
+    const activeIcon = '<i class="fa-solid fa-bullseye"></i>';
+    const inactiveIcon = '<i class="fa-regular fa-circle"></i>';
+    if (btnToggleRing) btnToggleRing.innerHTML = isRingVisible ? activeIcon : inactiveIcon;
+    if (btnFsToggleRing) btnFsToggleRing.innerHTML = isRingVisible ? activeIcon : inactiveIcon;
 }
+
+if (btnToggleRing) btnToggleRing.addEventListener('click', handleToggleRing);
+if (btnFsToggleRing) btnFsToggleRing.addEventListener('click', handleToggleRing);
 
 function toggleTimerGlobal() {
     if (isPomoRunning) startPomoTimer(false);
