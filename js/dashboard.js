@@ -854,7 +854,7 @@ function renderTodayRevisions() {
                 ${overdueBadge}
                 <span class="whitespace-nowrap"><i class="fa-regular fa-clock"></i> Read: ${session.dateRead}</span>
             </div>
-            <button class="w-full mt-auto bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-2.5 rounded-xl cursor-pointer font-medium transition-all duration-200 flex justify-center items-center gap-2 hover:bg-emerald-500/20 hover:-translate-y-[1px]" onclick="completeRevision('${session.id}', '${session.revisionType}')">
+            <button class="w-full mt-auto bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border border-emerald-500/30 text-emerald-300 py-3 rounded-xl cursor-pointer font-semibold transition-all duration-300 flex justify-center items-center gap-2 hover:from-emerald-500/20 hover:to-emerald-500/10 hover:border-emerald-500/50 hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(16,185,129,0.15)] focus:ring-2 focus:ring-emerald-500/50" onclick="completeRevision('${session.id}', '${session.revisionType}')">
                 <i class="fa-solid fa-check"></i> Mark Completed
             </button>
         `;
@@ -902,7 +902,7 @@ function renderAllTopics() {
         const rev7Icon = rev7Done ? '<i class="fa-solid fa-check"></i>' : '7d';
 
         // Persistent Delete Button
-        const deleteBtnHtml = `<button class="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-2.5 py-1 text-[0.75rem] transition-colors hover:bg-red-500/20 hover:text-red-300" title="Delete Ongoing Revision" onclick="deleteRevisionCard(event, '${session.id}')"><i class="fa-solid fa-trash-can"></i></button>`;
+        const deleteBtnHtml = `<button class="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-3.5 py-1.5 text-[0.85rem] transition-all duration-200 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/40 hover:-translate-y-[1px] focus:ring-2 focus:ring-red-500/50" title="Delete Ongoing Revision" onclick="deleteRevisionCard(event, '${session.id}')"><i class="fa-solid fa-trash-can"></i></button>`;
 
         item.innerHTML = `
             <div class="flex-1 pr-4">
