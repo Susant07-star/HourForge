@@ -87,65 +87,69 @@
     <div class="app-container" id="mainAppContainer" style="display: none;">
 
         <!-- ===================== SIDEBAR OVERLAY ===================== -->
-        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+        <div id="sidebarOverlay" class="fixed inset-0 z-[299] bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto"></div>
 
         <!-- ===================== SIDEBAR DRAWER ===================== -->
-        <aside id="sidebarDrawer" class="sidebar-drawer">
-            <div class="sidebar-header">
-                <div class="sidebar-brand">
-                    <i class="fa-solid fa-brain sidebar-brand-icon"></i>
+        <aside id="sidebarDrawer" class="fixed top-0 left-0 bottom-0 z-[300] w-[290px] max-w-[85vw] bg-gradient-to-b from-[#0f0c29]/98 to-[#161038]/98 border-r border-white/5 flex flex-col -translate-x-full transition-transform duration-300 shadow-[4px_0_40px_rgba(0,0,0,0.4)] overflow-hidden [&.open]:translate-x-0">
+            <div class="p-[1.25rem_1.25rem_0.75rem] border-b border-white/5">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-brain text-[1.6rem] text-indigo-400"></i>
                     <div>
-                        <div class="sidebar-brand-name">HourForge</div>
-                        <div class="sidebar-brand-tagline">2-4-7 Spaced Repetition</div>
+                        <div class="text-[1.15rem] font-bold text-slate-200">HourForge</div>
+                        <div class="text-[0.72rem] text-slate-400 mt-[1px]">2-4-7 Spaced Repetition</div>
                     </div>
-            </div>
-
-            <div class="sidebar-user-card">
-                <img id="sidebarAvatar" class="sidebar-avatar" src="" alt="Profile" onerror="this.src=''; this.style.display='none'; document.getElementById('sidebarAvatarFallback').style.display='flex';">
-                <div id="sidebarAvatarFallback" class="sidebar-avatar-fallback"><i class="fa-solid fa-user"></i></div>
-                <div class="sidebar-user-info">
-                    <div id="sidebarUserName" class="sidebar-user-name">Student</div>
-                    <div id="sidebarUserEmail" class="sidebar-user-email">Not signed in</div>
                 </div>
             </div>
 
-            <nav class="sidebar-nav">
-                <button class="sidebar-nav-item active-sidebar-item" onclick="switchTab('dashboardView'); closeSidebar();">
-                    <i class="fa-solid fa-layer-group"></i> Dashboard
+            <div class="flex items-center gap-3 p-[1rem_1.25rem] bg-indigo-400/5 border-b border-white/5">
+                <img id="sidebarAvatar" class="w-[44px] h-[44px] rounded-full object-cover border-2 border-indigo-400/40 shrink-0" src="" alt="Profile" onerror="this.src=''; this.style.display='none'; document.getElementById('sidebarAvatarFallback').style.display='flex';">
+                <div id="sidebarAvatarFallback" class="hidden items-center justify-center w-[44px] h-[44px] rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 text-white text-[1.1rem] shrink-0 border-2 border-indigo-400/40"><i class="fa-solid fa-user"></i></div>
+                <div class="flex flex-col">
+                    <div id="sidebarUserName" class="text-[0.95rem] font-semibold text-slate-200">Student</div>
+                    <div id="sidebarUserEmail" class="text-[0.75rem] text-slate-400 mt-[2px] overflow-hidden text-ellipsis whitespace-nowrap max-w-[180px]">Not signed in</div>
+                </div>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto py-3">
+                <button class="sidebar-nav-item active-sidebar-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 [&.active-sidebar-item]:border-indigo-400 [&.active-sidebar-item]:bg-indigo-400/10 [&.active-sidebar-item]:text-indigo-400 group" onclick="switchTab('dashboardView'); closeSidebar();">
+                    <i class="fa-solid fa-layer-group w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> Dashboard
                 </button>
-                <button class="sidebar-nav-item" onclick="switchTab('tableView'); closeSidebar();">
-                    <i class="fa-solid fa-table"></i> Log Table
+                <button class="sidebar-nav-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 [&.active-sidebar-item]:border-indigo-400 [&.active-sidebar-item]:bg-indigo-400/10 [&.active-sidebar-item]:text-indigo-400 group" onclick="switchTab('tableView'); closeSidebar();">
+                    <i class="fa-solid fa-table w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> Log Table
                 </button>
-                <button class="sidebar-nav-item" onclick="switchTab('hourLogView'); closeSidebar();">
-                    <i class="fa-solid fa-clock"></i> Time Tracker
+                <button class="sidebar-nav-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 [&.active-sidebar-item]:border-indigo-400 [&.active-sidebar-item]:bg-indigo-400/10 [&.active-sidebar-item]:text-indigo-400 group" onclick="switchTab('hourLogView'); closeSidebar();">
+                    <i class="fa-solid fa-clock w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> Time Tracker
                 </button>
-                <button class="sidebar-nav-item" onclick="switchTab('insightsView'); closeSidebar();">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Insights
+                <button class="sidebar-nav-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 [&.active-sidebar-item]:border-indigo-400 [&.active-sidebar-item]:bg-indigo-400/10 [&.active-sidebar-item]:text-indigo-400 group" onclick="switchTab('insightsView'); closeSidebar();">
+                    <i class="fa-solid fa-wand-magic-sparkles w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> AI Insights
                 </button>
-                <button class="sidebar-nav-item" id="btnSidebarProfileOpen">
-                    <i class="fa-solid fa-user-graduate"></i> My Profile
+                <button id="btnSidebarProfileOpen" class="sidebar-nav-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 [&.active-sidebar-item]:border-indigo-400 [&.active-sidebar-item]:bg-indigo-400/10 [&.active-sidebar-item]:text-indigo-400 group">
+                    <i class="fa-solid fa-user-graduate w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> My Profile
                 </button>
-                <div class="sidebar-section-label">More</div>
-                <button class="sidebar-nav-item" id="btnInstallPWA" style="display: none;">
-                    <i class="fa-solid fa-download"></i> Install App
+                
+                <div class="text-[0.7rem] font-semibold uppercase tracking-widest text-slate-400 px-5 pt-3 pb-1 opacity-50">More</div>
+                
+                <button id="btnInstallPWA" class="sidebar-nav-item w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-l-4 border-transparent text-slate-400 text-[0.95rem] font-medium text-left cursor-pointer transition-all hover:bg-indigo-400/10 hover:text-indigo-400 group" style="display: none;">
+                    <i class="fa-solid fa-download w-5 text-center text-[1rem] text-slate-400 transition-colors group-hover:text-indigo-400 group-[.active-sidebar-item]:text-indigo-400"></i> Install App
                 </button>
-                <div class="sidebar-info-block" id="sidebarInfoBlock">
-                    <i class="fa-solid fa-circle-info"></i>
+                
+                <div id="sidebarInfoBlock" class="flex items-start gap-3 m-[0.5rem_1rem_0.5rem] p-[0.85rem] bg-indigo-400/5 rounded-[10px] border border-indigo-400/10">
+                    <i class="fa-solid fa-circle-info text-indigo-400 mt-[2px] shrink-0"></i>
                     <div>
-                        <strong>About HourForge</strong>
-                        <p>Study smarter using the scientifically proven 2-4-7 spaced repetition method. Your data syncs automatically across all your devices.</p>
+                        <strong class="block text-[0.85rem] text-slate-200 mb-1">About HourForge</strong>
+                        <p class="text-[0.8rem] text-slate-400 leading-relaxed m-0">Study smarter using the scientifically proven 2-4-7 spaced repetition method. Your data syncs automatically across all your devices.</p>
                     </div>
                 </div>
             </nav>
 
-            <div class="sidebar-footer">
-                <div class="sidebar-streak" id="sidebarStreakArea">
-                    <span id="streakBadge" class="streak-badge" style="display:none;">
-                        <i class="fa-solid fa-fire"></i> <span id="streakCount">0</span> Day Streak
+            <div class="p-[0.75rem_0_calc(0.75rem+env(safe-area-inset-bottom))] border-t border-white/5">
+                <div id="sidebarStreakArea" class="px-5 pb-2 min-h-[24px]">
+                    <span id="streakBadge" class="flex w-fit items-center gap-1 bg-orange-500/15 border border-orange-500/30 px-3 py-1 rounded-full text-[0.8rem] font-bold text-orange-500" style="display:none;">
+                        <i class="fa-solid fa-fire text-orange-500"></i> <span id="streakCount">0</span> Day Streak
                     </span>
                 </div>
-                <button id="btnSignOutIcon" class="sidebar-logout-btn">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+                <button id="btnSignOutIcon" class="w-full flex items-center gap-3 px-5 py-[0.85rem] bg-transparent border-none text-red-500 text-[0.95rem] font-medium cursor-pointer transition-colors hover:bg-red-500/10 group">
+                    <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center text-[1rem]"></i> Sign Out
                 </button>
             </div>
         </aside>
@@ -974,31 +978,31 @@
     </div>
 
     <!-- ===================== BOTTOM NAV BAR ===================== -->
-    <nav class="bottom-nav" id="bottomNav">
-        <button class="bottom-nav-item active" data-view="dashboardView" aria-label="Dashboard">
-            <span class="bottom-nav-dot"></span>
-            <i class="fa-solid fa-layer-group"></i>
-            <span class="bottom-nav-label">Home</span>
+    <nav class="fixed bottom-0 left-0 right-0 z-[250] h-[calc(70px+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] flex items-stretch justify-around bg-[#0a0820]/96 border-t border-white/5 shadow-[0_-4px_24px_rgba(0,0,0,0.4)] pointer-events-auto" id="bottomNav">
+        <button class="bottom-nav-item flex-1 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none text-slate-400/60 text-[1.25rem] max-[480px]:text-[1.1rem] max-[480px]:gap-[2px] min-h-[62px] p-[0.4rem_0.25rem_0.5rem] relative transition-colors cursor-pointer active:bg-white/5 [&.active]:text-indigo-400 group active" data-view="dashboardView" aria-label="Dashboard">
+            <span class="absolute top-[6px] w-[4px] h-[4px] rounded-full bg-indigo-400 opacity-0 scale-0 transition-all group-[.active]:opacity-100 group-[.active]:scale-100"></span>
+            <i class="fa-solid fa-layer-group group-[.active]:drop-shadow-[0_0_8px_rgba(129,140,248,0.7)]"></i>
+            <span class="text-[0.62rem] max-[480px]:text-[0.58rem] font-semibold tracking-[0.02em] opacity-80 mt-[1px] group-[.active]:text-indigo-400">Home</span>
         </button>
-        <button class="bottom-nav-item" data-view="tableView" aria-label="Log Table">
-            <span class="bottom-nav-dot"></span>
-            <i class="fa-solid fa-table"></i>
-            <span class="bottom-nav-label">Log</span>
+        <button class="bottom-nav-item flex-1 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none text-slate-400/60 text-[1.25rem] max-[480px]:text-[1.1rem] max-[480px]:gap-[2px] min-h-[62px] p-[0.4rem_0.25rem_0.5rem] relative transition-colors cursor-pointer active:bg-white/5 [&.active]:text-indigo-400 group" data-view="tableView" aria-label="Log Table">
+            <span class="absolute top-[6px] w-[4px] h-[4px] rounded-full bg-indigo-400 opacity-0 scale-0 transition-all group-[.active]:opacity-100 group-[.active]:scale-100"></span>
+            <i class="fa-solid fa-table group-[.active]:drop-shadow-[0_0_8px_rgba(129,140,248,0.7)]"></i>
+            <span class="text-[0.62rem] max-[480px]:text-[0.58rem] font-semibold tracking-[0.02em] opacity-80 mt-[1px] group-[.active]:text-indigo-400">Log</span>
         </button>
-        <button class="bottom-nav-item" data-view="hourLogView" aria-label="Time Tracker">
-            <span class="bottom-nav-dot"></span>
-            <i class="fa-solid fa-clock"></i>
-            <span class="bottom-nav-label">Hours</span>
+        <button class="bottom-nav-item flex-1 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none text-slate-400/60 text-[1.25rem] max-[480px]:text-[1.1rem] max-[480px]:gap-[2px] min-h-[62px] p-[0.4rem_0.25rem_0.5rem] relative transition-colors cursor-pointer active:bg-white/5 [&.active]:text-indigo-400 group" data-view="hourLogView" aria-label="Time Tracker">
+            <span class="absolute top-[6px] w-[4px] h-[4px] rounded-full bg-indigo-400 opacity-0 scale-0 transition-all group-[.active]:opacity-100 group-[.active]:scale-100"></span>
+            <i class="fa-solid fa-clock group-[.active]:drop-shadow-[0_0_8px_rgba(129,140,248,0.7)]"></i>
+            <span class="text-[0.62rem] max-[480px]:text-[0.58rem] font-semibold tracking-[0.02em] opacity-80 mt-[1px] group-[.active]:text-indigo-400">Hours</span>
         </button>
-        <button class="bottom-nav-item" data-view="insightsView" aria-label="AI Insights">
-            <span class="bottom-nav-dot"></span>
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span class="bottom-nav-label">Insights</span>
+        <button class="bottom-nav-item flex-1 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none text-slate-400/60 text-[1.25rem] max-[480px]:text-[1.1rem] max-[480px]:gap-[2px] min-h-[62px] p-[0.4rem_0.25rem_0.5rem] relative transition-colors cursor-pointer active:bg-white/5 [&.active]:text-indigo-400 group" data-view="insightsView" aria-label="AI Insights">
+            <span class="absolute top-[6px] w-[4px] h-[4px] rounded-full bg-indigo-400 opacity-0 scale-0 transition-all group-[.active]:opacity-100 group-[.active]:scale-100"></span>
+            <i class="fa-solid fa-wand-magic-sparkles group-[.active]:drop-shadow-[0_0_8px_rgba(129,140,248,0.7)]"></i>
+            <span class="text-[0.62rem] max-[480px]:text-[0.58rem] font-semibold tracking-[0.02em] opacity-80 mt-[1px] group-[.active]:text-indigo-400">Insights</span>
         </button>
-        <button class="bottom-nav-item" data-view="pomodoroView" id="bottomNavPomodoro" aria-label="Pomodoro Timer">
-            <span class="bottom-nav-dot"></span>
-            <i class="fa-solid fa-hourglass-half"></i>
-            <span class="bottom-nav-label">Focus</span>
+        <button class="bottom-nav-item flex-1 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none text-slate-400/60 text-[1.25rem] max-[480px]:text-[1.1rem] max-[480px]:gap-[2px] min-h-[62px] p-[0.4rem_0.25rem_0.5rem] relative transition-colors cursor-pointer active:bg-white/5 [&.active]:text-indigo-400 group" data-view="pomodoroView" id="bottomNavPomodoro" aria-label="Pomodoro Timer">
+            <span class="absolute top-[6px] w-[4px] h-[4px] rounded-full bg-indigo-400 opacity-0 scale-0 transition-all group-[.active]:opacity-100 group-[.active]:scale-100"></span>
+            <i class="fa-solid fa-hourglass-half group-[.active]:drop-shadow-[0_0_8px_rgba(129,140,248,0.7)]"></i>
+            <span class="text-[0.62rem] max-[480px]:text-[0.58rem] font-semibold tracking-[0.02em] opacity-80 mt-[1px] group-[.active]:text-indigo-400">Focus</span>
         </button>
     </nav>
     
