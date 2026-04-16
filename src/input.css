@@ -515,3 +515,183 @@ main#insightsView.active {
 .quick-activity-chips::-webkit-scrollbar,
 .quick-duration-container::-webkit-scrollbar { display: none; }
 
+/* ============================================================
+   RESPONSIVE — TABLET (max-width: 1024px)
+   ============================================================ */
+@media (max-width: 1024px) {
+    .app-container {
+        padding: 64px 1rem 1rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — MOBILE (max-width: 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 64px 0.4rem 0.4rem !important;
+    }
+
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .glass-panel {
+        padding: 0.8rem;
+        border-radius: 1rem;
+    }
+
+    .glass-panel h2 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-row { grid-template-columns: 1fr; }
+
+    /* Table header */
+    .table-header-section { padding: 1rem 1rem 0.5rem; }
+    .table-header-section h2 { font-size: 1.1rem; }
+
+    /* Subject tabs wrap on mobile */
+    .subject-tabs {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        padding: 0 1rem 0.5rem;
+        gap: 0.5rem;
+    }
+    .sub-tab { padding: 0.5rem 0.75rem; font-size: 0.85rem; }
+
+    /* ── Mobile table → card transform ── */
+    .table-container { padding-bottom: 0.5rem; overflow-x: hidden; }
+    .revision-table { min-width: 0 !important; table-layout: fixed; margin-top: 0.5rem; }
+
+    .revision-table,
+    .revision-table thead,
+    .revision-table tbody,
+    .revision-table th,
+    .revision-table td,
+    .revision-table tr { display: block; }
+
+    .revision-table thead tr { display: none; }
+
+    .revision-table tbody tr {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(145deg, rgba(30,41,59,0.5), rgba(255,255,255,0.02));
+        padding: 0.75rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        gap: 0;
+    }
+
+    .revision-table td {
+        border: none !important;
+        padding: 0 !important;
+        text-align: left !important;
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .revision-table td[data-label="Chapter / Topic"] {
+        grid-column: 1 / -1;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        color: var(--text-primary);
+        margin-bottom: 0.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .revision-table td[data-label="Date Read"] {
+        grid-column: 1 / -1;
+        font-size: 0.8rem !important;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem !important;
+        border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    }
+
+    .revision-table td.center-col {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding: 0.35rem 0.15rem !important;
+        text-align: center !important;
+    }
+
+    /* Label above each status circle */
+    .revision-table td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.55rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 0.25rem;
+        text-align: center;
+        width: 100%;
+    }
+
+    .revision-table td[data-label="Chapter / Topic"]::before,
+    .revision-table td[data-label="Date Read"]::before { display: none; }
+
+    .status-cell-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 0.2rem !important;
+    }
+
+    .status-cell {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.7rem !important;
+        flex-shrink: 0;
+    }
+
+    .status-date { font-size: 0.52rem !important; white-space: nowrap; text-align: center; }
+
+    /* Countdown panel */
+    .countdown-panel {
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        padding: 1rem 0.5rem !important;
+    }
+
+    .countdown-divider {
+        display: block !important;
+        height: 30px !important;
+        width: 1px !important;
+        background: rgba(255,255,255,0.1);
+        margin: 0 !important;
+    }
+
+    .countdown-days  { font-size: 1.5rem !important; }
+    .countdown-label { font-size: 0.75rem !important; margin-bottom: 0.25rem !important; }
+    .countdown-unit  { font-size: 0.75rem !important; }
+
+    .btn-primary { padding: 0.8rem; font-size: 1rem; }
+    .revision-card { padding: 1rem; }
+    .card-topic { font-size: 1.1rem; }
+}
+
+/* ============================================================
+   EXAM COUNTDOWN STYLES
+   ============================================================ */
+.exam-countdown-container { animation: fadeIn 0.8s ease-out; }
+.countdown-panel { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.countdown-panel:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(245, 158, 11, 0.15);
+}
+
+
