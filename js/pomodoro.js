@@ -10,6 +10,7 @@ let isRingVisible = true;
 let wakeLock = null;
 let focusSessionStartedAt = null; // FAIR-PLAY: Timestamp when user hits 'Play' while in Focus mode
 let accumulatedFocusMs = 0;       // FAIR-PLAY: Total milliseconds earned so far in the current focus block
+let extraFocusMinutes = 0;      // BOOST: Extra minutes added via +5m button
 
 // Read the real default from input immediately
 function getInitialTime() {
@@ -248,6 +249,7 @@ function setPomoMode(mode, autoStart = false) {
     
     // Reset markers for the new mode setup
     accumulatedFocusMs = 0;
+    extraFocusMinutes = 0;
     focusSessionStartedAt = null;
 
     document.querySelectorAll('.pomo-mode-btn[data-mode]').forEach(btn => btn.classList.remove('active'));
@@ -266,6 +268,12 @@ function setPomoMode(mode, autoStart = false) {
     pomoTimeLeft = mode === 'focus'
         ? parseInt(pomoFocusMin.value) * 60
         : parseInt(pomoShortMin.value) * 60;
+
+    // Show/Hide +5m button based on mode
+    const btnPomoAdd5 = document.getElementById('btnPomoAdd5');
+    const btnFsAdd5 = document.getElementById('btnFsAdd5');
+    if (btnPomoAdd5) btnPomoAdd5.style.display = mode === 'focus' ? 'flex' : 'none';
+    if (btnFsAdd5) btnFsAdd5.style.display = mode === 'focus' ? 'flex' : 'none';
 
     updatePomoDisplay();
     startPomoTimer(autoStart);
@@ -370,6 +378,25 @@ function startPomoTimer(startPlaying = true) {
     }, 1000);
 }
 
+function addPomoFiveMinutes() {
+    if (pomoMode !== 'focus') return;
+    
+    pomoTimeLeft += 300; // 5 mins
+    extraFocusMinutes += 5;
+    
+    // If running, we need to shift the expected end time forward
+    if (isPomoRunning) {
+        // We simply restart the timer with the new time left to recalibrate the timestamp
+        startPomoTimer(true);
+    } else {
+        updatePomoDisplay();
+    }
+    
+    if (typeof showToast === 'function') {
+        showToast('Added +5m to your focus session! 🚀', 'success');
+    }
+}
+
 // ===================== EVENT LISTENERS =====================
 document.querySelectorAll('.pomo-mode-btn[data-mode]').forEach(btn => {
     btn.addEventListener('click', () => setPomoMode(btn.dataset.mode, false));
@@ -396,11 +423,14 @@ function toggleTimerGlobal() {
 if (btnPomoStartPause) btnPomoStartPause.addEventListener('click', toggleTimerGlobal);
 
 if (btnFsPlayPause) btnFsPlayPause.addEventListener('click', toggleTimerGlobal);
-if (btnFsPrev) btnFsPrev.addEventListener('click', () => setPomoMode(pomoMode, false));
-if (btnFsSkip) {
-    btnFsSkip.addEventListener('click', () => {
-        if (pomoMode === 'focus') {
-            setPomoMode('short', isPomoRunning);
+if (btnFsSkip) btnFsSkip.addEventListener('click', () => setPomoMode(pomoMode === 'focus' ? 'short' : 'focus', true));
+
+const btnPomoAdd5 = document.getElementById('btnPomoAdd5');
+const btnFsAdd5 = document.getElementById('btnFsAdd5');
+if (btnPomoAdd5) btnPomoAdd5.addEventListener('click', addPomoFiveMinutes);
+if (btnFsAdd5) btnFsAdd5.addEventListener('click', addPomoFiveMinutes);
+
+function handlePomoBack() {
         } else {
             pomoCurrentCycle++;
             if (pomoCurrentCycle > getTotalCycles()) {
@@ -706,8 +736,10 @@ function autoLogFocusSession() {
     const taskName = (pomoTaskInput?.value.trim()) || 'Focus Session';
     const subject = pomoSubjectSelect?.value || '';
     
-    // If timer finished naturally, use the scheduled minutes to ensure clean numbers (e.g. 50 instead of 49.9)
-    const logMinutes = (pomoTimeLeft <= 0) ? (parseInt(pomoFocusMin?.value) || 50) : actualMinutes;
+    // If timer finished naturally, use the scheduled minutes + any extras
+    const logMinutes = (pomoTimeLeft <= 0) 
+        ? ((parseInt(pomoFocusMin?.value) || 50) + extraFocusMinutes) 
+        : actualMinutes;
 
     // Calculate start/end times
     const now = new Date();
