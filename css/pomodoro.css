@@ -476,6 +476,27 @@
 .fs-top-side.left { justify-content: flex-start; }
 .fs-top-side.right { justify-content: flex-end; }
 
+/* New Fullscreen Boost Button (Text version) */
+.fs-boost-btn {
+    width: auto !important;
+    height: 36px !important;
+    padding: 0 0.8rem !important;
+    border-radius: 2rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #f87171 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.fs-boost-btn:hover {
+    background: rgba(239, 68, 68, 0.25) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+}
+
 /* Horizontal and centered cycle text */
 .fs-cycle-text {
     white-space: nowrap !important;
