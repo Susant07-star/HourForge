@@ -11,28 +11,28 @@
 ## 3. Critical Rules (DO NOT BREAK)
 - **Synchronization**: We use a **Deep Merge** strategy (`id` + `updated_at`). Never delete a record without updating its `updated_at` or handling the sync tombstone.
 - **Timestamps**: Always update the `updated_at` (Unix epoch in ms) field on every data mutation.
-- **Simplicity Over Features**: Prefer a clean, fast UI over complex nested features.
-- **Vanilla JS**: This is NOT a React/Vue app. Do not introduce build tools, Webpack, or Vite unless explicitly instructed.
+- **Automated Logging**: Study hours are "earned" via the Pomodoro timer. Manual logging is a secondary fallback.
+- **Fair Play**: We only log sessions >= 5 minutes.
+- **Vanilla JS**: No React/Vue. No build steps.
 
 ## 4. Core Application Flow
-1. **Start Study**: User taps "Start" on the Home/Study tab.
-2. **Timer**: Focus timer runs in real-time.
-3. **Stop**: User stops the session.
-4. **Auto Log**: The session is automatically saved to `study_sessions`.
-5. **AI Feedback**: AI provides a 1-2 line "Psychology Insight" or performance rating.
-6. **Revision Scheduled**: 3 revision tasks (2-day, 4-day, 7-day) are automatically created in the `revision_tasks` table.
+1. **Setup**: User selects a Subject chip in the Pomodoro tab.
+2. **Focus**: User starts the Pomodoro timer.
+3. **Tracking**: The app tracks actual focus time (excluding pauses).
+4. **Auto Log**: Upon completion (or manual reset after 5 mins), the session is automatically saved to `timeLogs` via `addTimeLogEntry`.
+5. **AI Feedback**: Insights are built based on actual verified focus time.
 
 ## 5. Important Files
-- **`script.js`**: The monolithic main engine. Handles state, sync, and DOM rendering.
-- **`js/charts.js`**: The analytics and AI prompt engine. Handles Groq API communication.
-- **`index.html`**: The monolithic view layer (all screens are here).
-- **`style.css`**: The design system (Glassmorphism, custom swipe logic).
-- **`sw.js`**: Service worker for PWA functionality.
+- **`js/pomodoro.js`**: The timer engine and automated logging trigger.
+- **`js/timeTracker.js`**: The history feed and core `addTimeLogEntry` API.
+- **`js/store.js`**: IndexedDB storage and profile management.
+- **`js/charts.js`**: AI analytics and Groq API logic.
+- **`index.html`**: The monolithic view layer.
 
 ## 6. Development Warnings
-- **No Build Tools**: All JS is served directly. Use ES6+ features sparingly if compatibility is an issue, but prioritize modern browser support.
-- **DOM Performance**: Use `DocumentFragment` for batch rendering. Avoid `container.innerHTML += ...` in loops to prevent massive reflow lag.
-- **Global State**: Most state is currently in global variables (e.g., `studySessions`, `timeLogs`). Be careful with scope.
+- **Modular JS**: Logic is split across files in `/js`. Do not re-introduce a monolithic `script.js`.
+- **DOM Performance**: Use `DocumentFragment` for batch rendering.
+- **Global State**: Managed via `localStorage` and `store.js` arrays.
 
 ---
 *This file is optimized for AI interpretation (Gemini, ChatGPT, Roo, Claude).*

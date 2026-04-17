@@ -20,8 +20,8 @@ A personal academic productivity web app that helps students study smarter — c
 
 | Feature | Description |
 |---|---|
-| 🧠 **2-4-7 Spaced Repetition** | Auto-schedules revision reminders at 2, 4, and 7 days after first study |
-| ⏱️ **Time Tracker** | Log every study session with subject, start/end time, and notes |
+| ⏱️ **Time Tracker** | Automated study logging synced with the timer; manual backfill available as a secondary option |
+| 🛡️ **Fair-Play System** | Anti-cheating logic that rewards real focus time while rejecting "farming" sessions |
 | 🤖 **AI Insights** | Daily, weekly, and monthly mentor-level feedback via Groq AI |
 | 📊 **Progress Charts** | Visual breakdown of study hours, subject distribution, peak hours & revision rate |
 | ⏱️ **Pomodoro Timer** | Fully configurable focus/break cycles with SVG ring progress, YouTube-style fullscreen mode, mode-based background themes (red = focus, green = break), crisp digital audio alerts, dynamic cycle tracking, screen Wake Lock, and iOS no-sleep fallback |
@@ -74,8 +74,8 @@ No installation needed. Works directly in your browser.
 **3. Do Your Daily Revisions**
 > Check the **Due Today** panel each morning. Green ✅ = done. Orange ⏳ = revision due. Red 🔴 = overdue!
 
-**4. Track Your Hours**
-> Go to **Time Tracker** and log each activity with a start time, end time, and subject. This feeds all the analytics charts.
+**4. Earn Your Hours**
+> Go to the **Pomodoro** tab, pick a subject chip, and hit Play. Once the timer finishes, the app **automatically logs** your study credit to the Time Tracker tab.
 
 **5. Get AI Feedback**
 > Visit **AI Insights**, paste your free [Groq API key](https://console.groq.com/keys), and generate a daily/weekly/monthly mentor analysis of your habits on HourForge.
@@ -121,15 +121,15 @@ HourForge uses the **Groq API** for AI-powered insights. It's completely free:
 
 ```
 HourForge/
-├── index.html          # Main app — all views (Dashboard, Time Tracker, AI Insights)
-├── style.css           # All styles — glassmorphism dark UI
-├── script.js           # Core logic — data management, UI rendering, sync
-├── js/
-│   └── charts.js       # Chart rendering (Chart.js) & AI insights logic
+├── index.html          # Main app — all views (Dashboard, Hours, AI Insights)
+├── css/                # Modular design system (layout, pomodoro, dashboard)
+├── js/                 # Modular core logic
+│   ├── pomodoro.js     # Timer engine & Automated logging
+│   ├── timeTracker.js  # History management & Logging API
+│   ├── charts.js       # AI analytics engine
+│   └── store.js        # State & persistence
 ├── sw.js               # Service worker for offline PWA support
 ├── manifest.json       # PWA manifest
-├── favicon.ico         # App icon
-├── logo.png            # App logo
 └── README.md           # You are here
 ```
 
