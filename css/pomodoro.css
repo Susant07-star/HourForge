@@ -89,7 +89,8 @@
 
 .pomo-mode-label {
     position: absolute;
-    top: 50px;
+    /* Move it closer to the timer */
+    bottom: 60%; 
     font-size: 0.85rem;
     color: var(--text-secondary);
     text-transform: uppercase;
@@ -388,7 +389,8 @@
 /* +5m Boost Button Styling */
 .pomo-add5-text {
     position: absolute;
-    bottom: 50px;
+    /* Move it closer to the timer to avoid overlap */
+    top: 65%;
     font-size: 0.85rem;
     font-weight: 700;
     color: #ef4444;
