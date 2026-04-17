@@ -88,6 +88,8 @@
 }
 
 .pomo-mode-label {
+    position: absolute;
+    top: 50px;
     font-size: 0.85rem;
     color: var(--text-secondary);
     text-transform: uppercase;
@@ -384,6 +386,23 @@
 }
 
 /* +5m Boost Button Styling */
+.pomo-add5-text {
+    position: absolute;
+    bottom: 50px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    padding: 0.2rem 0.8rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
 .pomo-add5-text:hover {
     background: rgba(239, 68, 68, 0.2) !important;
     border-color: rgba(239, 68, 68, 0.4) !important;
