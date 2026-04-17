@@ -429,3 +429,27 @@
     margin: 0;
     transform: scale(1.2); /* Slightly larger in fullscreen */
 }
+
+/* Hide the in-ring boost text specifically in fullscreen */
+#pomodoroView:fullscreen #btnPomoAdd5,
+#pomodoroView.is-pomo-fs #btnPomoAdd5 {
+    display: none !important;
+}
+
+/* Fullscreen Controls Top Row styling for dead-center text */
+.fs-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 280px; /* Precise width to help centering */
+    margin-bottom: 0.5rem;
+}
+
+.fs-top-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.fs-top-side.left { justify-content: flex-start; }
+.fs-top-side.right { justify-content: flex-end; }

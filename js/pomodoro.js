@@ -240,8 +240,13 @@ function updatePomoDisplay() {
 
     // TOGGLE +5M VISIBILITY: Only show boost when studying
     const btnPomoAdd5 = document.getElementById('btnPomoAdd5');
+    const btnFsAdd5 = document.getElementById('btnFsAdd5');
     if (btnPomoAdd5) {
         btnPomoAdd5.style.display = pomoMode === 'focus' ? 'inline-block' : 'none';
+    }
+    if (btnFsAdd5) {
+        // Enforce the special top-row visibility
+        btnFsAdd5.style.display = pomoMode === 'focus' ? 'flex' : 'none';
     }
 }
 
@@ -459,7 +464,9 @@ if (btnFsBack) {
 if (pomoMiniPlay) pomoMiniPlay.addEventListener('click', toggleTimerGlobal);
 
 const btnPomoAdd5 = document.getElementById('btnPomoAdd5');
+const btnFsAdd5 = document.getElementById('btnFsAdd5');
 if (btnPomoAdd5) btnPomoAdd5.addEventListener('click', addPomoFiveMinutes);
+if (btnFsAdd5) btnFsAdd5.addEventListener('click', addPomoFiveMinutes);
 
 // SETTINGS PERSISTENCE: Save to localStorage on change
 if (pomoFocusMin) {
