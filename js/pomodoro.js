@@ -185,7 +185,7 @@ function updatePomoDisplay() {
     if (pomoMiniLabel) pomoMiniLabel.textContent = pomoMode === 'focus' ? 'Focus' : 'Break';
 
     const totalTime = pomoMode === 'focus'
-        ? parseInt(pomoFocusMin.value) * 60
+        ? (parseInt(pomoFocusMin.value) * 60) + (extraFocusMinutes * 60)
         : parseInt(pomoShortMin.value) * 60;
         
     // --- BACKGROUND VISIBILITY (Tab Title & Lock Screen) ---
@@ -231,10 +231,17 @@ function updatePomoDisplay() {
 
     if (pomoSessionCount) {
         const total = getTotalCycles();
-        pomoSessionCount.textContent = `${Math.min(pomoCurrentCycle, total)} of ${total}`;
+        const countText = `${Math.min(pomoCurrentCycle, total)} of ${total}`;
+        pomoSessionCount.textContent = countText;
         if (fsCycleText) {
-            fsCycleText.textContent = `${Math.min(pomoCurrentCycle, total)} of ${total}`;
+            fsCycleText.textContent = countText;
         }
+    }
+
+    // TOGGLE +5M VISIBILITY: Only show boost when studying
+    const btnPomoAdd5 = document.getElementById('btnPomoAdd5');
+    if (btnPomoAdd5) {
+        btnPomoAdd5.style.display = pomoMode === 'focus' ? 'inline-block' : 'none';
     }
 }
 
