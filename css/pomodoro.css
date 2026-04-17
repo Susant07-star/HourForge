@@ -393,3 +393,38 @@
 .pomo-add5-text:active {
     transform: scale(0.95);
 }
+
+/* ==========================================
+   CLEAN FULLSCREEN MODE
+   ========================================== */
+/* Hide non-essential elements when in native fullscreen or mobile fallback */
+#pomodoroView:fullscreen .modal-header,
+#pomodoroView:fullscreen .pomo-mode-bar,
+#pomodoroView:fullscreen .pomo-context-wrap,
+#pomodoroView:fullscreen .pomo-settings-details,
+#pomodoroView:fullscreen .pomo-fullscreen-btn-wrap,
+#pomodoroView:fullscreen .pomo-controls,
+#pomodoroView:fullscreen .pomo-sessions,
+#pomodoroView.is-pomo-fs .modal-header,
+#pomodoroView.is-pomo-fs .pomo-mode-bar,
+#pomodoroView.is-pomo-fs .pomo-context-wrap,
+#pomodoroView.is-pomo-fs .pomo-settings-details,
+#pomodoroView.is-pomo-fs .pomo-fullscreen-btn-wrap,
+#pomodoroView.is-pomo-fs .pomo-controls,
+#pomodoroView.is-pomo-fs .pomo-sessions {
+    display: none !important;
+}
+
+/* Ensure the panel expands and centers the ring in fullscreen */
+#pomodoroView:fullscreen .pomodoro-panel,
+#pomodoroView.is-pomo-fs .pomodoro-panel {
+    min-height: 100vh;
+    padding: 0;
+    justify-content: center;
+}
+
+#pomodoroView:fullscreen .pomo-ring-wrap,
+#pomodoroView.is-pomo-fs .pomo-ring-wrap {
+    margin: 0;
+    transform: scale(1.2); /* Slightly larger in fullscreen */
+}
