@@ -882,14 +882,14 @@ function renderTimeLogs() {
                 ${actionBtnsHtml}
             </div>
             <div class="tl-duration">
-                ${log.duration} <span>hrs</span>
+                ${formatDurationReadable(log.duration)}
             </div>
         `;
         fragment.appendChild(item);
     });
     timeLogFeed.appendChild(fragment);
 
-    totalHoursTodayEl.textContent = dailyTotal.toFixed(1);
+    totalHoursTodayEl.textContent = formatDurationReadable(dailyTotal);
 
     if (typeof calculateAndRenderStreak === 'function') calculateAndRenderStreak();
 }
