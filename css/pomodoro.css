@@ -381,3 +381,28 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* +5m Boost Button Styling */
+.pomo-add5-btn {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+    color: #f87171 !important;
+    width: auto !important;
+    padding: 0 0.8rem !important;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease !important;
+}
+
+.pomo-add5-btn:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+
+.pomo-add5-btn:active {
+    transform: scale(0.95);
+}
