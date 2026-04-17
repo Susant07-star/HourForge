@@ -356,76 +356,70 @@
                 <div class="analytics-label" style="font-size: 0.9rem;">Hours Logged Today</div>
             </div>
 
-            <!-- Input Section -->
-            <section class="add-session-section glass-panel">
-                <h2><i class="fa-solid fa-stopwatch" style="color: var(--color-computer);"></i> Log Activity</h2>
+            <!-- Input Section (Hidden by default to focus on Pomodoro automation) -->
+            <section class="add-session-section glass-panel" style="padding: 0;">
+                <details class="manual-log-details" style="width: 100%;">
+                    <summary style="padding: 1rem 1.5rem; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; list-style: none; display: flex; align-items: center; gap: 0.5rem; outline: none;">
+                        <i class="fa-solid fa-plus-circle"></i> <span>Log hours manually (Backfill)</span>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: auto; opacity: 0.5;"></i>
+                    </summary>
+                    <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
+                        <h2 style="font-size: 1rem; margin-top: 0.5rem; margin-bottom: 1rem; border: none; padding: 0;"><i class="fa-solid fa-pen-to-square"></i> Manual Entry</h2>
+                        <form id="addTimeLogForm">
+                            <!-- Form content remains the same -->
+                            <div class="form-group">
+                                <label>Task / Activity Name</label>
+                                <input type="text" id="timeTaskInput" required
+                                    placeholder="e.g. Math homework, Coding side-project" autocomplete="off">
+                            </div>
 
-                <form id="addTimeLogForm">
+                            <div id="quickActivityChips" class="quick-activity-chips" style="display: none; margin-bottom: 0.8rem; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-start;">
+                                <!-- Chips injected here -->
+                            </div>
 
-                    <div class="form-group">
-                        <label>Task / Activity Name</label>
-                        <input type="text" id="timeTaskInput" required
-                            placeholder="e.g. Math homework, Coding side-project" autocomplete="off">
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <select id="timeSubjectInput">
+                                    <option value="">General / Other</option>
+                                    <option value="Sleep">Sleep</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Start Time</label>
+                                <input type="time" id="timeStartInput" required style="width: 100%; box-sizing: border-box;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>End Time</label>
+                                <div id="quickDurationContainer" class="quick-duration-container" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; justify-content: flex-start;">
+                                    <button type="button" class="btn-duration" data-mins="15">+15m</button>
+                                    <button type="button" class="btn-duration" data-mins="30">+30m</button>
+                                    <button type="button" class="btn-duration" data-mins="45">+45m</button>
+                                    <button type="button" class="btn-duration" data-mins="60">+1h</button>
+                                </div>
+                                <input type="time" id="timeEndInput" required style="width: 100%; box-sizing: border-box;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" id="timeDateInput" required>
+                            </div>
+
+                            <div class="form-group">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <label style="margin-bottom: 0;">Short Notes</label>
+                                    <button type="button" id="btnClearNotes" class="btn-clear-notes" style="display: none;"><i class="fa-solid fa-xmark"></i> Clear</button>
+                                </div>
+                                <textarea id="timeNotesInput" placeholder="Optional notes..." autocomplete="off" rows="2"></textarea>
+                                <div id="smartNoteSuggestions" class="smart-note-suggestions" style="display: none; margin-top: 0.5rem; gap: 0.4rem; flex-wrap: wrap;"></div>
+                            </div>
+                            <button type="submit" class="btn-primary" style="background: var(--color-computer);">Save Manual Log</button>
+                        </form>
                     </div>
-
-                    <!-- Quick Activity Chips (shown below task input as smart suggestions) -->
-                    <div id="quickActivityChips" class="quick-activity-chips" style="display: none; margin-bottom: 0.8rem; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-start;">
-                        <!-- Chips injected here -->
-                    </div>
-
-                    <div class="form-group">
-                        <label>Subject <span style="font-size: 0.8em; opacity: 0.6;">(for accurate
-                                analytics)</span></label>
-                        <select id="timeSubjectInput">
-                            <option value="">General / Other</option>
-                            <!-- Subjects populated dynamically from profile -->
-                            <option value="Sleep">Sleep</option>
-                        </select>
-                    </div>
-
-                    <!-- Start Time: its own full row -->
-                    <div class="form-group">
-                        <label>Start Time</label>
-                        <input type="time" id="timeStartInput" required style="width: 100%; box-sizing: border-box;">
-                    </div>
-
-                    <!-- End Time: its own row, with smart duration buttons above -->
-                    <div class="form-group">
-                        <label>End Time</label>
-                        <!-- Intelligent Quick Duration Buttons -->
-                        <div id="quickDurationContainer" class="quick-duration-container" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; justify-content: flex-start;">
-                            <button type="button" class="btn-duration" data-mins="15">+15m</button>
-                            <button type="button" class="btn-duration" data-mins="30">+30m</button>
-                            <button type="button" class="btn-duration" data-mins="45">+45m</button>
-                            <button type="button" class="btn-duration" data-mins="60">+1h</button>
-                        </div>
-                        <input type="time" id="timeEndInput" required style="width: 100%; box-sizing: border-box;">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Date</label>
-                        <input type="date" id="timeDateInput" required>
-                    </div>
-
-                    <div class="form-group">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <label style="margin-bottom: 0;">Short Notes <span style="font-size: 0.8em; opacity: 0.6;">(Describe what you did)</span></label>
-                            <button type="button" id="btnClearNotes" class="btn-clear-notes" title="Clear Notes" style="display: none; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem; transition: all 0.2s;">
-                                <i class="fa-solid fa-xmark"></i> Clear
-                            </button>
-                        </div>
-                        <textarea id="timeNotesInput"
-                            placeholder="Describe what you worked on... (Optional)"
-                            autocomplete="off" rows="2"></textarea>
-                        <!-- Smart Note Suggestions -->
-                        <div id="smartNoteSuggestions" class="smart-note-suggestions" style="display: none; margin-top: 0.5rem; gap: 0.4rem; flex-wrap: wrap;"></div>
-                    </div>
-                    <button type="submit" class="btn-primary"
-                        style="background: var(--color-computer); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
-                        Save Log <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </form>
+                </details>
             </section>
+
 
             <!-- History Feed Section -->
             <section class="dashboard-section">
@@ -885,6 +879,22 @@
                 <button class="pomo-mode-btn" data-mode="short" data-duration="600">Break</button>
                 <button class="pomo-mode-btn" id="btnToggleRing" title="Toggle Ring Style"><i class="fa-solid fa-bullseye"></i></button>
             </div>
+
+            <!-- Study Context (Newly Added for Frictionless Logging) -->
+            <div class="pomo-context-wrap" style="width: 100%; max-width: 400px; margin: 1.5rem 0 0.5rem 0; padding: 0 1rem;">
+                <div class="pomo-subject-chips" id="pomoSubjectChips" style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 0.8rem; scrollbar-width: none;">
+                    <!-- Auto-populated with subject chips -->
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <input type="text" id="pomoTaskInput" placeholder="What are you studying? (e.g. Physics)" 
+                        style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 0.8rem 1rem; border-radius: 1rem; outline: none; transition: border-color 0.2s;">
+                    <select id="pomoSubjectSelect" style="display: none;">
+                        <!-- Hidden but synced with chips/input -->
+                        <option value="">General</option>
+                    </select>
+                </div>
+            </div>
+
 
             <!-- Custom time settings (Collapsible) -->
             <details class="pomo-settings-details" style="width: 100%; max-width: 400px; margin-top: 1rem; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 0.5rem 1rem;">

@@ -654,16 +654,12 @@ function renderQuickActivityChips() {
 
 historyDateFilter.addEventListener('change', renderTimeLogs);
 
-addTimeLogForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const taskName = document.getElementById('timeTaskInput').value.trim();
-    const subject = document.getElementById('timeSubjectInput').value;
-    const startTimeStr = document.getElementById('timeStartInput').value;
-    const endTimeStr = document.getElementById('timeEndInput').value;
-    const dateStr = document.getElementById('timeDateInput').value;
-    const notes = document.getElementById('timeNotesInput').value.trim();
-
-    if (!taskName || !startTimeStr || !endTimeStr || !dateStr) return;
+/**
+ * Core logging function that handles normal and overnight entries.
+ * Can be called by the form OR externally (e.g., from Pomodoro timer).
+ */
+function addTimeLogEntry(taskName, subject, startTimeStr, endTimeStr, dateStr, notes = '') {
+    if (!taskName || !startTimeStr || !endTimeStr || !dateStr) return false;
 
     // Parse start/end times
     const start = new Date(`2000-01-01T${startTimeStr}`);
@@ -674,21 +670,16 @@ addTimeLogForm.addEventListener('submit', (e) => {
 
     if (isOvernight) {
         // SPLIT at midnight into two separate log entries
-        // Part 1: original date, startTime → 23:59 (before midnight)
-        // FIX: Use the next day for end time to get correct duration calculation
         const endOfDay = new Date(`2000-01-01T23:59:59`);
-        const midnightMs = endOfDay.getTime() - start.getTime() + 1000; // +1 second to include the full minute
+        const midnightMs = endOfDay.getTime() - start.getTime() + 1000;
         const beforeMidnightHours = parseFloat((midnightMs / (1000 * 60 * 60)).toFixed(2));
 
-        // Part 2: next date, 00:00 → endTime (after midnight)
-        // FIX: Calculate from midnight on the NEXT day to the end time
         const startOfNextDay = new Date(`2000-01-02T00:00:00`);
         const endNextDay = new Date(`2000-01-02T${endTimeStr}`);
         const afterMidnightMs = endNextDay.getTime() - startOfNextDay.getTime();
         const afterMidnightHours = parseFloat((afterMidnightMs / (1000 * 60 * 60)).toFixed(2));
 
-        // Calculate next day's date string (avoid toISOString timezone trap)
-        const nextDay = new Date(dateStr + 'T12:00:00'); // noon avoids DST edge cases
+        const nextDay = new Date(dateStr + 'T12:00:00');
         nextDay.setDate(nextDay.getDate() + 1);
         const nextDayStr = `${nextDay.getFullYear()}-${String(nextDay.getMonth() + 1).padStart(2, '0')}-${String(nextDay.getDate()).padStart(2, '0')}`;
 
@@ -696,7 +687,6 @@ addTimeLogForm.addEventListener('submit', (e) => {
         const overnightGroupId = `overnight_${Date.now()}`;
         const totalOvernightHours = parseFloat((beforeMidnightHours + afterMidnightHours).toFixed(2));
 
-        // Log 1: Before midnight (original date)
         if (beforeMidnightHours > 0) {
             timeLogs.unshift({
                 id: Date.now().toString(),
@@ -716,7 +706,6 @@ addTimeLogForm.addEventListener('submit', (e) => {
             });
         }
 
-        // Log 2: After midnight (next date)
         if (afterMidnightHours > 0) {
             timeLogs.unshift({
                 id: (Date.now() + 1).toString(),
@@ -756,9 +745,22 @@ addTimeLogForm.addEventListener('submit', (e) => {
 
     saveToLocalStorage();
     renderTimeLogs();
-
-    // Auto-backup trigger
     autoBackupSync();
+    return true;
+}
+
+addTimeLogForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const taskName = document.getElementById('timeTaskInput').value.trim();
+    const subject = document.getElementById('timeSubjectInput').value;
+    const startTimeStr = document.getElementById('timeStartInput').value;
+    const endTimeStr = document.getElementById('timeEndInput').value;
+    const dateStr = document.getElementById('timeDateInput').value;
+    const notes = document.getElementById('timeNotesInput').value.trim();
+
+    const success = addTimeLogEntry(taskName, subject, startTimeStr, endTimeStr, dateStr, notes);
+    if (!success) return;
+
 
     // Preserve the date the user was logging for (important for backfilling)
     const lastDateStr = dateStr;

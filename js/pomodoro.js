@@ -8,6 +8,8 @@ let isPomoRunning = false;
 let pomoCurrentCycle = 1;
 let isRingVisible = true;
 let wakeLock = null;
+let focusSessionStartedAt = null; // FAIR-PLAY: Timestamp when user hits 'Play' while in Focus mode
+let accumulatedFocusMs = 0;       // FAIR-PLAY: Total milliseconds earned so far in the current focus block
 
 // Read the real default from input immediately
 function getInitialTime() {
@@ -237,7 +239,17 @@ function updatePomoDisplay() {
 
 // ===================== TIMER CORE =====================
 function setPomoMode(mode, autoStart = false) {
+    // FAIR-PLAY: Log any accumulated work before wiping the mode
+    if (pomoMode === 'focus') {
+        autoLogFocusSession();
+    }
+
     pomoMode = mode;
+    
+    // Reset markers for the new mode setup
+    accumulatedFocusMs = 0;
+    focusSessionStartedAt = null;
+
     document.querySelectorAll('.pomo-mode-btn[data-mode]').forEach(btn => btn.classList.remove('active'));
     const matchedBtn = document.querySelector(`.pomo-mode-btn[data-mode="${mode}"]`);
     if (matchedBtn) matchedBtn.classList.add('active');
@@ -263,6 +275,13 @@ function startPomoTimer(startPlaying = true) {
     clearInterval(pomoInterval);
     if (!startPlaying) {
         isPomoRunning = false;
+        
+        // FAIR-PLAY: On pause, save what was earned so far
+        if (pomoMode === 'focus' && focusSessionStartedAt) {
+            accumulatedFocusMs += (Date.now() - focusSessionStartedAt);
+            focusSessionStartedAt = null;
+        }
+
         if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-play';
         if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
             if (pomoFsPlayIcon) pomoFsPlayIcon.className = 'fa-solid fa-play';
@@ -279,6 +298,12 @@ function startPomoTimer(startPlaying = true) {
 
     initAudio();
     isPomoRunning = true;
+    
+    // FAIR-PLAY: Mark start time if in focus mode
+    if (pomoMode === 'focus') {
+        focusSessionStartedAt = Date.now();
+    }
+
     if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-pause';
     if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-pause';
             if (pomoFsPlayIcon) pomoFsPlayIcon.className = 'fa-solid fa-pause';
@@ -313,6 +338,11 @@ function startPomoTimer(startPlaying = true) {
                         vibrate: [200, 100, 200]
                     });
                 } catch(e) { console.log('Notification failed', e); }
+            }
+
+            // AUTO-LOGGING: Only for Focus sessions
+            if (pomoMode === 'focus') {
+                autoLogFocusSession();
             }
 
             if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-play';
@@ -573,6 +603,149 @@ if (btnFsExit) {
         }
     });
 }
+
+// ===================== STUDY CONTEXT & AUTO-LOGGING =====================
+const pomoTaskInput = document.getElementById('pomoTaskInput');
+const pomoSubjectSelect = document.getElementById('pomoSubjectSelect');
+const pomoSubjectChips = document.getElementById('pomoSubjectChips');
+
+function renderPomoSubjectChips() {
+    if (!pomoSubjectChips) return;
+    const subjects = typeof getSubjects === 'function' ? getSubjects() : [];
+    
+    // We only re-render if the number of subjects changed or it's empty
+    // to avoid layout shifts while typing/using
+    if (pomoSubjectChips.dataset.count == subjects.length + 1) return;
+    pomoSubjectChips.dataset.count = subjects.length + 1;
+
+    pomoSubjectChips.innerHTML = '';
+
+    // Add "General" chip
+    const generalChip = createPomoChip('General', '');
+    pomoSubjectChips.appendChild(generalChip);
+
+    subjects.forEach(s => {
+        const chip = createPomoChip(s, s);
+        pomoSubjectChips.appendChild(chip);
+    });
+
+    syncPomoChipActiveState();
+}
+
+function createPomoChip(label, value) {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'pomo-context-chip';
+    
+    // Check if it's the active one to set initial style
+    const currentSubject = localStorage.getItem('pomoSubject') || '';
+    const isActive = value === currentSubject;
+
+    chip.style.cssText = `
+        background: ${isActive ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
+        border: 1px solid ${isActive ? '#ef4444' : 'rgba(255, 255, 255, 0.1)'};
+        color: ${isActive ? 'white' : 'var(--text-secondary)'};
+        padding: 0.45rem 1.1rem;
+        border-radius: 2rem;
+        font-size: 0.82rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        flex-shrink: 0;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    `;
+    chip.textContent = label;
+    chip.dataset.value = value;
+
+    chip.addEventListener('click', () => {
+        if (pomoSubjectSelect) pomoSubjectSelect.value = value;
+        localStorage.setItem('pomoSubject', value);
+        syncPomoChipActiveState();
+        if (navigator.vibrate) navigator.vibrate(12);
+    });
+
+    return chip;
+}
+
+function syncPomoChipActiveState() {
+    const currentSubject = localStorage.getItem('pomoSubject') || '';
+    if (pomoSubjectSelect) pomoSubjectSelect.value = currentSubject;
+
+    document.querySelectorAll('.pomo-context-chip').forEach(chip => {
+        const isActive = chip.dataset.value === currentSubject;
+        chip.style.background = isActive ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.05)';
+        chip.style.borderColor = isActive ? '#ef4444' : 'rgba(255, 255, 255, 0.1)';
+        chip.style.color = isActive ? 'white' : 'var(--text-secondary)';
+    });
+}
+
+function autoLogFocusSession() {
+    // Determine the actual minutes studied
+    let finalFocusMs = accumulatedFocusMs;
+    // If it's still running, add the drift from current tick
+    if (focusSessionStartedAt) {
+        finalFocusMs += (Date.now() - focusSessionStartedAt);
+    }
+
+    const actualMinutes = Math.floor(finalFocusMs / (1000 * 60));
+    
+    // FAIR-PLAY THRESHOLD: Must be at least 5 minutes to count for partial credit
+    // (If the timer finished naturally, we always log)
+    if (pomoTimeLeft > 0 && actualMinutes < 5) {
+        console.log(`Fair Play: Session too short for partial credit (${actualMinutes}m)`);
+        // We still reset markers to avoid "carry over" cheating
+        accumulatedFocusMs = 0;
+        focusSessionStartedAt = isPomoRunning ? Date.now() : null;
+        return; 
+    }
+
+    // Safety: If somehow 0 mins, don't log anything
+    if (actualMinutes === 0 && pomoTimeLeft > 0) return;
+
+    const taskName = (pomoTaskInput?.value.trim()) || 'Focus Session';
+    const subject = pomoSubjectSelect?.value || '';
+    
+    // If timer finished naturally, use the scheduled minutes to ensure clean numbers (e.g. 50 instead of 49.9)
+    const logMinutes = (pomoTimeLeft <= 0) ? (parseInt(pomoFocusMin?.value) || 50) : actualMinutes;
+
+    // Calculate start/end times
+    const now = new Date();
+    const startTimeDate = new Date(now.getTime() - (logMinutes * 60 * 1000));
+    
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const startTimeStr = `${String(startTimeDate.getHours()).padStart(2, '0')}:${String(startTimeDate.getMinutes()).padStart(2, '0')}`;
+    const endTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    if (typeof addTimeLogEntry === 'function') {
+        const isPartial = pomoTimeLeft > 0;
+        const notes = isPartial ? 'Partially earned via Pomodoro.' : 'Earned via Pomodoro focus session.';
+        
+        const success = addTimeLogEntry(taskName, subject, startTimeStr, endTimeStr, dateStr, notes);
+        if (success && typeof showToast === 'function') {
+            const msg = isPartial ? `Partial session logged! +${logMinutes}m` : `Focus session logged! +${logMinutes}m`;
+            showToast(`${msg} to ${subject || 'General'} 🏆`, 'success');
+        }
+    }
+
+    // Reset markers after logging
+    accumulatedFocusMs = 0;
+    focusSessionStartedAt = isPomoRunning ? Date.now() : null;
+}
+
+// Persist task input
+if (pomoTaskInput) {
+    pomoTaskInput.value = localStorage.getItem('pomoTask') || '';
+    pomoTaskInput.addEventListener('input', () => {
+        localStorage.setItem('pomoTask', pomoTaskInput.value);
+    });
+}
+
+// Initial chip render
+renderPomoSubjectChips();
+
+// Re-render chips periodically or when specific tabs are clicked to ensure sync
+setInterval(renderPomoSubjectChips, 10000);
 
 // Initial display — runs synchronously after inputs are in DOM
 updatePomoDisplay();
