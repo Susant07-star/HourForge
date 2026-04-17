@@ -19,10 +19,10 @@ HourForge is a **Vanilla JS Single Page Application (SPA)** with Progressive Web
   - `store.js`: Offline IndexedDB wrapper, local arrays.
   - `supabase.js`: Cloud DB Sync and Realtime functionality.
   - `ui.js`: Touch swipe navigator and mobile features.
-  - `timeTracker.js`: Time logging logic.
+  - `timeTracker.js`: Logic for study hour history and the `addTimeLogEntry` core API.
   - `dashboard.js`: Examboards, subject rendering, revision lists.
   - `insights.js`: AI-powered performance analysis.
-  - `pomodoro.js`: Core visual timer engine and fullscreen web-locks.
+  - `pomodoro.js`: Core visual timer engine, fullscreen web-locks, and **Automated Study Logging**.
   - `charts.js`: Extracted logic for all `Chart.js` rendering and Groq AI API calls.
 - `sw.js`: The Service Worker handling offline caching with the v32 cache.
 
@@ -108,7 +108,18 @@ Audio is synthesized via the **Web Audio API** (`AudioContext`) — no external 
 When `setPomoMode(mode)` is called, it adds a class to the `#pomodoroView` element:
 - **`mode-focus`** → The timer card glows with a subtle **red border + background tint**.
 - **`mode-short`** → The timer card glows with a subtle **green border + background tint**.
-In fullscreen, the glow extends to a full radial-gradient background behind the card.
+
+### Automated Study Logging (Frictionless Tracking)
+The Pomodoro timer is the primary driver for study hour tracking.
+- **`autoLogFocusSession()`**: Called when a focus session ends or is reset. It calculates elapsed time and logs it to `timeLogs` using `addTimeLogEntry`.
+- **Fair-Play System**:
+    - **5-Minute Threshold**: To prevent "spamming" or farming hours, sessions shorter than 5 minutes are discarded.
+    - **Partial Credit**: If a focus session is stopped or reset mid-way (but after 5 mins), the *actual* focused minutes are logged as a "Partial Session".
+    - **Actual Time Tracking**: The app uses `focusSessionStartedAt` and `accumulatedFocusMs` to track real study time, excluding pauses.
+
+### Subject Chips & Context
+- Users can select a "Subject" (Math, Physics, etc.) via one-tap chips in the Pomodoro tab. 
+- This choice is persisted in `localStorage` and synced with the logging engine for automated categorization.
 
 ---
 
@@ -121,7 +132,8 @@ If you are an AI reading this, adhere strictly to these rules:
 3. **Fullscreen Swipe Lock**: The swipe `touchstart` handler bails out early when `document.fullscreenElement` is truthy. **Never remove this guard** — without it, tab swipes silently fire during Pomodoro fullscreen.
 4. **Global Scope**: `script.js` and `js/charts.js` share globals (`studySessions`, `timeLogs`, etc.). Do not wrap `script.js` in a closed IIFE or ES Module unless you explicitly export/mount these globals to `window`, as `charts.js` relies on them.
 5. **Error Handling**: Use the built-in `showToast(msg, type)` function for user-facing errors rather than native alerts.
-6. **Single Pomodoro Engine**: There is exactly one timer engine in `script.js` (around line 3900+). The legacy `POMO` object was deleted in v2.2. Do not re-introduce it. If you find any code referencing `POMO.running`, delete it as a regression.
+6. **Automated Logging Preference**: Always prefer the automated Pomodoro logging flow. The manual form in the "Hours" tab is hidden by default and should only be used for backfilling missed sessions.
+7. **Single Pomodoro Engine**: There is exactly one timer engine in `js/pomodoro.js`. 
 7. **Fullscreen CSS Overrides**: All fullscreen element hiding uses both `:fullscreen` and `:-webkit-full-screen` selectors with `!important`. When adding new elements that must be hidden in fullscreen, add them to both selector blocks in `style.css` around line 3885. 
 
 ---
