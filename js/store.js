@@ -99,6 +99,23 @@ function withTimeout(promise, ms) {
     });
 }
 
+/**
+ * Converts decimal hours (e.g., 0.1, 1.5) into a readable string like "6m" or "1h 30m".
+ * @param {number} hours - Decimal hours.
+ * @returns {string} - Formatted duration.
+ */
+function formatDurationReadable(hours) {
+    if (!hours || hours <= 0) return "0m";
+    const totalMinutes = Math.round(hours * 60);
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    
+    if (h > 0) {
+        return m > 0 ? `${h}h ${m}m` : `${h}h`;
+    }
+    return `${m}m`;
+}
+
 // Auto Backup State
 let backupDirHandle = null;
 let timeLogBackupFolderHandle = null;

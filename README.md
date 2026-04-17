@@ -20,6 +20,7 @@ A personal academic productivity web app that helps students study smarter — c
 
 | Feature | Description |
 |---|---|
+| 🧠 **2-4-7 Spaced Repetition** | Auto-schedules revision reminders at 2, 4, and 7 days after first study |
 | ⏱️ **Time Tracker** | Automated study logging synced with the timer; manual backfill available as a secondary option |
 | 🛡️ **Fair-Play System** | Anti-cheating logic that rewards real focus time while rejecting "farming" sessions |
 | 🤖 **AI Insights** | Daily, weekly, and monthly mentor-level feedback via Groq AI |

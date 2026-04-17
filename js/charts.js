@@ -115,7 +115,7 @@ function renderStudyHoursChart() {
                     padding: 12,
                     cornerRadius: 10,
                     callbacks: {
-                        label: (ctx) => `${ctx.parsed.y} hours`
+                        label: (ctx) => formatDurationReadable(ctx.parsed.y)
                     }
                 }
             },
@@ -213,7 +213,9 @@ function renderSubjectDistChart() {
                     padding: 12,
                     cornerRadius: 10,
                     callbacks: {
-                        label: (ctx) => `${ctx.label}: ${ctx.parsed} hrs`
+                    callbacks: {
+                        label: (ctx) => `${ctx.label}: ${formatDurationReadable(ctx.parsed)}`
+                    }
                     }
                 }
             }
@@ -292,7 +294,7 @@ function renderPeakHoursChart() {
                     padding: 12,
                     cornerRadius: 10,
                     callbacks: {
-                        label: (ctx) => `${ctx.parsed.y.toFixed(1)} hrs active`
+                        label: (ctx) => `${formatDurationReadable(ctx.parsed.y)} active`
                     }
                 }
             },
@@ -662,7 +664,7 @@ Only include subjects with hours > 0. Use exact decimal hours from the logs.`;
         });
         const subjectSummary = Object.entries(subjectBreakdown)
             .sort(([, a], [, b]) => b - a)
-            .map(([s, h]) => `${s}: ${h.toFixed(1)}h`)
+            .map(([s, h]) => `${s}: ${formatDurationReadable(h)}`)
             .join(', ');
 
         // --- Call 2: AI Feedback Text (Real Mentor) ---
@@ -676,7 +678,7 @@ Only include subjects with hours > 0. Use exact decimal hours from the logs.`;
         });
         const lifetimeSubjectSummary = Object.entries(allSubjects)
             .sort(([, a], [, b]) => b - a)
-            .map(([s, h]) => `${s}: ${h.toFixed(1)}h`)
+            .map(([s, h]) => `${s}: ${formatDurationReadable(h)}`)
             .join(', ');
 
         // Build study sessions context with due dates and overdue info
