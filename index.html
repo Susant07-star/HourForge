@@ -953,9 +953,14 @@
 
             <!-- ========= FULLSCREEN FLOATING CONTROLS ========= -->
             <div id="pomoFullscreenControls" class="fs-visible" style="flex-direction: column; align-items: center; gap: 1rem;">
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div class="fs-cycle-text" id="fsCycleText" style="margin: 0;">1 of 4</div>
-                    <button id="btnFsToggleRing" class="pomo-ctrl-btn" title="Toggle Ring Style" style="width: 40px; height: 40px; font-size: 1.1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-bullseye"></i></button>
+                <div class="fs-top-row">
+                    <div class="fs-top-side left">
+                        <button id="btnFsAdd5" class="pomo-ctrl-btn" title="Add 5 Minutes" style="width: 40px; height: 40px; font-size: 0.8rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #f87171;"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div class="fs-cycle-text" id="fsCycleText" style="margin: 0; flex: 0;">1 of 4</div>
+                    <div class="fs-top-side right">
+                        <button id="btnFsToggleRing" class="pomo-ctrl-btn" title="Toggle Ring Style" style="width: 40px; height: 40px; font-size: 1.1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-bullseye"></i></button>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <button id="btnFsPrev" class="pomo-ctrl-btn" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
