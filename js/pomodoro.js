@@ -269,12 +269,6 @@ function setPomoMode(mode, autoStart = false) {
         ? parseInt(pomoFocusMin.value) * 60
         : parseInt(pomoShortMin.value) * 60;
 
-    // Show/Hide +5m button based on mode
-    const btnPomoAdd5 = document.getElementById('btnPomoAdd5');
-    const btnFsAdd5 = document.getElementById('btnFsAdd5');
-    if (btnPomoAdd5) btnPomoAdd5.style.display = mode === 'focus' ? 'flex' : 'none';
-    if (btnFsAdd5) btnFsAdd5.style.display = mode === 'focus' ? 'flex' : 'none';
-
     updatePomoDisplay();
     startPomoTimer(autoStart);
 }
@@ -381,19 +375,19 @@ function startPomoTimer(startPlaying = true) {
 function addPomoFiveMinutes() {
     if (pomoMode !== 'focus') return;
     
-    pomoTimeLeft += 300; // 5 mins
+    // Increment both the time and the record
+    pomoTimeLeft += 300; 
     extraFocusMinutes += 5;
     
-    // If running, we need to shift the expected end time forward
+    // RE-INIT TIMER: Re-calculate the expected end timestamp so background logic is accurate
     if (isPomoRunning) {
-        // We simply restart the timer with the new time left to recalibrate the timestamp
         startPomoTimer(true);
     } else {
         updatePomoDisplay();
     }
     
     if (typeof showToast === 'function') {
-        showToast('Added +5m to your focus session! 🚀', 'success');
+        showToast('Boosted: +5m Focus! 🚀', 'success');
     }
 }
 
@@ -423,14 +417,11 @@ function toggleTimerGlobal() {
 if (btnPomoStartPause) btnPomoStartPause.addEventListener('click', toggleTimerGlobal);
 
 if (btnFsPlayPause) btnFsPlayPause.addEventListener('click', toggleTimerGlobal);
-if (btnFsSkip) btnFsSkip.addEventListener('click', () => setPomoMode(pomoMode === 'focus' ? 'short' : 'focus', true));
-
-const btnPomoAdd5 = document.getElementById('btnPomoAdd5');
-const btnFsAdd5 = document.getElementById('btnFsAdd5');
-if (btnPomoAdd5) btnPomoAdd5.addEventListener('click', addPomoFiveMinutes);
-if (btnFsAdd5) btnFsAdd5.addEventListener('click', addPomoFiveMinutes);
-
-function handlePomoBack() {
+if (btnFsPrev) btnFsPrev.addEventListener('click', () => setPomoMode(pomoMode, false));
+if (btnFsSkip) {
+    btnFsSkip.addEventListener('click', () => {
+        if (pomoMode === 'focus') {
+            setPomoMode('short', isPomoRunning);
         } else {
             pomoCurrentCycle++;
             if (pomoCurrentCycle > getTotalCycles()) {
@@ -459,6 +450,31 @@ if (btnFsBack) {
 }
 
 if (pomoMiniPlay) pomoMiniPlay.addEventListener('click', toggleTimerGlobal);
+
+const btnPomoAdd5 = document.getElementById('btnPomoAdd5');
+if (btnPomoAdd5) btnPomoAdd5.addEventListener('click', addPomoFiveMinutes);
+
+// SETTINGS PERSISTENCE: Save to localStorage on change
+if (pomoFocusMin) {
+    pomoFocusMin.addEventListener('change', () => {
+        localStorage.setItem('pomoFocusMin', pomoFocusMin.value);
+        if (!isPomoRunning) pomoTimeLeft = getInitialTime();
+        updatePomoDisplay();
+    });
+}
+if (pomoShortMin) {
+    pomoShortMin.addEventListener('change', () => {
+        localStorage.setItem('pomoShortMin', pomoShortMin.value);
+        if (!isPomoRunning) pomoTimeLeft = getInitialTime();
+        updatePomoDisplay();
+    });
+}
+if (pomoTotalHours) {
+    pomoTotalHours.addEventListener('change', () => {
+        localStorage.setItem('pomoTotalHours', pomoTotalHours.value);
+        updatePomoDisplay();
+    });
+}
 
 if (btnPomoPrev) {
     btnPomoPrev.addEventListener('click', () => setPomoMode(pomoMode, false));
@@ -736,7 +752,7 @@ function autoLogFocusSession() {
     const taskName = (pomoTaskInput?.value.trim()) || 'Focus Session';
     const subject = pomoSubjectSelect?.value || '';
     
-    // If timer finished naturally, use the scheduled minutes + any extras
+    // If timer finished naturally, use the scheduled minutes + extra boost
     const logMinutes = (pomoTimeLeft <= 0) 
         ? ((parseInt(pomoFocusMin?.value) || 50) + extraFocusMinutes) 
         : actualMinutes;
