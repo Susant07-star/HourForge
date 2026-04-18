@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HourForge - 2-4-7 Spaced Repetition</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.png" type="image/png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e1b4b">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -55,7 +55,7 @@
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         gap: 1.5rem; transition: opacity 0.3s ease;
     ">
-        <i class="fa-solid fa-brain" style="font-size: 3rem; color: #6366f1;"></i>
+        <img src="assets/branding/concept_1_chrono_anvil.png" alt="HourForge Logo" class="app-logo app-logo-lg">
         <div style="
             width: 40px; height: 40px;
             border: 3px solid rgba(99,102,241,0.3);
@@ -70,9 +70,7 @@
     <!-- Full-Screen Login Gate: hidden until auth resolves to NOT LOGGED IN -->
     <div id="loginGate" class="login-gate" style="display: none;">
         <div class="login-gate-content">
-            <div class="login-gate-logo">
-                <i class="fa-solid fa-brain"></i>
-            </div>
+                <img src="assets/branding/concept_1_chrono_anvil.png" alt="HourForge Logo" class="app-logo app-logo-lg">
             <h1>HourForge</h1>
             <p>Welcome back. Please sign in to sync your study data.</p>
             <button id="btnGoogleSignIn" class="google-signin-btn">
@@ -91,7 +89,7 @@
         <aside id="sidebarDrawer" class="sidebar-drawer">
             <div class="sidebar-header">
                 <div class="sidebar-brand">
-                    <i class="fa-solid fa-brain sidebar-brand-icon"></i>
+                    <img src="assets/branding/concept_1_chrono_anvil.png" alt="HourForge Logo" class="app-logo sidebar-brand-logo">
                     <div>
                         <div class="sidebar-brand-name">HourForge</div>
                         <div class="sidebar-brand-tagline">2-4-7 Spaced Repetition</div>
@@ -157,7 +155,7 @@
             </button>
 
             <div class="top-bar-title">
-                <i class="fa-solid fa-brain"></i>
+                <img src="assets/branding/concept_1_chrono_anvil.png" alt="HourForge Logo" class="app-logo">
                 <span>HourForge</span>
                 <span id="topBarStreak" class="topbar-streak" style="display:none;">
                     <i class="fa-solid fa-fire"></i> <span id="topBarStreakCount">0</span>
@@ -226,7 +224,7 @@
                     style="border-color: rgba(236, 72, 153, 0.3); background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(236, 72, 153, 0.05));">
                     <h3
                         style="margin-bottom: 0.5rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #fbcfe8;">
-                        <i class="fa-solid fa-brain"></i> <span
+                        <img src="assets/branding/concept_1_chrono_anvil.png" alt="HourForge Logo" class="app-logo" style="width: 20px; height: 20px;"> <span
                             style="background: linear-gradient(to right, #6366f1, #ec4899); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">AI
                             Psychology Insight</span>
                     </h3>
@@ -660,7 +658,7 @@
     <div id="infoModal" class="modal-overlay" style="display:none;">
         <div class="modal-box info-modal">
             <div class="modal-header">
-                <h2><i class="fa-solid fa-circle-info" style="color:#6366f1;"></i> About HourForge</h2>
+                <h2><img src="assets/branding/concept_1_chrono_anvil.png" alt="HourForge Logo" class="app-logo" style="width: 24px; height: 24px;"> About HourForge</h2>
                 <button id="btnCloseInfo" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
