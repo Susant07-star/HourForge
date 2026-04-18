@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hourforge-v33';
+const CACHE_NAME = 'hourforge-v34';
 const ASSETS = [
     './',
     './index.html',
@@ -26,7 +26,7 @@ const ASSETS = [
     './js/charts.js',
     './silent.wav',
     './manifest.json',
-    './favicon.ico',
+    './favicon.png',
     './logo.png',
     './icon-192.png',
     './icon-512.png',
