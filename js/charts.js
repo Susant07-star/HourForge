@@ -123,7 +123,7 @@ function renderStudyHoursChart() {
                 y: {
                     beginAtZero: true,
                     grid: { color: 'rgba(255,255,255,0.04)' },
-                    ticks: { callback: v => v + 'h' }
+                    ticks: { callback: v => formatDurationReadable(v) }
                 },
                 x: {
                     grid: { display: false }
@@ -213,9 +213,7 @@ function renderSubjectDistChart() {
                     padding: 12,
                     cornerRadius: 10,
                     callbacks: {
-                    callbacks: {
                         label: (ctx) => `${ctx.label}: ${formatDurationReadable(ctx.parsed)}`
-                    }
                     }
                 }
             }
@@ -302,7 +300,7 @@ function renderPeakHoursChart() {
                 y: {
                     beginAtZero: true,
                     grid: { color: 'rgba(255,255,255,0.04)' },
-                    ticks: { callback: v => v + 'h' }
+                    ticks: { callback: v => formatDurationReadable(v) }
                 },
                 x: {
                     grid: { display: false },
