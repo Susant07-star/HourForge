@@ -505,7 +505,7 @@ function renderAllCharts() {
 }
 
 // --- Gemini AI Integration ---
-document.getElementById('btnGenerateInsights').addEventListener('click', generateAIInsights);
+document.getElementById('btnGenerateInsights')?.addEventListener('click', generateAIInsights);
 
 async function generateAIInsights() {
     const apiKey = GROQ_API_KEY;
