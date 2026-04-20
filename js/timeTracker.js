@@ -654,6 +654,26 @@ function renderQuickActivityChips() {
 
 historyDateFilter.addEventListener('change', renderTimeLogs);
 
+document.getElementById('btnHistoryPrev')?.addEventListener('click', () => {
+    const currentVal = historyDateFilter.value || getLocalDateStr();
+    const [y, m, d] = currentVal.split('-').map(Number);
+    const date = new Date(y, m - 1, d - 1);
+    historyDateFilter.value = getLocalDateStr(date);
+    renderTimeLogs();
+});
+
+document.getElementById('btnHistoryNext')?.addEventListener('click', () => {
+    const currentVal = historyDateFilter.value || getLocalDateStr();
+    const [y, m, d] = currentVal.split('-').map(Number);
+    const date = new Date(y, m - 1, d + 1);
+    const today = getLocalDateStr();
+    const nextStr = getLocalDateStr(date);
+    if (nextStr <= today) {
+        historyDateFilter.value = nextStr;
+        renderTimeLogs();
+    }
+});
+
 /**
  * Core logging function that handles normal and overnight entries.
  * Can be called by the form OR externally (e.g., from Pomodoro timer).

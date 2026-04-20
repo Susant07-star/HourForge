@@ -424,9 +424,14 @@
                 <div class="glass-panel">
                     <div class="panel-header">
                         <h2><i class="fa-solid fa-timeline"></i> Activity History</h2>
-                        <!-- simple date filter via native date picker to see other days -->
-                        <input type="date" id="historyDateFilter"
-                            style="background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: white; border-radius: 1rem; padding: 0.5rem 1rem; outline: none; font-family: inherit;">
+                        <div class="history-nav">
+                            <button id="btnHistoryPrev" class="history-arrow" title="Previous Day"><i class="fa-solid fa-chevron-left"></i></button>
+                            <div class="history-date-display">
+                                <input type="date" id="historyDateFilter"
+                                    style="background: transparent; border: none; color: white; font-family: inherit; font-size: 0.95rem; cursor: pointer; outline: none;">
+                            </div>
+                            <button id="btnHistoryNext" class="history-arrow" title="Next Day"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
                     </div>
                     <div id="timeLogFeed" class="time-log-feed">
                         <!-- Populated by JS -->
@@ -1075,7 +1080,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v35';
+            const CURRENT_SW_VERSION = 'v36';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh
