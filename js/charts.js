@@ -491,6 +491,7 @@ function renderAllCharts() {
     renderPeakHoursChart();
     renderRevisionChart();
     renderAIRatingChart();
+    if (typeof calculateAndRenderStreak === 'function') calculateAndRenderStreak();
 
     // Update date range labels on charts
     const { start, end } = getDateRange(currentPeriod);
