@@ -745,6 +745,7 @@ function addTimeLogEntry(taskName, subject, startTimeStr, endTimeStr, dateStr, n
 
     saveToLocalStorage();
     renderTimeLogs();
+    if (typeof renderAllCharts === 'function') renderAllCharts();
     autoBackupSync();
     return true;
 }

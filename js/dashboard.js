@@ -582,6 +582,7 @@ function editTimeLog(id) {
     
     saveToLocalStorage();
     renderTimeLogs();
+    if (typeof renderAllCharts === 'function') renderAllCharts();
     autoBackupSync();
 
     // Scroll to the form so user can edit and re-save
@@ -605,6 +606,7 @@ function deleteTimeLog(id) {
         
         saveToLocalStorage();
         renderTimeLogs();
+        if (typeof renderAllCharts === 'function') renderAllCharts();
         autoBackupSync();
         
         // Refresh smart autofill to update start time if the deleted log was the last one

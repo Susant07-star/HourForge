@@ -900,7 +900,7 @@
                 <div class="pomo-settings-row" style="margin-top: 1rem; display: flex; justify-content: space-between;">
                     <div class="pomo-setting" style="text-align: center;">
                         <label>Focus <span class="pomo-setting-unit">min</span></label>
-                        <input type="number" id="pomoFocusMin" class="pomo-setting-input" value="50" min="1" max="120" style="width: 60px;">
+                        <input type="number" id="pomoFocusMin" class="pomo-setting-input" value="60" min="1" max="120" style="width: 60px;">
                     </div>
                     <div class="pomo-setting" style="text-align: center;">
                         <label>Break <span class="pomo-setting-unit">min</span></label>
@@ -931,8 +931,8 @@
                 </svg>
                 <div class="pomo-timer-display">
                     <div id="pomoModeLabel" class="pomo-mode-label">Focus</div>
-                    <div id="pomoTime">50:00</div>
-                    <div id="btnPomoAdd5" class="pomo-add5-text"><i class="fa-solid fa-plus"></i> 5 min</div>
+                    <div id="pomoTime">60:00</div>
+                    <div id="btnPomoAdd5" class="pomo-add5-text"><i class="fa-solid fa-plus"></i> 10 min</div>
                 </div>
             </div>
             
@@ -953,7 +953,7 @@
             <div id="pomoFullscreenControls" class="fs-visible" style="flex-direction: column; align-items: center; gap: 1rem;">
                 <div class="fs-top-row">
                     <div class="fs-top-side left">
-                        <button id="btnFsAdd5" class="pomo-ctrl-btn fs-boost-btn" title="Add 5 Minutes">+5 min</button>
+                        <button id="btnFsAdd5" class="pomo-ctrl-btn fs-boost-btn" title="Add 10 Minutes">+10 min</button>
                     </div>
                     <div class="fs-cycle-text" id="fsCycleText" style="margin: 0; flex: 0;">1 of 4</div>
                     <div class="fs-top-side right">
@@ -977,7 +977,7 @@
             <i class="fa-solid fa-play" id="pomoMiniPlayIcon"></i>
         </button>
         <div class="pomo-mini-info">
-            <div id="pomoMiniTime" class="pomo-mini-time">50:00</div>
+            <div id="pomoMiniTime" class="pomo-mini-time">60:00</div>
             <div id="pomoMiniLabel" class="pomo-mini-label">Focus</div>
         </div>
         <button id="pomoMiniOpen" class="pomo-mini-open" title="Open Timer">
@@ -1075,7 +1075,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v33';
+            const CURRENT_SW_VERSION = 'v35';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh

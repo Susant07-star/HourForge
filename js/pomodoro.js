@@ -23,7 +23,7 @@ function getInitialTime() {
     if (shortEl && localStorage.getItem('pomoShortMin')) shortEl.value = localStorage.getItem('pomoShortMin');
     if (totalEl && localStorage.getItem('pomoTotalHours')) totalEl.value = localStorage.getItem('pomoTotalHours');
 
-    return focusEl ? parseInt(focusEl.value) * 60 : 50 * 60;
+    return focusEl ? parseInt(focusEl.value) * 60 : 60 * 60;
 }
 let pomoTimeLeft = getInitialTime();
 
@@ -171,7 +171,7 @@ function formatPomoTime(seconds) {
 }
 
 function getTotalCycles() {
-    const focusMin = parseInt(pomoFocusMin.value) || 50;
+    const focusMin = parseInt(pomoFocusMin.value) || 60;
     const shortMin = parseInt(pomoShortMin.value) ?? 0; // allow 0 break
     const totalHr = parseFloat(pomoTotalHours.value) || 4;
     const cycleMin = focusMin + (isNaN(shortMin) ? 0 : shortMin);
@@ -238,7 +238,7 @@ function updatePomoDisplay() {
         }
     }
 
-    // TOGGLE +5M VISIBILITY: Only show boost when studying
+    // TOGGLE +10M VISIBILITY: Only show boost when studying
     const btnPomoAdd5 = document.getElementById('btnPomoAdd5');
     const btnFsAdd5 = document.getElementById('btnFsAdd5');
     if (btnPomoAdd5) {
@@ -354,12 +354,8 @@ function startPomoTimer(startPlaying = true) {
                 } catch(e) { console.log('Notification failed', e); }
             }
 
-            // AUTO-LOGGING: Only for Focus sessions
-            if (pomoMode === 'focus') {
-                autoLogFocusSession();
-            }
-
             if (pomoPlayIcon) pomoPlayIcon.className = 'fa-solid fa-play';
+
             if (pomoMiniPlayIcon) pomoMiniPlayIcon.className = 'fa-solid fa-play';
             if (pomoFsPlayIcon) pomoFsPlayIcon.className = 'fa-solid fa-play';
 
@@ -384,12 +380,12 @@ function startPomoTimer(startPlaying = true) {
     }, 1000);
 }
 
-function addPomoFiveMinutes() {
+function addPomoTenMinutes() {
     if (pomoMode !== 'focus') return;
     
     // Increment both the time and the record
-    pomoTimeLeft += 300; 
-    extraFocusMinutes += 5;
+    pomoTimeLeft += 600; 
+    extraFocusMinutes += 10;
     
     // RE-INIT TIMER: Re-calculate the expected end timestamp so background logic is accurate
     if (isPomoRunning) {
@@ -399,7 +395,7 @@ function addPomoFiveMinutes() {
     }
     
     if (typeof showToast === 'function') {
-        showToast('Boosted: +5m Focus! 🚀', 'success');
+        showToast('Boosted: +10m Focus! 🚀', 'success');
     }
 }
 
@@ -465,8 +461,8 @@ if (pomoMiniPlay) pomoMiniPlay.addEventListener('click', toggleTimerGlobal);
 
 const btnPomoAdd5 = document.getElementById('btnPomoAdd5');
 const btnFsAdd5 = document.getElementById('btnFsAdd5');
-if (btnPomoAdd5) btnPomoAdd5.addEventListener('click', addPomoFiveMinutes);
-if (btnFsAdd5) btnFsAdd5.addEventListener('click', addPomoFiveMinutes);
+if (btnPomoAdd5) btnPomoAdd5.addEventListener('click', addPomoTenMinutes);
+if (btnFsAdd5) btnFsAdd5.addEventListener('click', addPomoTenMinutes);
 
 // SETTINGS PERSISTENCE: Save to localStorage on change
 if (pomoFocusMin) {
@@ -768,7 +764,7 @@ function autoLogFocusSession() {
     
     // If timer finished naturally, use the scheduled minutes + extra boost
     const logMinutes = (pomoTimeLeft <= 0) 
-        ? ((parseInt(pomoFocusMin?.value) || 50) + extraFocusMinutes) 
+        ? ((parseInt(pomoFocusMin?.value) || 60) + extraFocusMinutes) 
         : actualMinutes;
 
     // Calculate start/end times

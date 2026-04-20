@@ -203,6 +203,7 @@ function getDateRange(period) {
 function getFilteredLogs(period) {
     const { start, end } = getDateRange(period);
     return timeLogs.filter(log => {
+        if (log.deleted) return false;
         const d = new Date(log.date);
         d.setHours(12, 0, 0, 0); // Normalize
         return d >= start && d <= end;
