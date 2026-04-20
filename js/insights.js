@@ -71,7 +71,7 @@ function showInsightsPlaceholder() {
     document.getElementById('aiFeedbackContent').innerHTML = `
         <div class="ai-placeholder">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <p>Click <strong>"Generate AI Insights"</strong> to get personalized study feedback & analysis for this date.</p>
+            <p>AI Analysis and study feedback will be provided soon by the developer or administrator.</p>
         </div>`;
     document.getElementById('aiRatingContainer').style.display = 'none';
     lastInsightsPeriod = null;
@@ -105,7 +105,7 @@ function updateHistoryStatus() {
     if (lastInsightsPeriod) {
         statusEl.textContent = `Last: ${lastInsightsPeriod}`;
     } else {
-        statusEl.textContent = 'Click Generate to analyze';
+        statusEl.textContent = 'Waiting for analysis...';
     }
 }
 
