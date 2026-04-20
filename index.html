@@ -442,23 +442,7 @@
 
         <!-- AI Insights View -->
         <main id="insightsView" class="view-section insights-view">
-            <!-- API Key Configuration -->
-            <div class="glass-panel insights-api-config">
-                <div class="api-config-row">
-                    <div class="api-config-info">
-                        <h3><i class="fa-solid fa-key" style="color: #fbbf24;"></i> Groq API Key <span
-                                style="font-size: 0.75em; opacity: 0.6;">(Free)</span></h3>
-                        <p id="apiKeyStatus">No API key configured — <a href="https://console.groq.com/keys"
-                                target="_blank" style="color: #a5b4fc; text-decoration: underline;">Get free key
-                                here</a></p>
-                    </div>
-                    <div class="api-config-actions">
-                        <input type="password" id="geminiApiKeyInput" placeholder="Paste your Groq API key..."
-                            autocomplete="off">
-                        <button id="btnSaveApiKey" class="btn-save-key"><i class="fa-solid fa-check"></i> Save</button>
-                    </div>
-                </div>
-            </div>
+
 
             <!-- Period Selector + Generate Button -->
             <div class="insights-controls">
@@ -1080,7 +1064,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v38';
+            const CURRENT_SW_VERSION = 'v39';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh
