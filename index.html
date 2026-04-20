@@ -451,7 +451,7 @@
                     <button class="period-btn" data-period="week">This Week</button>
                     <button class="period-btn" data-period="month">This Month</button>
                 </div>
-                <button id="btnGenerateInsights" class="btn-generate">
+                <button id="btnGenerateInsights" class="btn-generate" style="display: none;">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Insights
                 </button>
             </div>
@@ -1064,7 +1064,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v39';
+            const CURRENT_SW_VERSION = 'v40';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh
