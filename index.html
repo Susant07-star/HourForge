@@ -500,19 +500,19 @@
                     </div>
                 </div>
                 <div class="chart-panel glass-panel">
-                    <h3><i class="fa-solid fa-chart-pie" style="color: #ec4899;"></i> Subject Distribution</h3>
-                    <p class="chart-description">Time per subject. <span id="chartRangeSubject"
-                            style="opacity:0.6;"></span></p>
-                    <div class="chart-container">
-                        <canvas id="chartSubjectDist"></canvas>
-                    </div>
-                </div>
-                <div class="chart-panel glass-panel">
                     <h3><i class="fa-solid fa-chart-bar" style="color: #10b981;"></i> Peak Productivity Hours</h3>
                     <p class="chart-description">Which hours you study most. <span id="chartRangePeak"
                             style="opacity:0.6;"></span></p>
                     <div class="chart-container">
                         <canvas id="chartPeakHours"></canvas>
+                    </div>
+                </div>
+                <div class="chart-panel glass-panel">
+                    <h3><i class="fa-solid fa-chart-pie" style="color: #ec4899;"></i> Subject Distribution</h3>
+                    <p class="chart-description">Time per subject. <span id="chartRangeSubject"
+                            style="opacity:0.6;"></span></p>
+                    <div class="chart-container">
+                        <canvas id="chartSubjectDist"></canvas>
                     </div>
                 </div>
                 <div class="chart-panel glass-panel">
@@ -1080,7 +1080,7 @@
         (async function() {
             if (!('serviceWorker' in navigator)) return;
             
-            const CURRENT_SW_VERSION = 'v37';
+            const CURRENT_SW_VERSION = 'v38';
             const lastVersion = localStorage.getItem('sw_version');
             
             // If the version changed or never set, nuke everything and start fresh
