@@ -23,8 +23,8 @@ HourForge is a **Vanilla JS Single Page Application (SPA)** with Progressive Web
   - `dashboard.js`: Examboards, subject rendering, revision lists.
   - `insights.js`: AI-powered performance analysis.
   - `pomodoro.js`: Core visual timer engine, fullscreen web-locks, and **Automated Study Logging**.
-  - `charts.js`: Extracted logic for all `Chart.js` rendering and Groq AI API calls.
-- `sw.js`: The Service Worker handling offline caching with the v32 cache.
+  - `charts.js`: Extracted logic for all `Chart.js` rendering and Groq AI API calls using the internal `GROQ_API_KEY`.
+- `sw.js`: The Service Worker handling offline caching with the v41 cache.
 
 ---
 
@@ -120,6 +120,22 @@ The Pomodoro timer is the primary driver for study hour tracking.
 ### Subject Chips & Context
 - Users can select a "Subject" (Math, Physics, etc.) via one-tap chips in the Pomodoro tab. 
 - This choice is persisted in `localStorage` and synced with the logging engine for automated categorization.
+
+---
+
+## 📈 Insights & AI Engine
+
+### Date Navigation Controls
+The app uses a consistent "History Browser" pattern across both the **Activity History** and **AI Insights** tabs.
+- `history-nav`: A UI component with Prev/Next buttons and a centered date picker.
+- Event listeners in `timeTracker.js` and `insights.js` handle date increments/decrements.
+- Next navigation is safety-capped at "Today" to prevent empty future states.
+
+### Internalized AI Logic
+The AI Insights engine (powered by Groq) no longer requires users to provide their own API keys.
+- **`GROQ_API_KEY`**: Defined in `js/config.js`, this constant acts as the single source for AI calls.
+- **Placeholder State**: The UI defaults to a "Coming Soon" or "Waiting for analysis" state until reports are provided by the administrator.
+- **Blank Graph Prevention**: The `btnGenerateInsights` button is hidden by default. The chart loading logic includes optional chaining (`?.`) to prevent script crashes when UI elements are hidden.
 
 ---
 
