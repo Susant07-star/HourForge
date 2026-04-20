@@ -508,9 +508,9 @@ function renderAllCharts() {
 document.getElementById('btnGenerateInsights').addEventListener('click', generateAIInsights);
 
 async function generateAIInsights() {
-    const apiKey = localStorage.getItem('groqApiKey');
+    const apiKey = GROQ_API_KEY;
     if (!apiKey) {
-        alert('Please save your Groq API key first. Get one free at console.groq.com');
+        alert('AI Insights are currently unavailable. Please contact the administrator.');
         return;
     }
 

@@ -119,3 +119,7 @@ function isNonStudyLog(log) {
     return /\b(sleep|slept|nap|sleeping)\b/.test(taskLower);
 }
 
+
+// AI Engine Configuration
+const GROQ_API_KEY = localStorage.getItem('groqApiKey') || ''; // Fallback to localStorage for internal key
+

@@ -22,35 +22,6 @@ async function disconnectBackup() {
     showToast('Auto-backup folder disconnected', 'info');
 };
 
-// --- API Key Management ---
-const apiKeyInput = document.getElementById('geminiApiKeyInput');
-const apiKeyStatus = document.getElementById('apiKeyStatus');
-const btnSaveApiKey = document.getElementById('btnSaveApiKey');
-
-function loadApiKey() {
-    const key = localStorage.getItem('groqApiKey');
-    if (key) {
-        apiKeyInput.value = '';
-        apiKeyInput.placeholder = '••••••••' + key.slice(-4);
-        apiKeyStatus.textContent = 'API key saved ✓';
-        apiKeyStatus.className = 'api-key-active';
-    } else {
-        apiKeyStatus.innerHTML = 'No API key configured — <a href="https://console.groq.com/keys" target="_blank" style="color: #a5b4fc; text-decoration: underline;">Get free key here</a>';
-        apiKeyStatus.className = 'api-key-missing';
-    }
-}
-
-btnSaveApiKey.addEventListener('click', () => {
-    const key = apiKeyInput.value.trim();
-    if (!key) {
-        alert('Please enter your Groq API key.');
-        return;
-    }
-    localStorage.setItem('groqApiKey', key);
-    loadApiKey();
-});
-
-loadApiKey();
 
 // --- AI Insights (per-date storage, capped at 30 days) ---
 
