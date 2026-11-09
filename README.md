@@ -102,6 +102,15 @@ cd HourForge
 # Right-click index.html → Open with Live Server
 ```
 
+### Local runtime configuration
+
+Copy the values from `.env` into the object in `js/env.js` before enabling
+Supabase locally. The checked-in `js/env.js` is intentionally empty, so the
+app falls back to offline mode when runtime configuration is unavailable.
+Never put a Groq, Supabase service-role, or other private server key in
+browser-delivered files. Groq keys are entered by each user and stored only
+in that browser's local storage.
+
 ---
 
 ## 🤖 AI Setup (Optional)

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HOURFORGE - CHARTS & AI ENGINE (js/charts.js)
  * =========================================================================
  * ⚠️ DEVELOPER & AI NOTICE ⚠️

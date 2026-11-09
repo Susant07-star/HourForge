@@ -131,9 +131,13 @@ The app uses a consistent "History Browser" pattern across both the **Activity H
 - Event listeners in `timeTracker.js` and `insights.js` handle date increments/decrements.
 - Next navigation is safety-capped at "Today" to prevent empty future states.
 
-### Internalized AI Logic
-The AI Insights engine (powered by Groq) no longer requires users to provide their own API keys.
-- **`GROQ_API_KEY`**: Defined in `js/config.js`, this constant acts as the single source for AI calls.
+### AI and runtime configuration
+Supabase and observability configuration is supplied through the local
+`js/env.js` runtime object. The checked-in file is empty so deployments
+without configuration safely use offline mode.
+- **`GROQ_API_KEY`**: Read from browser `localStorage` after the user enters
+  their own key. Do not move a private model key into frontend source or
+  runtime configuration, because browser-delivered values are public.
 - **Placeholder State**: The UI defaults to a "Coming Soon" or "Waiting for analysis" state until reports are provided by the administrator.
 - **Blank Graph Prevention**: The `btnGenerateInsights` button is hidden by default. The chart loading logic includes optional chaining (`?.`) to prevent script crashes when UI elements are hidden.
 

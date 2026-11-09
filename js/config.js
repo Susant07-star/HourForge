@@ -22,12 +22,18 @@
  * =========================================================================
  */
 
+// Runtime configuration is supplied by js/env.js, which is intentionally
+// ignored so local credentials are never committed.
+const HOURFORGE_ENV = window.HOURFORGE_ENV || {};
+const SUPABASE_URL = HOURFORGE_ENV.SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = HOURFORGE_ENV.SUPABASE_ANON_KEY || '';
+
 // ==========================================
 // ERROR TRACKING (Sentry)
 // ==========================================
-if (typeof Sentry !== 'undefined') {
+if (typeof Sentry !== 'undefined' && HOURFORGE_ENV.SENTRY_DSN) {
     Sentry.init({
-        dsn: "https://5434c8fc905e9805887e8d156ecdfab6@o4508930847952896.ingest.us.sentry.io/4508930850705408",
+        dsn: HOURFORGE_ENV.SENTRY_DSN,
         // The basic CDN bundle does not include Tracing/Replay by default, so we remove those integrations to prevent the 'not a function' error.
     });
 }
@@ -120,6 +126,6 @@ function isNonStudyLog(log) {
 }
 
 
-// AI Engine Configuration
-const GROQ_API_KEY = localStorage.getItem('groqApiKey') || ''; // Fallback to localStorage for internal key
-
+// AI Engine Configuration. Provider keys stay user-supplied in localStorage;
+// putting a model key in browser runtime configuration would expose it publicly.
+const GROQ_API_KEY = localStorage.getItem('groqApiKey') || '';
